@@ -1,0 +1,20 @@
+body {
+  font-family: 'Lato', sans-serif;
+}
+
+#logo {
+  font-weight: 900;
+  font-size: 18px;
+}
+
+#logo #the {
+  font-weight: 400;
+}
+
+#logo #shell {
+  color: #00b0f0;
+}
+
+.padless{
+  padding: 0;
+}
