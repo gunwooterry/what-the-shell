@@ -53,34 +53,94 @@ $(document).ready(() => {
   const finder = document.getElementById('finder');
   sidebar.appendChild(renderHierarchy(root));
   renderFinder(current);
+
+  const arrow_btn = document.getElementById('arrow_btn');
+  const right_arrow = document.getElementById('arrow_right_icon');
+  const left_arrow = document.getElementById('arrow_left_icon');
+  arrow_btn.onmouseover = function() {
+    if (current_mode == 'gui_window') {
+      right_arrow.style.fontSize = '3.5em';
+      left_arrow.style.fontSize = '2em';
+    } else {
+      right_arrow.style.fontSize = '2em';
+      left_arrow.style.fontSize = '3.5em';
+    }
+  };
+  arrow_btn.onmouseout = function() {
+    if (current_mode == 'gui_window') {
+      right_arrow.style.fontSize = '4em';
+      left_arrow.style.fontSize = '1.5em';
+    } else {
+      right_arrow.style.fontSize = '1.5em';
+      left_arrow.style.fontSize = '4em';
+    }
+  };
+
+  // const gui_window = document.getElementById('gui_window');
+  // const cui_commandline = document.getElementById('cui_commandline');
+  // gui_window.onmouseover = function() {
+  //   if (current_mode == 'cui_commandline') {
+  //     right_arrow.style.fontSize = '2em';
+  //     left_arrow.style.fontSize = '3.5em';
+  //   }
+  // };
+  // gui_window.onmouseout = function() {
+  //   if (current_mode == 'gui_window') {
+  //     right_arrow.style.fontSize = '4em';
+  //     left_arrow.style.fontSize = '1.5em';
+  //   } else {
+  //     right_arrow.style.fontSize = '1.5em';
+  //     left_arrow.style.fontSize = '4em';
+  //   }
+  // };
+  // cui_commandline.onmouseover = function() {
+  //   if (current_mode == 'gui_window') {
+  //     right_arrow.style.fontSize = '3.5em';
+  //     left_arrow.style.fontSize = '2em';
+  //   }
+  // };
+  // cui_commandline.onmouseout = function() {
+  //   if (current_mode == 'gui_window') {
+  //     right_arrow.style.fontSize = '4em';
+  //     left_arrow.style.fontSize = '1.5em';
+  //   } else {
+  //     right_arrow.style.fontSize = '1.5em';
+  //     left_arrow.style.fontSize = '4em';
+  //   }
+  // };
 })
 
 let current_mode = 'gui_window';
 
 function changeModeListener(clicked_id) {
-    let gui_window = document.getElementById('gui_window');
-    let cui_commandline = document.getElementById('cui_commandline');
-    if ((clicked_id == 'arrow_btn' && current_mode == 'gui_window')
-      || (clicked_id == 'cui_commandline')) {
-      gui_window.style.boxShadow = '0 0 0 rgba(0,0,0,0)';
-      gui_window.style.backgroundColor = '#ffffff'
-      cui_commandline.style.boxShadow = 'inset 0 3px 8px rgba(0,0,0,0.24)';
-      cui_commandline.style.backgroundColor = '#fcfcfc'
-      cui_commandline.placeholder='';
-      cui_commandline.focus();
-      current_mode = 'cui_commandline';
-    } else if ((clicked_id == 'arrow_btn' && current_mode == 'cui_commandline')
-      || (clicked_id == 'gui_window')) {
-      gui_window.style.boxShadow = 'inset 0 3px 8px rgba(0,0,0,0.24)';
-      gui_window.style.backgroundColor = '#fcfcfc'
-      cui_commandline.style.boxShadow = '0 0 0 rgba(0,0,0,0)';
-      cui_commandline.style.backgroundColor = '#ffffff'
-      cui_commandline.value = '';
-      cui_commandline.placeholder='Type your command here';
-      current_mode = 'gui_window';
-    }
-    console.log('hi~');
-  };
+  const gui_window = document.getElementById('gui_window');
+  const cui_commandline = document.getElementById('cui_commandline');
+  const right_arrow = document.getElementById('arrow_right_icon');
+  const left_arrow = document.getElementById('arrow_left_icon');
+  if ((clicked_id == 'arrow_btn' && current_mode == 'gui_window')
+    || (clicked_id == 'cui_commandline')) {
+    gui_window.style.boxShadow = '0 0 0 rgba(0,0,0,0)';
+    gui_window.style.backgroundColor = '#ffffff'
+    cui_commandline.style.boxShadow = 'inset 0 3px 8px rgba(0,0,0,0.24)';
+    cui_commandline.style.backgroundColor = '#fcfcfc'
+    cui_commandline.placeholder='';
+    cui_commandline.focus();
+    right_arrow.style.fontSize = '2em';
+    left_arrow.style.fontSize = '3.5em';
+    current_mode = 'cui_commandline';
+  } else if ((clicked_id == 'arrow_btn' && current_mode == 'cui_commandline')
+    || (clicked_id == 'gui_window')) {
+    gui_window.style.boxShadow = 'inset 0 3px 8px rgba(0,0,0,0.24)';
+    gui_window.style.backgroundColor = '#fcfcfc'
+    cui_commandline.style.boxShadow = '0 0 0 rgba(0,0,0,0)';
+    cui_commandline.style.backgroundColor = '#ffffff'
+    cui_commandline.value = '';
+    cui_commandline.placeholder='Type your command here';
+    right_arrow.style.fontSize = '3.5em';
+    left_arrow.style.fontSize = '2em';
+    current_mode = 'gui_window';
+  }
+};
 
 function renderHierarchy(current) {
   const currentDir = document.createElement('div');
