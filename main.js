@@ -55,6 +55,33 @@ $(document).ready(() => {
   renderFinder(current);
 })
 
+let current_mode = 'gui_window';
+
+function changeModeListener(clicked_id) {
+    let gui_window = document.getElementById('gui_window');
+    let cui_commandline = document.getElementById('cui_commandline');
+    if ((clicked_id == 'arrow_btn' && current_mode == 'gui_window')
+      || (clicked_id == 'cui_commandline')) {
+      gui_window.style.boxShadow = '0 0 0 rgba(0,0,0,0)';
+      gui_window.style.backgroundColor = '#ffffff'
+      cui_commandline.style.boxShadow = 'inset 0 3px 8px rgba(0,0,0,0.24)';
+      cui_commandline.style.backgroundColor = '#fcfcfc'
+      cui_commandline.placeholder='';
+      cui_commandline.focus();
+      current_mode = 'cui_commandline';
+    } else if ((clicked_id == 'arrow_btn' && current_mode == 'cui_commandline')
+      || (clicked_id == 'gui_window')) {
+      gui_window.style.boxShadow = 'inset 0 3px 8px rgba(0,0,0,0.24)';
+      gui_window.style.backgroundColor = '#fcfcfc'
+      cui_commandline.style.boxShadow = '0 0 0 rgba(0,0,0,0)';
+      cui_commandline.style.backgroundColor = '#ffffff'
+      cui_commandline.value = '';
+      cui_commandline.placeholder='Type your command here';
+      current_mode = 'gui_window';
+    }
+    console.log('hi~');
+  };
+
 function renderHierarchy(current) {
   const currentDir = document.createElement('div');
   currentDir.classList.add('ui', 'accordion');
