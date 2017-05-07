@@ -11,12 +11,14 @@
 </head>
 <body>
   <div class="ui small secondary pointing menu">
+  	<div class="head_menu">
     <a class="item" id="logo">
       What<span id="the">The</span><span id="shell">Shell</span>
     </a>
+    </div>
   </div>
   <div class="ui container">
-    <div class="ui middle aligned grid">
+    <div class="ui middle aligned grid ui-box">
       <div class="eight wide column" style="padding: 0">
         <div class="ui segment" id="gui_window" onclick="changeModeListener(this.id)" style="padding: 0">
           <div class="ui internally celled grid">
@@ -67,5 +69,11 @@
       </div>
     </div>
   </div>
+  <div class="ui vertical basic buttons" id="ctxMenu">
+  <button class="ui button">Copy</button>
+  <button class="ui button">Cut</button>
+  <button class="ui button">Delete</button>
+  <button class="ui button">Rename</button>
+</div>
 </body>
 </html>

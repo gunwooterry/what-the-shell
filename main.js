@@ -63,6 +63,26 @@ $(document).ready(() => {
     if (currentMode == 'GUI') resizeArrows(arrowSmall, arrowBig);
     else resizeArrows(arrowBig, arrowSmall);
   };
+
+   
+
+
+  
+  $(document).on("contextmenu", '.title', function(event){
+    console.log("fuck");
+    event.preventDefault();
+    var ctxMenu = document.getElementById("ctxMenu");
+    ctxMenu.style.display = "block";
+    ctxMenu.style.left = (event.pageX)+"px";
+    ctxMenu.style.top = (event.pageY)+"px";
+  });
+  $(document).on("click", function(event){
+    var ctxMenu = document.getElementById("ctxMenu");
+    ctxMenu.style.display = "";
+    ctxMenu.style.left = "";
+    ctxMenu.style.top = "";
+  });
+
 })
 
 const arrowBig = 4;
@@ -186,3 +206,6 @@ function showManual() {
 function hideManual() {
   document.getElementById('manual').style.visibility = 'hidden';
 }
+
+
+
