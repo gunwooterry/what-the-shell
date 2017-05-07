@@ -45,3 +45,41 @@ input:focus {
 .padless{
   padding: 0;
 }
+
+.command{
+  margin: 15px;
+  font-size: 17px;
+}
+
+.help.icon{
+  opacity: 0.6;
+}
+
+.help.icon:hover{
+  transform: scale(1.5, 1.5); /** default is 1, scale it to 1.5 */
+  opacity: 1;
+}
+
+.close.icon{
+  z-index: 1001 !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+  margin: 0em 0em 0em -44% !important;
+}
+
+
+.manual{
+  position: absolute;
+  width: 40% !important;
+  margin: 0em 0em 0em -44%;
+  z-index: 1001;
+  top: 35% !important;
+  left: 0% !important;
+  margin-left: 55% !important;
+  visibility: hidden;
+  text-align: left;
+  background: #ffffff;
+  border: none;
+  box-shadow: 1px 3px 3px 0px rgba(0, 0, 0, 0.2), 1px 3px 15px 2px rgba(0, 0, 0, 0.2);
+  transform-origin: 50% 25%;
+  border-radius: 0.28571429rem;
+}

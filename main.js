@@ -76,6 +76,7 @@ $(document).ready(() => {
     }
   };
 
+
   // const gui_window = document.getElementById('gui_window');
   // const cui_commandline = document.getElementById('cui_commandline');
   // gui_window.onmouseover = function() {
@@ -111,6 +112,7 @@ $(document).ready(() => {
 })
 
 let current_mode = 'gui_window';
+let history_num = 0;
 
 function changeModeListener(clicked_id) {
   const gui_window = document.getElementById('gui_window');
@@ -174,4 +176,39 @@ function renderHierarchy(current) {
 }
 
 function renderFinder(current) {
+}
+
+function addCommand(command){
+  let tag = '<div id=\"command_' + history_num + '\" class=\"command\">' + command + '<i id=\"m_button\" class=\"help icon\" style=\"float:right;\" onclick="showManual()\"></i></div>';
+  if(command == "")
+    tag += "<br>";
+  $('#history').append(tag);
+  $("#history").scrollTop($("#history")[0].scrollHeight);
+  $( "#command_" + history_num ).animate({
+    backgroundColor: "#aa0000"
+  }, 500, function(){
+    $( "#command_" + history_num ).animate({
+      backgroundColor: "#ffffff"
+    }, 500);
+  } );
+  history_num += 1;
+}
+
+function commandInput(e){
+    if (current_mode == 'cui_commandline' && e.keyCode == 13) {
+      let cui_input = document.getElementById('cui_commandline');
+      let command = cui_input.value;
+      if(command == "")
+        return;
+      addCommand(command);
+      cui_input.value = "";
+    }
+}
+
+function showManual(){
+  document.getElementById('manual').style.visibility = 'visible';
+}
+
+function hideManual(){
+  document.getElementById('manual').style.visibility = 'hidden';
 }

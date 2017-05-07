@@ -7,6 +7,7 @@
   <link href="./main.css" rel="stylesheet" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="./main.js"></script>
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
 </head>
 <body>
   <div class="ui small secondary pointing menu">
@@ -39,12 +40,30 @@
         </div>
       </div>
       <div class="seven wide column" style="padding: 0">
-        <div class="ui segment" id="cui_window" style="padding: 0; margin: 0; height: 72vh">
+        <div id="history" class="ui segment" id="cui_window" style="padding: 0; margin: 0; height: 72vh; max-height: 72vh; overflow-y: auto;">
+          
         </div>
         <div class="row" style="padding: 0; margin: 0; height: 2vh">
         </div>
         <div class="ui segment" style="padding: 0; margin: 0; height: 6vh">
-          <input id="cui_commandline" onclick="changeModeListener(this.id)" type="text" name="command" placeholder="Type your command here"></input>
+            <input id="cui_commandline" onclick="changeModeListener(this.id)" type="text" name="command" placeholder="Type your command here" onkeypress="commandInput(event)"></input>
+        </div>
+
+        <div id="manual" class="ui active modal manual">
+          <div class="ui content">
+            <div class="description">
+              <div class="ui header" style="font-size: 25px;">cd ..</div>
+              <p>cd stands for change directory</p>
+              <p>.. means parent directory</p>
+              <p>so cd .. means change directory into parent directory!</p>
+            </div>
+          </div>
+          <div class="ui actions">
+            <div class="ui positive right labeled icon button"  onclick="hideManual()">
+              Okay
+              <i class="checkmark icon"></i>
+            </div>
+          </div>
         </div>
       </div>
     </div>
