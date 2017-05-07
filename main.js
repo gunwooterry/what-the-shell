@@ -55,6 +55,7 @@ $(document).ready(() => {
   renderFinder(current);
 
   const arrowBtn = document.getElementById('arrow_btn');
+  resizeArrows(arrowSmall, arrowBig);
   arrowBtn.onmouseover = function() {
     if (currentMode == 'GUI') resizeArrows(arrowSmallHover, arrowBigHover);
     else resizeArrows(arrowBigHover, arrowSmallHover);
@@ -94,43 +95,37 @@ let currentMode = 'GUI';
 let historyCount = 0;
 
 function resizeArrows(left, right) {
-  const leftArrow = document.getElementById('arrow_left_icon');
-  const rightArrow = document.getElementById('arrow_right_icon');
-  leftArrow.style.fontSize = `${left}em`;
-  rightArrow.style.fontSize = `${right}em`;
+  const arrowLeft = document.getElementById('arrow_left');
+  const arrowRight = document.getElementById('arrow_right');
+  arrowLeft.style.fontSize = `${left}em`;
+  arrowRight.style.fontSize = `${right}em`;
 }
 
 function changeModeListener(clicked) {
-  function emphasize(target) {
-    target.style.boxShadow = 'inset 0 3px 8px rgba(0, 0, 0, 0.24)';
-    target.style.backgroundColor = '#fcfcfc';
-  }
-  function deemphasize(target) {
-    target.style.boxShadow = '0 0 0 rgba(0, 0, 0, 0)';
-    target.style.backgroundColor = '#ffffff';
-  }
+  function emphasize(target) { target.classList.add('emphasized'); }
+  function deemphasize(target) { target.classList.remove('emphasized') }
 
   const guiWindow = document.getElementById('gui_window');
-  const cuiCommandline = document.getElementById('cui_commandline');
+  const commandLine = document.getElementById('command_line');
 
   const btnToCUI = clicked == 'arrow_btn' && currentMode == 'GUI';
   const btnToGUI = clicked == 'arrow_btn' && currentMode == 'CUI';
-  const clickedCUI = clicked == 'cui_commandline';
+  const clickedCUI = clicked == 'command_line';
   const clickedGUI = clicked == 'gui_window'
 
   if (btnToCUI || clickedCUI) {
-    cuiCommandline.placeholder = '';
-    cuiCommandline.focus();
-    emphasize(cuiCommandline);
+    commandLine.placeholder = '';
+    commandLine.focus();
+    emphasize(commandLine);
     deemphasize(guiWindow);
     if (btnToCUI) resizeArrows(arrowBigHover, arrowSmallHover);
     else resizeArrows(arrowBig, arrowSmall);
     currentMode = 'CUI';
   } else if (btnToGUI || clickedGUI) {
-    cui_commandline.value = '';
-    cui_commandline.placeholder='Type your command here';
+    commandLine.value = '';
+    commandLine.placeholder='Type your command here';
     emphasize(guiWindow);
-    deemphasize(cuiCommandline);
+    deemphasize(commandLine);
     if (btnToGUI) resizeArrows(arrowSmallHover, arrowBigHover);
     else resizeArrows(arrowSmall, arrowBig);
     currentMode = 'GUI';
@@ -142,7 +137,7 @@ function renderHierarchy(current) {
   currentDir.classList.add('ui', 'accordion');
   current.children.forEach(child => {
     const { type, name } = child
-    if (type === 'folder') {
+    if (type == 'folder') {
       const title = document.createElement('div');
       const dropdown = document.createElement('i');
       const icon = document.createElement('i');
@@ -174,6 +169,9 @@ function renderHierarchy(current) {
 }
 
 function renderFinder(current) {
+  current.children.forEach(child => {
+
+  });
 }
 
 function addCommand(command) {
@@ -192,7 +190,7 @@ function addCommand(command) {
 
 function commandInput(e) {
     if (currentMode == 'CUI' && e.keyCode == 13) {
-      const commandLine = document.getElementById('cui_commandline');
+      const commandLine = document.getElementById('command_line');
       const command = commandLine.value;
       if (command) addCommand(command);
       commandLine.value = '';

@@ -20,7 +20,7 @@
   <div class="ui container">
     <div class="ui middle aligned grid ui-box">
       <div class="eight wide column" style="padding: 0">
-        <div class="ui segment" id="gui_window" onclick="changeModeListener(this.id)" style="padding: 0">
+        <div class="ui emphasized segment" id="gui_window" onclick="changeModeListener(this.id)" style="padding: 0">
           <div class="ui internally celled grid">
             <div class="four wide column" style="padding: 0">
               <div class="ui basic segment" id="sidebar">
@@ -36,8 +36,8 @@
       <div class="one wide center aligned column" style="padding: 0">
         <div class="middle aligned content">
           <div id="arrow_btn" onclick="changeModeListener(this.id)">
-            <i class="huge arrow right icon" id="arrow_right_icon"></i>
-            <i class="large arrow left icon" id="arrow_left_icon"></i>
+            <i class="huge arrow right icon" id="arrow_right"></i>
+            <i class="large arrow left icon" id="arrow_left"></i>
           </div>
         </div>
       </div>
@@ -47,7 +47,7 @@
         <div class="row" style="padding: 0; margin: 0; height: 2vh">
         </div>
         <div class="ui segment" style="padding: 0; margin: 0; height: 6vh">
-          <input id="cui_commandline" onclick="changeModeListener(this.id)" type="text" name="command" placeholder="Type your command here" onkeypress="commandInput(event)" />
+          <input id="command_line" onclick="changeModeListener(this.id)" type="text" name="command" placeholder="Type your command here" onkeypress="commandInput(event)" />
         </div>
 
         <div id="manual" class="ui active modal manual">
