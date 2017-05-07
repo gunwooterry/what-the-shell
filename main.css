@@ -47,8 +47,9 @@ input:focus {
 }
 
 .command{
-  margin: 15px;
+  font-style: 'Roboto Mono', monospace;
   font-size: 17px;
+  margin: 15px;
 }
 
 .help.icon{
@@ -65,7 +66,6 @@ input:focus {
   color: rgba(0, 0, 0, 0.87) !important;
   margin: 0em 0em 0em -44% !important;
 }
-
 
 .manual{
   position: absolute;
