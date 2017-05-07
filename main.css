@@ -40,9 +40,7 @@ input:focus {
   height: 88vh;
 }
 
-
-
-#gui_window {
+.ui.emphasized.segment {
 	-moz-box-shadow: inset 0 3px 8px rgba(0,0,0,.4);
   -webkit-box-shadow: inset 0 3px 8px rgba(0,0,0,.4);
   box-shadow: inset 0 3px 8px rgba(0,0,0,.24);
@@ -97,7 +95,6 @@ input.emphasized {
   transform-origin: 50% 25%;
   border-radius: 0.28571429rem;
 }
-
 
 #ctxMenu{
     background: #FFFFFF;
