@@ -1,4 +1,5 @@
-$(document).ready(() => {
+const $document = $(document);
+$document.ready(() => {
   let root = {
     type: 'folder',
     name: 'root',
@@ -47,15 +48,16 @@ $(document).ready(() => {
       },
     ],
   };
-
   let current = root;
+
   const sidebar = document.getElementById('sidebar');
   const finder = document.getElementById('finder');
+  const arrowBtn = document.getElementById('arrow_btn');
+  const ctxMenu = document.getElementById('ctxMenu');
+
+  resizeArrows(arrowSmall, arrowBig);
   sidebar.appendChild(renderHierarchy(root));
   renderFinder(current);
-
-  const arrowBtn = document.getElementById('arrow_btn');
-  resizeArrows(arrowSmall, arrowBig);
 
   arrowBtn.onmouseover = function() {
     if (currentMode == 'GUI') resizeArrows(arrowSmallHover, arrowBigHover);
@@ -67,16 +69,14 @@ $(document).ready(() => {
     else resizeArrows(arrowBig, arrowSmall);
   };
 
-  $(document).on('contextmenu', '.title', function(event) {
+  $document.on('contextmenu', '.title', function(event) {
     event.preventDefault();
-    const ctxMenu = document.getElementById('ctxMenu');
     ctxMenu.style.display = 'block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
   });
 
-  $(document).on('click', function(event) {
-    const ctxMenu = document.getElementById('ctxMenu');
+  $document.on('click', function(event) {
     ctxMenu.style.display = '';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
@@ -172,12 +172,13 @@ function renderFinder(current) {
 }
 
 function addCommand(command) {
+  const history = document.getElementById('history');
   const tag = `<div id="command_${historyCount}" class="command">` + command +
               '<i id="m_button" class="help icon"' +
               'style="float:right;" onclick="showManual()"></i></div>';
-  const $history = $('#history');
-  $history.append(tag);
-  $history.scrollTop($history[0].scrollHeight);
+  history.innerHTML += tag;
+  history.scrollTop = history.scrollHeight;
+
   const $addedCommand = $(`#command_${historyCount}`);
   // TODO: Reformat to callback, decide what 'ease' is
   $addedCommand.animate({backgroundColor: '#aa0000'}, 500);
