@@ -128,7 +128,7 @@ function renderHierarchy(current) {
       const icon = document.createElement('i');
       const nameText = document.createTextNode(name);
 
-      title.classList.add('active', 'title');
+      title.classList.add('title');
       dropdown.classList.add('dropdown', 'icon');
       icon.classList.add('folder', 'icon');
       title.appendChild(dropdown);
@@ -137,11 +137,16 @@ function renderHierarchy(current) {
       currentDir.appendChild(title);
 
       const content = document.createElement('div');
-      content.classList.add('active', 'content');
+      content.classList.add('content');
       content.style.marginTop = '-1em';
       content.style.padding = '0 0 0 1em';
       content.appendChild(renderHierarchy(child));
       currentDir.appendChild(content);
+
+      title.onclick = function() {
+        title.classList.toggle('active');
+        content.classList.toggle('active');
+      }
     }
   });
 
