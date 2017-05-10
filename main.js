@@ -216,6 +216,7 @@ function renderHierarchy(current) {
 
       icon.onclick = function() {
         goto(child);
+        addCommand(`cd ${child.path}`);
       }
       dropdown.onclick = function() {
         title.classList.toggle('active');
