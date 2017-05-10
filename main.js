@@ -96,7 +96,6 @@ $document.ready(() => {
 
 
   $document.on('click', function(event) {
-    console.log("out");
     ctxMenu.style.display = '';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
@@ -110,11 +109,17 @@ $document.ready(() => {
     event.preventDefault();
     ctxMenu.style.display = '';
     if(modal_on == 0) {
-      console.log("ddd");
       $('#modal_popup').show();
       modal_on = 1;
      }
      return false;
+  });
+
+  $document.on('click', '.modal_title', function(event) {
+    event.preventDefault();
+    console.log('fuck');
+    event.target.backgroundColor = 'blue';
+    return false;
   });
 
 
@@ -239,7 +244,7 @@ function renderModalHierarchy(current) {
       const icon = document.createElement('i');
       const nameText = document.createTextNode(name);
 
-      title.classList = 'title';
+      title.classList.add('title', 'modal_title');
       dropdown.classList.add('dropdown', 'icon');
       icon.classList.add('folder', 'icon');
       title.appendChild(dropdown);
