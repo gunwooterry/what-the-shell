@@ -55,11 +55,14 @@ $document.ready(() => {
   const sidebar = document.getElementById('sidebar');
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
+  const popup_hierarchy = document.getElementById('hierarchy');
+  
 
   let returnobj = findByAbsolutePath('~/aaa');
   console.log(returnobj);
 
   resizeArrows(arrowSmall, arrowBig);
+  popup_hierarchy.appendChild(renderHierarchy(root));
   sidebar.appendChild(renderHierarchy(root));
   renderFinder(current);
   renderBreadcrumb(current);
