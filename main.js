@@ -54,7 +54,6 @@ let current = root;
 let selectedObj = root;
 
 $document.ready(() => {
-
   const sidebar = document.getElementById('sidebar');
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
@@ -279,7 +278,6 @@ function renderModalHierarchy(current) {
   return currentDir;
 }
 
-
 function renderFinder(current) {
   const finder = document.getElementById('finder');
   const grid = document.createElement('div');
@@ -303,7 +301,12 @@ function renderFinder(current) {
         addCommand(`cd ${name}`);
       }
     }
-    else if (type == 'file') icon.classList.add('huge', 'file', 'icon');
+    else if (type == 'file') {
+      icon.classList.add('huge', 'file', 'icon');
+      unit.ondblclick = function () {
+        addCommand(`cat ${name}`);
+      }
+    }
 
     unit.appendChild(icon);
     unit.appendChild(nameText);
@@ -340,7 +343,7 @@ function renderBreadcrumb(current) {
       breadcrumb.appendChild(divider);
       folder.onclick = function () {
         goto(findByAbsolutePath(arr.slice(0, idx + 1).join('/')));
-        addCommand(`cd ${Array(pathArray.length - 2).fill('..').join('/')}`);
+        addCommand(`cd ${Array(pathArray.length - idx - 2).fill('..').join('/')}`);
       }
     }
   });
@@ -375,14 +378,9 @@ function addCommand(command) {
   manualButton.classList.add('one', 'wide', 'column', 'help', 'icon');
   manualButton.style.cssFloat = 'right';
   manualButton.style.margin = 0;
-  manualButton.onclick = function () { showManual() };
+  manualButton.onclick = function () { showManual(command) };
 
   history.scrollTop = history.scrollHeight;
-
-  const $addedCommand = $(`#command_${historyCount}`);
-  // TODO: Reformat to callback, decide what 'ease' is
-  $addedCommand.animate({backgroundColor: '#aa0000'}, 500);
-  $addedCommand.animate({backgroundColor: '#ffffff'}, 500);
   historyCount += 1;
 }
 
@@ -416,7 +414,6 @@ function handleDelete(filename) {
   if (fileType === 'folder') addCommand(`rm -rf ${filename}`);
   else addCommand(`rm -f ${filename}`);
 }
-
 
 /*
 function handleCommand(command){
@@ -469,8 +466,15 @@ function findByChildName(obj, childName){
   return -1;
 }
 
-function showManual() {
-  document.getElementById('manual').style.visibility = 'visible';
+function showManual(command) {
+  const manualModal = document.getElementById('manual');
+  const header = document.getElementById('manual_header');
+  const description = document.getElementById('manual_desc');
+  const loremIpsum = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+
+  header.innerHTML = command;
+  description.innerHTML = loremIpsum;
+  manualModal.style.visibility = 'visible';
 }
 
 function hideManual() {
