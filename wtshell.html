@@ -63,13 +63,11 @@
           <input id="command_line" onclick="changeModeListener(this.id)" type="text" name="command" placeholder="Type your command here" onkeypress="commandInput(event)" />
         </div>
 
-        <div id="manual" class="ui active modal manual">
+        <div class="ui active modal manual" id="manual">
           <div class="ui content">
             <div class="description">
-              <div class="ui header" style="font-size: 25px;">cd ..</div>
-              <p>cd stands for change directory</p>
-              <p>.. means parent directory</p>
-              <p>so cd .. means change directory into parent directory!</p>
+              <div class="ui header" id="manual_header" style="font-size: 25px;"></div>
+              <p id="manual_desc"></p>
             </div>
           </div>
           <div class="ui actions">
