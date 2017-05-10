@@ -266,7 +266,7 @@ function renderModalHierarchy(current) {
       content.className = 'content';
       content.style.marginTop = '-1em';
       content.style.padding = '0 0 0 1em';
-      content.appendChild(renderHierarchy(child));
+      content.appendChild(renderModalHierarchy(child));
       currentDir.appendChild(content);
 
       dropdown.onclick = function() {
