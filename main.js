@@ -59,9 +59,6 @@ $document.ready(() => {
   const popup_hierarchy = document.getElementById('hierarchy');
   const modal = document.getElementById('modal_popup');
 
-  let returnobj = findByAbsolutePath('~/aaa');
-  console.log(returnobj);
-
   resizeArrows(arrowSmall, arrowBig);
   popup_hierarchy.appendChild(renderHierarchy(root));
   sidebar.appendChild(renderHierarchy(root));
@@ -329,16 +326,39 @@ function commandInput(e) {
     if (currentMode == 'CUI' && e.keyCode == 13) {
       const commandLine = document.getElementById('command_line');
       const command = commandLine.value;
-      if (command) addCommand(command);
+      if (command){
+        addCommand(command);
+        //handleCommand(command);
+      }
       commandLine.value = '';
     }
 }
+
+
+
+/*
+function handleCommand(command){
+  // TODO : handle '>'
+  let args = command.split(' ');
+  let op = args[0];
+  let argnum = args.length - 1;
+  if (op === 'echo'){
+    if (argnum != 3) handleError('echo requires 2 argument! \n ex) echo "hi" ');
+    let newFile = {
+      type: 'file',
+      name: args[2],
+      path: 'root/aaa/hello.c',
+      content: '#include <stdio.h> \n int main(){ \n printf("hello, world!"); \n}',
+    }
+  }
+}
+*/
 
 function findByAbsolutePath(path){
   let obj = root;
   let names = path.split('/');
   let currentName = obj.name;
-  if (names[0] != '~') return -1;
+  if (names[0] != '~' && names[0] !== 'root') return -1;
   for (let i = 1 ; i < names.length - 1 ; i++){
     if(names == '') return obj;
     obj = findByChildName(obj, names[i]);
