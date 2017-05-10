@@ -303,6 +303,8 @@ function commandInput(e) {
     }
 }
 
+
+
 /*
 function handleCommand(command){
   // TODO : handle '>'
@@ -325,7 +327,7 @@ function findByAbsolutePath(path){
   let obj = root;
   let names = path.split('/');
   let currentName = obj.name;
-  if (names[0] != '~') return -1;
+  if (names[0] != '~' && names[0] !== 'root') return -1;
   for (let i = 1 ; i < names.length - 1 ; i++){
     if(names == '') return obj;
     obj = findByChildName(obj, names[i]);
