@@ -64,8 +64,8 @@ $document.ready(() => {
   const modal = document.getElementById('modal_popup');
 
   resizeArrows(arrowSmall, arrowBig);
-  renderModalHierarchy(root);
-  renderHierarchy(root);
+  renderHierarchy();
+  renderModalHierarchy();
   renderFinder(current);
   renderBreadcrumb(current);
 
@@ -245,7 +245,7 @@ function goto(here) {
   renderBreadcrumb(here);
 }
 
-function renderHierarchy(current) {
+function renderHierarchy() {
   function renderHierarchyRec(current) {
     const currentDir = document.createElement('div');
     currentDir.classList.add('ui', 'accordion');
@@ -286,10 +286,10 @@ function renderHierarchy(current) {
   }
   const sidebar = document.getElementById('sidebar');
   while (sidebar.firstChild) sidebar.removeChild(sidebar.firstChild);
-  sidebar.appendChild(renderHierarchyRec(current));
+  sidebar.appendChild(renderHierarchyRec(root));
 }
 
-function renderModalHierarchy(current) {
+function renderModalHierarchy() {
   function renderModalHierarchyRec(current) {
     const currentDir = document.createElement('div');
     currentDir.classList.add('ui', 'accordion');
@@ -326,7 +326,7 @@ function renderModalHierarchy(current) {
   }
   const hierarchy = document.getElementById('hierarchy');
   while (hierarchy.firstChild) hierarchy.removeChild(hierarchy.firstChild);
-  hierarchy.appendChild(renderModalHierarchyRec(current));
+  hierarchy.appendChild(renderModalHierarchyRec(root));
 }
 
 function renderFinder(current) {
@@ -457,7 +457,7 @@ function handleDelete(filename) {
     }
   }
 
-  renderHierarchy(current);
+  renderHierarchy();
   renderFinder(current);
 
   if (fileType === 'folder') addCommand(`rm -rf ${filename}`);
