@@ -57,7 +57,7 @@ $document.ready(() => {
 
   resizeArrows(arrowSmall, arrowBig);
   sidebar.appendChild(renderHierarchy(root));
-  renderFinder(current);
+  finder.appendChild(renderFinder(current));
 
   arrowBtn.onmouseover = function() {
     if (currentMode == 'GUI') resizeArrows(arrowSmallHover, arrowBigHover);
@@ -166,9 +166,26 @@ function renderHierarchy(current) {
 }
 
 function renderFinder(current) {
+  const grid = document.createElement('div');
+  grid.classList.add('ui', 'four', 'column', 'grid');
   current.children.forEach(child => {
+    const { type, name } = child
+    const column = document.createElement('div');
+    const icon = document.createElement('i');
+    const nameText = document.createTextNode(name);
 
+    column.classList.add('column');
+    column.style.textAlign = 'center';
+    icon.style.margin = 0;
+    if (type == 'folder') icon.classList.add('huge', 'blue', 'folder', 'icon');
+    else if (type == 'file') icon.classList.add('huge', 'file', 'icon');
+
+    column.appendChild(icon);
+    column.appendChild(nameText);
+    grid.appendChild(column);
   });
+
+  return grid;
 }
 
 function addCommand(command) {

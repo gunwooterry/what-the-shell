@@ -49,32 +49,28 @@ input.emphasized {
   background-color: #fcfcfc;
 }
 
-.padless{
-  padding: 0;
-}
-
-.command{
+.command {
   font-style: 'Roboto Mono', monospace;
   font-size: 17px;
   margin: 15px;
 }
 
-.help.icon{
+.help.icon {
   opacity: 0.6;
 }
 
-.help.icon:hover{
+.help.icon:hover {
   transform: scale(1.5, 1.5); /** default is 1, scale it to 1.5 */
   opacity: 1;
 }
 
-.close.icon{
+.close.icon {
   z-index: 1001 !important;
   color: rgba(0, 0, 0, 0.87) !important;
   margin: 0em 0em 0em -44% !important;
 }
 
-.manual{
+.manual {
   position: absolute;
   width: 40% !important;
   margin: 0em 0em 0em -44%;
@@ -91,25 +87,22 @@ input.emphasized {
   border-radius: 0.28571429rem;
 }
 
-#ctxMenu{
-    background: #FFFFFF;
-    display:none;
-    z-index:100;
-}
-
 #ctxMenu {
-    position:absolute;
-    left:0px;
-    top:0px;
-    padding:0;
-    margin:0;
-    background-color:white;
-    font-weight:normal;
-    white-space:nowrap;
+  background: #FFFFFF;
+  display:none;
+  z-index:100;
+  position:absolute;
+  left:0px;
+  top:0px;
+  padding:0;
+  margin:0;
+  background-color:white;
+  font-weight:normal;
+  white-space:nowrap;
 }
 
-#ctxMenu:hover{
-    font-weight:bold;
+#ctxMenu:hover {
+  font-weight:bold;
 }
 
 .ui-box {
