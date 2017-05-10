@@ -49,22 +49,34 @@ input.emphasized {
   background-color: #fcfcfc;
 }
 
+.no_right_pad{
+  padding-right: 0px !important;
+  padding-left: 16px !important;
+}
+
+.no_left_pad{
+  padding-left: 5px !important;
+}
+
 .command {
   font-family: monospace;
   font-size: 17px;
-  padding: 12px 14px 12px 16px;
+  padding: 0px 0px 0px 0px !important;
+  margin: 0 !important;
   background-color: #ffffff;
 }
 
 .command_color{
   font-family: monospace;
   font-size: 17px;
-  padding: 12px 14px 12px 16px;
+  padding: 0px 0px 0px 0px !important;
+  margin: 0 !important;
   background-color: #F4F4F4;
 }
 
 .command_text{
   display: inline-block;
+  line-height: 130%;
 }
 
 #command_line{
