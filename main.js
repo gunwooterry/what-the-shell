@@ -2,30 +2,30 @@ const $document = $(document);
 var modal_on = 0;
 let root = {
   type: 'folder',
-  name: 'root',
-  path: 'root/',
+  name: '~',
+  path: '~/',
   children: [
     {
       type: 'folder',
       name: 'aaa',
-      path: 'root/aaa/',
+      path: '~/aaa/',
       children: [
         {
           type: 'folder',
           name: 'ccc',
-          path: 'root/aaa/ccc/',
+          path: '~/aaa/ccc/',
           children: []
         },
         {
           type: 'file',
           name: 'hello.c',
-          path: 'root/aaa/hello.c',
+          path: '~/aaa/hello.c',
           content: '#include <stdio.h> \n int main(){ \n printf("hello, world!"); \n}',
         },
         {
           type: 'file',
           name: 'hi.txt',
-          path: 'root/aaa/hi.txt',
+          path: '~/aaa/hi.txt',
           content: 'hi hello bonjour',
         },
       ],
@@ -33,25 +33,30 @@ let root = {
     {
       type: 'folder',
       name: 'bbb',
-      path: 'root/bbb/',
+      path: '~/bbb/',
       children: [
         {
           type: 'file',
           name: 'trash.txt',
-          path: 'root/bbb/trash.txt',
+          path: '~/bbb/trash.txt',
         },
       ],
     },
     {
       type: 'file',
       name: 'README.md',
-      path: 'root/README.md',
+      path: '~/README.md',
       content: 'whattheshell mid-fi prototype',
     },
   ],
 };
 let current = root;
 let selectedObj = root;
+const descriptions = {
+  rm: 'rm removes a folder or a file.',
+  cd: 'cd changes current directory.',
+  cat: 'cat shows the content of the file.',
+}
 
 $document.ready(() => {
   const arrowBtn = document.getElementById('arrow_btn');
@@ -118,7 +123,6 @@ $document.ready(() => {
 
   $document.on('click', '.modal_title', function(event) {
     event.preventDefault();
-    console.log('fuck');
     event.target.backgroundColor = 'blue';
     return false;
   });
@@ -278,7 +282,6 @@ function renderHierarchy(current) {
         }
       }
     });
-
     return currentDir;
   }
   const sidebar = document.getElementById('sidebar');
@@ -319,7 +322,6 @@ function renderModalHierarchy(current) {
         }
       }
     });
-
     return currentDir;
   }
   const hierarchy = document.getElementById('hierarchy');
@@ -347,7 +349,7 @@ function renderFinder(current) {
       icon.classList.add('huge', 'blue', 'folder', 'icon');
       unit.ondblclick = function () {
         goto(child);
-        addCommand(`cd ${name}`);
+        addCommand(`cd ${name}/`);
       }
     }
     else if (type == 'file') {
@@ -362,7 +364,6 @@ function renderFinder(current) {
     column.appendChild(unit);
     grid.appendChild(column);
   });
-
   while (finder.firstChild) finder.removeChild(finder.firstChild);
   finder.appendChild(grid);
 }
@@ -389,7 +390,7 @@ function renderBreadcrumb(current) {
       breadcrumb.appendChild(folder);
       folder.onclick = function () {
         goto(findByAbsolutePath(arr.slice(0, idx + 1).join('/')));
-        addCommand(`cd ${Array(pathArray.length - idx - 2).fill('..').join('/')}`);
+        addCommand(`cd ${Array(pathArray.length - idx - 2).fill('..').join('/')}/`);
       }
     }
     divider.className = 'divider';
@@ -446,7 +447,6 @@ function commandInput(e) {
 }
 
 function handleDelete(filename) {
-  console.log(filename);
   const children = current['children'];
   const fileType = findByChildName(current, filename)['type'];
 
@@ -508,7 +508,7 @@ function findByAbsolutePath(path){
   const names = path.split('/');
   const currentName = obj.name;
 
-  if (names[0] != '~' && names[0] !== 'root') return -1;
+  if (names[0] != '~') return -1;
   for (let i = 1; i < names.length; i++){
     if (!names[i]) return obj;
     obj = findByChildName(obj, names[i]);
@@ -528,10 +528,10 @@ function showManual(command) {
   const manualModal = document.getElementById('manual');
   const header = document.getElementById('manual_header');
   const description = document.getElementById('manual_desc');
-  const loremIpsum = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+  const parseCmd = command.split(' ');
 
   header.innerHTML = command;
-  description.innerHTML = loremIpsum;
+  description.innerHTML = descriptions[parseCmd[0]];
   manualModal.style.visibility = 'visible';
 }
 
