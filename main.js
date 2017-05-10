@@ -56,7 +56,7 @@ $document.ready(() => {
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
   const popup_hierarchy = document.getElementById('hierarchy');
-  
+  const modal = document.getElementById('modal_popup');
 
   let returnobj = findByAbsolutePath('~/aaa');
   console.log(returnobj);
@@ -95,7 +95,14 @@ $document.ready(() => {
     ctxMenu.style.display = '';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
+    modal.style.display = 'none';
   });
+
+  $('.modal_content').click(function(event) {
+    event.preventDefault();
+    return false;
+  })
+
 })
 
 const arrowBig = 4;
