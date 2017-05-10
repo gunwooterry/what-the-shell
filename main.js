@@ -205,6 +205,7 @@ function renderFinder(current) {
       icon.classList.add('huge', 'blue', 'folder', 'icon');
       unit.ondblclick = function () {
         goto(child);
+        addCommand(`cd ${name}`);
       }
     }
     else if (type == 'file') icon.classList.add('huge', 'file', 'icon');
@@ -248,28 +249,35 @@ function renderBreadcrumb(current) {
 
 function addCommand(command) {
   const history = document.getElementById('history');
-  let tag = "";
-  if(historyCount % 2 == 0){
-    tag = `<div id="command_${historyCount}" class="ui three column grid command">` +
-                '<div class="one wide column no_right_pad">' +
-                `<span class="command_text"> $ </span> </div>` +
-                '<div class="fourteen wide column no_left_pad">' +
-                `<span class="command_text">${command} </span> </div>` +
-                '<div class="one wide column">' +
-                '<i id="m_button" class="one wide column help icon"' +
-                'style="float:right; margin:0;" onclick="showManual()"></i></div></div>';
-  }
-  else{
-    tag = `<div id="command_${historyCount}" class="ui three column grid command_color">` +
-                '<div class="one wide column no_right_pad">' +
-                `<span class="command_text"> $ </span> </div>` +
-                '<div class="fourteen wide column no_left_pad">' +
-                `<span class="command_text">${command} </span> </div>` +
-                '<div class="one wide column">' +
-                '<i id="m_button" class="one wide column help icon"' +
-                'style="float:right; margin:0;" onclick="showManual()"></i></div></div>';
-  }
-  history.innerHTML += tag;
+  const newCommand = document.createElement('div');
+  const dollarColumn = document.createElement('div');
+  const cmdColumn = document.createElement('div');
+  const manualColumn = document.createElement('div');
+  const manualButton = document.createElement('i');
+
+  history.appendChild(newCommand);
+  newCommand.appendChild(dollarColumn);
+  newCommand.appendChild(cmdColumn);
+  newCommand.appendChild(manualColumn);
+  dollarColumn.innerHTML += `<span class="command_text"> $ </span>`;
+  cmdColumn.innerHTML += `<span class="command_text">${command}</span>`;
+  manualColumn.appendChild(manualButton);
+
+  newCommand.id = `command_${historyCount}`;
+  newCommand.classList.add('ui', 'three', 'column', 'grid');
+  if (historyCount % 2 == 0) newCommand.classList.add('command');
+  else newCommand.classList.add('command_color');
+
+  dollarColumn.classList.add('one', 'wide', 'column', 'no_right_pad');
+  cmdColumn.classList.add('fourteen', 'wide', 'column', 'no_left_pad');
+  manualColumn.classList.add('one', 'wide', 'column');
+
+  manualButton.id = 'm_button';
+  manualButton.classList.add('one', 'wide', 'column', 'help', 'icon');
+  manualButton.style.cssFloat = 'right';
+  manualButton.style.margin = 0;
+  manualButton.onclick = function () { showManual() };
+
   history.scrollTop = history.scrollHeight;
 
   const $addedCommand = $(`#command_${historyCount}`);
