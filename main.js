@@ -205,6 +205,7 @@ function renderFinder(current) {
     const nameText = document.createTextNode(name);
 
     column.className = 'column';
+    column.id = name;
     column.style.textAlign = 'center';
     unit.className = 'unit';
     icon.style.margin = 0;
@@ -325,6 +326,18 @@ function handleCommand(command){
   }
 }
 */
+
+function handleCopy(obj, dirobj){
+  if(obj.type === 'folder'){
+    let newObj = {
+      type: 'folder',
+      name: 'ccc',
+      path: 'root/aaa/ccc/',
+      children: []
+    }
+  }
+  dirobj.children.push()
+}
 
 function findByAbsolutePath(path){
   let obj = root;
