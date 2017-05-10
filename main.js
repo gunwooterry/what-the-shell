@@ -54,15 +54,13 @@ let current = root;
 let selectedObj = root;
 
 $document.ready(() => {
-  const sidebar = document.getElementById('sidebar');
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
-  const popup_hierarchy = document.getElementById('hierarchy');
   const modal = document.getElementById('modal_popup');
 
   resizeArrows(arrowSmall, arrowBig);
-  popup_hierarchy.appendChild(renderModalHierarchy(root));
-  sidebar.appendChild(renderHierarchy(root));
+  renderModalHierarchy(root);
+  renderHierarchy(root);
   renderFinder(current);
   renderBreadcrumb(current);
 
@@ -202,80 +200,89 @@ function goto(here) {
 }
 
 function renderHierarchy(current) {
-  const currentDir = document.createElement('div');
-  currentDir.classList.add('ui', 'accordion');
-  current.children.forEach(child => {
-    const { type, name } = child
-    if (type == 'folder') {
-      const title = document.createElement('div');
-      const dropdown = document.createElement('i');
-      const icon = document.createElement('i');
-      const nameText = document.createTextNode(name);
+  function renderHierarchyRec(current) {
+    const currentDir = document.createElement('div');
+    currentDir.classList.add('ui', 'accordion');
+    current.children.forEach(child => {
+      const { type, name } = child
+      if (type == 'folder') {
+        const title = document.createElement('div');
+        const dropdown = document.createElement('i');
+        const icon = document.createElement('i');
+        const nameText = document.createTextNode(name);
 
-      title.classList.add('title', 'non_modal_title');
-      dropdown.classList.add('dropdown', 'icon');
-      icon.classList.add('folder', 'icon');
-      title.appendChild(dropdown);
-      title.appendChild(icon);
-      title.appendChild(nameText);
-      currentDir.appendChild(title);
+        title.classList.add('title', 'non_modal_title');
+        dropdown.classList.add('dropdown', 'icon');
+        icon.classList.add('folder', 'icon');
+        title.appendChild(dropdown);
+        title.appendChild(icon);
+        title.appendChild(nameText);
+        currentDir.appendChild(title);
 
-      const content = document.createElement('div');
-      content.className = 'content';
-      content.style.marginTop = '-1em';
-      content.style.padding = '0 0 0 1em';
-      content.appendChild(renderHierarchy(child));
-      currentDir.appendChild(content);
+        const content = document.createElement('div');
+        content.className = 'content';
+        content.style.marginTop = '-1em';
+        content.style.padding = '0 0 0 1em';
+        content.appendChild(renderHierarchyRec(child));
+        currentDir.appendChild(content);
 
-      icon.onclick = function() {
-        goto(child);
-        addCommand(`cd ${child.path}`);
+        icon.onclick = function() {
+          goto(child);
+          addCommand(`cd ${child.path}`);
+        }
+        dropdown.onclick = function() {
+          title.classList.toggle('active');
+          content.classList.toggle('active');
+        }
       }
-      dropdown.onclick = function() {
-        title.classList.toggle('active');
-        content.classList.toggle('active');
-      }
-    }
-  });
+    });
 
-  return currentDir;
+    return currentDir;
+  }
+  const sidebar = document.getElementById('sidebar');
+  while (sidebar.firstChild) sidebar.removeChild(sidebar.firstChild);
+  sidebar.appendChild(renderHierarchyRec(current));
 }
 
-
 function renderModalHierarchy(current) {
-  const currentDir = document.createElement('div');
-  currentDir.classList.add('ui', 'accordion');
-  current.children.forEach(child => {
-    const { type, name } = child
-    if (type == 'folder') {
-      const title = document.createElement('div');
-      const dropdown = document.createElement('i');
-      const icon = document.createElement('i');
-      const nameText = document.createTextNode(name);
+  function renderModalHierarchyRec(current) {
+    const currentDir = document.createElement('div');
+    currentDir.classList.add('ui', 'accordion');
+    current.children.forEach(child => {
+      const { type, name } = child
+      if (type == 'folder') {
+        const title = document.createElement('div');
+        const dropdown = document.createElement('i');
+        const icon = document.createElement('i');
+        const nameText = document.createTextNode(name);
 
-      title.classList.add('title', 'modal_title');
-      dropdown.classList.add('dropdown', 'icon');
-      icon.classList.add('folder', 'icon');
-      title.appendChild(dropdown);
-      title.appendChild(icon);
-      title.appendChild(nameText);
-      currentDir.appendChild(title);
+        title.classList.add('title', 'modal_title');
+        dropdown.classList.add('dropdown', 'icon');
+        icon.classList.add('folder', 'icon');
+        title.appendChild(dropdown);
+        title.appendChild(icon);
+        title.appendChild(nameText);
+        currentDir.appendChild(title);
 
-      const content = document.createElement('div');
-      content.className = 'content';
-      content.style.marginTop = '-1em';
-      content.style.padding = '0 0 0 1em';
-      content.appendChild(renderHierarchy(child));
-      currentDir.appendChild(content);
+        const content = document.createElement('div');
+        content.className = 'content';
+        content.style.marginTop = '-1em';
+        content.style.padding = '0 0 0 1em';
+        content.appendChild(renderModalHierarchyRec(child));
+        currentDir.appendChild(content);
 
-      dropdown.onclick = function() {
-        title.classList.toggle('active');
-        content.classList.toggle('active');
+        dropdown.onclick = function() {
+          title.classList.toggle('active');
+          content.classList.toggle('active');
+        }
       }
-    }
-  });
+    });
 
-  return currentDir;
+    return currentDir;
+  }
+  const hierarchy = document.getElementById('hierarchy');
+  while (hierarchy.firstChild) hierarchy.removeChild(hierarchy.firstChild);
+  hierarchy.appendChild(renderModalHierarchyRec(current));
 }
 
 function renderFinder(current) {
