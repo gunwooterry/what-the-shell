@@ -76,6 +76,13 @@ $document.ready(() => {
     ctxMenu.style.top = `${event.pageY}px`;
   });
 
+  $document.on('contextmenu', '.unit', function(event) {
+    event.preventDefault();
+    ctxMenu.style.display = 'block';
+    ctxMenu.style.left = `${event.pageX}px`;
+    ctxMenu.style.top = `${event.pageY}px`;
+  });
+
   $document.on('click', function(event) {
     ctxMenu.style.display = '';
     ctxMenu.style.left = '';
