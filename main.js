@@ -305,9 +305,9 @@ function renderBreadcrumb(current) {
 
   const { path } = current;
   const pathArray = path.split('/');
-  pathArray.forEach((folderName, idx, arr) => {
+  pathArray.slice(0, pathArray.length - 1).forEach((folderName, idx, arr) => {
     const folderNameText = document.createTextNode(folderName);
-    if (idx >= arr.length - 2) {
+    if (idx == arr.length - 1) {
       const folder = document.createElement('div');
       folder.classList.add('active', 'section');
       folder.appendChild(folderNameText);
@@ -322,6 +322,10 @@ function renderBreadcrumb(current) {
       divider.appendChild(dividerText);
       breadcrumb.appendChild(folder);
       breadcrumb.appendChild(divider);
+      folder.onclick = function () {
+        goto(findByAbsolutePath(arr.slice(0, idx + 1).join('/')));
+        addCommand(`cd ${Array(pathArray.length - 2).fill('..').join('/')}`);
+      }
     }
   });
 }
@@ -417,21 +421,22 @@ function handleCommand(command){
 
 function findByAbsolutePath(path){
   let obj = root;
-  let names = path.split('/');
-  let currentName = obj.name;
+  const names = path.split('/');
+  const currentName = obj.name;
+
   if (names[0] != '~' && names[0] !== 'root') return -1;
-  for (let i = 1 ; i < names.length - 1 ; i++){
-    if(names == '') return obj;
+  for (let i = 1; i < names.length; i++){
+    if (!names[i]) return obj;
     obj = findByChildName(obj, names[i]);
   }
   return obj;
 }
 
 function findByChildName(obj, childName){
-  obj.children.forEach(child => {
+  for (child of obj.children) {
     const { type, name } = child;
     if (name === childName) return child;
-  });
+  }
   return -1;
 }
 
