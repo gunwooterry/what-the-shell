@@ -51,6 +51,8 @@ let root = {
   ],
 };
 let current = root;
+let selectedObj = root;
+
 $document.ready(() => {
   const sidebar = document.getElementById('sidebar');
   const arrowBtn = document.getElementById('arrow_btn');
@@ -88,6 +90,8 @@ $document.ready(() => {
 
   $document.on('contextmenu', '.unit', function(event) {
     event.preventDefault();
+    let targetName = event.currentTarget.id;
+    selectedObj = findByChildName(current, targetName);
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
@@ -95,7 +99,6 @@ $document.ready(() => {
 
 
   $document.on('click', function(event) {
-    console.log("out");
     ctxMenu.style.display = '';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
@@ -109,11 +112,17 @@ $document.ready(() => {
     event.preventDefault();
     ctxMenu.style.display = '';
     if(modal_on == 0) {
-      console.log("ddd");
       $('#modal_popup').show();
       modal_on = 1;
      }
      return false;
+  });
+
+  $document.on('click', '.modal_title', function(event) {
+    event.preventDefault();
+    console.log('fuck');
+    event.target.backgroundColor = 'blue';
+    return false;
   });
 
 
@@ -126,6 +135,11 @@ $document.ready(() => {
       modal_on = 1;
     }
     return false;
+  });
+
+  $document.on('click', '.delete', function(event) {
+    event.preventDefault();
+    handleDelete(selectedObj.name);
   });
 
   $('.modal_content').click(function(event) {
@@ -215,6 +229,7 @@ function renderHierarchy(current) {
 
       icon.onclick = function() {
         goto(child);
+        addCommand(`cd ${child.path}`);
       }
       dropdown.onclick = function() {
         title.classList.toggle('active');
@@ -238,7 +253,7 @@ function renderModalHierarchy(current) {
       const icon = document.createElement('i');
       const nameText = document.createTextNode(name);
 
-      title.classList = 'title';
+      title.classList.add('title', 'modal_title');
       dropdown.classList.add('dropdown', 'icon');
       icon.classList.add('folder', 'icon');
       title.appendChild(dropdown);
@@ -253,9 +268,6 @@ function renderModalHierarchy(current) {
       content.appendChild(renderHierarchy(child));
       currentDir.appendChild(content);
 
-      icon.onclick = function() {
-        goto(child);
-      }
       dropdown.onclick = function() {
         title.classList.toggle('active');
         content.classList.toggle('active');
@@ -280,6 +292,7 @@ function renderFinder(current) {
     column.className = 'column';
     column.style.textAlign = 'center';
     unit.className = 'unit';
+    unit.id = name;
     icon.style.margin = 0;
     if (type == 'folder') {
       icon.classList.add('huge', 'blue', 'folder', 'icon');
@@ -384,6 +397,7 @@ function commandInput(e) {
 }
 
 function handleDelete(filename) {
+  console.log(filename);
   const children = current['children'];
   const fileType = findByChildName(current, filename)['type'];
 
@@ -418,6 +432,18 @@ function handleCommand(command){
   }
 }
 */
+
+function handleCopy(obj, dirobj){
+  if(obj.type === 'folder'){
+    let newObj = {
+      type: 'folder',
+      name: 'ccc',
+      path: 'root/aaa/ccc/',
+      children: []
+    }
+  }
+  dirobj.children.push()
+}
 
 function findByAbsolutePath(path){
   let obj = root;
