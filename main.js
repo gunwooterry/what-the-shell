@@ -306,7 +306,7 @@ function renderFinder(current) {
       icon.classList.add('huge', 'blue', 'folder', 'icon');
       unit.ondblclick = function () {
         goto(child);
-        addCommand(`cd ${name}`);
+        addCommand(`cd ${name}/`);
       }
     }
     else if (type == 'file') {
@@ -347,7 +347,7 @@ function renderBreadcrumb(current) {
       breadcrumb.appendChild(folder);
       folder.onclick = function () {
         goto(findByAbsolutePath(arr.slice(0, idx + 1).join('/')));
-        addCommand(`cd ${Array(pathArray.length - idx - 2).fill('..').join('/')}`);
+        addCommand(`cd ${Array(pathArray.length - idx - 2).fill('..').join('/')}/`);
       }
     }
     divider.className = 'divider';
