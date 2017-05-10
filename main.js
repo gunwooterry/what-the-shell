@@ -104,17 +104,16 @@ $document.ready(() => {
     ctxMenu.style.display = '';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
-    if(modal_on == 1) {
-      $('#modal_popup').hide();
-      modal_on =0;
-    }
+    // if(modal_on == 1) {
+    //   $('#modal_popup').hide();
+    //   modal_on =0;
+    // }
   });
 
   $document.on('click', '.copy', function(event) {
-    event.preventDefault();
+    //event.preventDefault();
     ctxMenu.style.display = '';
     if(modal_on == 0) {
-      console.log("ddd");
       $('#modal_popup').show();
       modal_on = 1;
      }
@@ -123,10 +122,9 @@ $document.ready(() => {
 
 
   $document.on('click', '.cut', function(event) {
-    event.preventDefault();
+    //event.preventDefault();
     ctxMenu.style.display = '';
     if(modal_on == 0) {
-      console.log("ddd");
       $('#modal_popup').show();
       modal_on = 1;
     }
@@ -138,10 +136,53 @@ $document.ready(() => {
     handleDelete(selectedObj.name);
   });
 
+
+
+  // $document.on('click', '.title', function(event) {
+  //   //event.preventDefault();
+  //   let selectedFolderName = event.currentTarget.id;
+  //   console.log(selectedFolderName);
+  // });
+
+  $('#modal_popup').click(function(event) {
+    if(modal_on == 1) {
+      if(prev_target != 0) prev_target.style.color = '#000000';
+      $('#submit_copy').addClass('disabled');
+      $('#modal_popup').hide();
+      modal_on =0;
+    }
+  })
+
+  let prev_target = 0;
+  let target = 0;
+
   $('.modal_content').click(function(event) {
-    event.preventDefault();
+
+    if($(event.target).closest('.title').length == 1){
+      if(prev_target != 0) prev_target.style.color = '#000000';
+      target = $(event.target).closest('.title')[0];
+      prev_target = target;
+      target.style.color = '#21ae21';
+      $('#submit_copy').removeClass('disabled');
+    }
     return false;
   })
+
+  $('#submit_copy').click(function(event) {
+    if(!$('#submit_copy').hasClass('disabled')){
+      let targetObj = findByAbsolutePath(target.id);
+      handleCopy(selectedObj, targetObj);
+      addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+      if(modal_on == 1) {
+        if(prev_target != 0) prev_target.style.color = '#000000';
+        $('#submit_copy').addClass('disabled');
+        $('#modal_popup').hide();
+        modal_on =0;
+      }
+    }
+  })
+
+
 
 })
 
@@ -242,7 +283,7 @@ function renderModalHierarchy(current) {
   const currentDir = document.createElement('div');
   currentDir.classList.add('ui', 'accordion');
   current.children.forEach(child => {
-    const { type, name } = child
+    const { type, name, path } = child
     if (type == 'folder') {
       const title = document.createElement('div');
       const dropdown = document.createElement('i');
@@ -255,13 +296,14 @@ function renderModalHierarchy(current) {
       title.appendChild(dropdown);
       title.appendChild(icon);
       title.appendChild(nameText);
+      title.id = path;
       currentDir.appendChild(title);
 
       const content = document.createElement('div');
       content.className = 'content';
       content.style.marginTop = '-1em';
       content.style.padding = '0 0 0 1em';
-      content.appendChild(renderHierarchy(child));
+      content.appendChild(renderModalHierarchy(child));
       currentDir.appendChild(content);
 
       dropdown.onclick = function() {
@@ -432,15 +474,24 @@ function handleCommand(command){
 */
 
 function handleCopy(obj, dirobj){
+  let newObj = 0;
   if(obj.type === 'folder'){
-    let newObj = {
-      type: 'folder',
-      name: 'ccc',
-      path: 'root/aaa/ccc/',
+    newObj = {
+      type: obj.type,
+      name: obj.name,
+      path: obj.path,
       children: []
     }
   }
-  dirobj.children.push()
+  else{
+    newObj = {
+      type: obj.type,
+      name: obj.name,
+      path: obj.path,
+      content: obj.content,
+    }
+  }
+  dirobj.children.push(newObj)
 }
 
 function findByAbsolutePath(path){
