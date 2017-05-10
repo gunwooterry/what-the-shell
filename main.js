@@ -60,7 +60,7 @@ $document.ready(() => {
   const modal = document.getElementById('modal_popup');
 
   resizeArrows(arrowSmall, arrowBig);
-  popup_hierarchy.appendChild(renderHierarchy(root));
+  popup_hierarchy.appendChild(renderModalHierarchy(root));
   sidebar.appendChild(renderHierarchy(root));
   renderFinder(current);
   renderBreadcrumb(current);
@@ -75,12 +75,17 @@ $document.ready(() => {
     else resizeArrows(arrowBig, arrowSmall);
   };
 
-  $document.on('contextmenu', '.title', function(event) {
+  $document.on('contextmenu', '.non_modal_title', function(event) {
     event.preventDefault();
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
   });
+
+  $document.on('contextmenu', '#modal_popup', function(event) {
+    event.preventDefault();
+  });
+
 
   $document.on('contextmenu', '.unit', function(event) {
     event.preventDefault();
@@ -88,6 +93,7 @@ $document.ready(() => {
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
   });
+
 
   $document.on('click', function(event) {
     console.log("out");
@@ -193,7 +199,7 @@ function renderHierarchy(current) {
       const icon = document.createElement('i');
       const nameText = document.createTextNode(name);
 
-      title.classList = 'title';
+      title.classList.add('title', 'non_modal_title');
       dropdown.classList.add('dropdown', 'icon');
       icon.classList.add('folder', 'icon');
       title.appendChild(dropdown);
@@ -210,6 +216,7 @@ function renderHierarchy(current) {
 
       icon.onclick = function() {
         goto(child);
+        addCommand(`cd ${child.path}`);
       }
       dropdown.onclick = function() {
         title.classList.toggle('active');
@@ -220,6 +227,44 @@ function renderHierarchy(current) {
 
   return currentDir;
 }
+
+
+function renderModalHierarchy(current) {
+  const currentDir = document.createElement('div');
+  currentDir.classList.add('ui', 'accordion');
+  current.children.forEach(child => {
+    const { type, name } = child
+    if (type == 'folder') {
+      const title = document.createElement('div');
+      const dropdown = document.createElement('i');
+      const icon = document.createElement('i');
+      const nameText = document.createTextNode(name);
+
+      title.classList = 'title';
+      dropdown.classList.add('dropdown', 'icon');
+      icon.classList.add('folder', 'icon');
+      title.appendChild(dropdown);
+      title.appendChild(icon);
+      title.appendChild(nameText);
+      currentDir.appendChild(title);
+
+      const content = document.createElement('div');
+      content.className = 'content';
+      content.style.marginTop = '-1em';
+      content.style.padding = '0 0 0 1em';
+      content.appendChild(renderHierarchy(child));
+      currentDir.appendChild(content);
+
+      dropdown.onclick = function() {
+        title.classList.toggle('active');
+        content.classList.toggle('active');
+      }
+    }
+  });
+
+  return currentDir;
+}
+
 
 function renderFinder(current) {
   const finder = document.getElementById('finder');
@@ -262,9 +307,9 @@ function renderBreadcrumb(current) {
 
   const { path } = current;
   const pathArray = path.split('/');
-  pathArray.forEach((folderName, idx, arr) => {
+  pathArray.slice(0, pathArray.length - 1).forEach((folderName, idx, arr) => {
     const folderNameText = document.createTextNode(folderName);
-    if (idx >= arr.length - 2) {
+    if (idx == arr.length - 1) {
       const folder = document.createElement('div');
       folder.classList.add('active', 'section');
       folder.appendChild(folderNameText);
@@ -279,6 +324,10 @@ function renderBreadcrumb(current) {
       divider.appendChild(dividerText);
       breadcrumb.appendChild(folder);
       breadcrumb.appendChild(divider);
+      folder.onclick = function () {
+        goto(findByAbsolutePath(arr.slice(0, idx + 1).join('/')));
+        addCommand(`cd ${Array(pathArray.length - 2).fill('..').join('/')}`);
+      }
     }
   });
 }
@@ -386,21 +435,22 @@ function handleCopy(obj, dirobj){
 
 function findByAbsolutePath(path){
   let obj = root;
-  let names = path.split('/');
-  let currentName = obj.name;
+  const names = path.split('/');
+  const currentName = obj.name;
+
   if (names[0] != '~' && names[0] !== 'root') return -1;
-  for (let i = 1 ; i < names.length - 1 ; i++){
-    if(names == '') return obj;
+  for (let i = 1; i < names.length; i++){
+    if (!names[i]) return obj;
     obj = findByChildName(obj, names[i]);
   }
   return obj;
 }
 
 function findByChildName(obj, childName){
-  obj.children.forEach(child => {
+  for (child of obj.children) {
     const { type, name } = child;
     if (name === childName) return child;
-  });
+  }
   return -1;
 }
 
