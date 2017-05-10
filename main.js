@@ -306,6 +306,23 @@ function commandInput(e) {
     }
 }
 
+function handleDelete(filename) {
+  const children = current['children'];
+  const fileType = findByChildName(current, filename)['type'];
+
+  for (let i = 0; i < children.length; i++) {
+    if (children[i]['name'] === filename) {
+      children.splice(i, 1);
+      break;
+    }
+  }
+
+  renderHierarchy(current);
+  renderFinder(current);
+
+  if (fileType === 'folder') addCommand(`rm -rf ${filename}`);
+  else addCommand(`rm -f ${filename}`);
+}
 
 
 /*
