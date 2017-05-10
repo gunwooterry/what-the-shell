@@ -13,7 +13,7 @@
   <div class="ui small secondary pointing menu">
   	<div class="ui container">
       <a class="item" id="logo">
-        What<span id="the">The</span><span id="shell">Shell</span>
+        <span id="wink">>_</span>What<span id="the">The</span><span id="shell">Shell</span>
       </a>
     </div>
   </div>
@@ -27,11 +27,11 @@
               </div>
             </div>
             <div class="twelve wide column" style="padding: 0">
-              <div class="ui basic segment" style="margin: 0; height: 5vh">
+              <div class="ui basic segment" style="margin: 0; height: 6vh">
                 <div class="ui breadcrumb" id="breadcrumb">
                 </div>
               </div>
-              <div class="ui basic segment" id="finder" style="margin: 0; height: 75vh">
+              <div class="ui basic segment" id="finder" style="margin: 0; height: 74vh">
               </div>
             </div>
           </div>
@@ -48,7 +48,7 @@
       </div>
       <div class="one wide center aligned column" style="padding: 0">
         <div class="middle aligned content">
-          <div id="arrow_btn" onclick="changeModeListener(this.id)">
+          <div id="arrow_btn" ondblclick="changeModeListener(this.id)" onclick="changeModeListener(this.id)">
             <i class="huge arrow right icon" id="arrow_right"></i>
             <i class="large arrow left icon" id="arrow_left"></i>
           </div>
@@ -60,16 +60,14 @@
         <div class="row" style="padding: 0; margin: 0; height: 2vh">
         </div>
         <div class="ui segment" style="padding: 0; margin: 0; height: 6vh">
-          <input id="command_line" onclick="changeModeListener(this.id)" type="text" name="command" placeholder="Type your command here" onkeypress="commandInput(event)" />
+          <input id="command_line" ondblclick="changeModeListener(this.id)" onclick="changeModeListener(this.id)" type="text" name="command" placeholder="Type your command here" onkeypress="commandInput(event)" />
         </div>
 
-        <div id="manual" class="ui active modal manual">
+        <div class="ui active modal manual" id="manual">
           <div class="ui content">
             <div class="description">
-              <div class="ui header" style="font-size: 25px;">cd ..</div>
-              <p>cd stands for change directory</p>
-              <p>.. means parent directory</p>
-              <p>so cd .. means change directory into parent directory!</p>
+              <div class="ui header" id="manual_header" style="font-size: 25px;"></div>
+              <p id="manual_desc"></p>
             </div>
           </div>
           <div class="ui actions">

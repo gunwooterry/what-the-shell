@@ -54,16 +54,13 @@ let current = root;
 let selectedObj = root;
 
 $document.ready(() => {
-
-  const sidebar = document.getElementById('sidebar');
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
-  const popup_hierarchy = document.getElementById('hierarchy');
   const modal = document.getElementById('modal_popup');
 
   resizeArrows(arrowSmall, arrowBig);
-  popup_hierarchy.appendChild(renderModalHierarchy(root));
-  sidebar.appendChild(renderHierarchy(root));
+  renderModalHierarchy(root);
+  renderHierarchy(root);
   renderFinder(current);
   renderBreadcrumb(current);
 
@@ -100,7 +97,6 @@ $document.ready(() => {
 
 
   $document.on('click', function(event) {
-    console.log("out");
     ctxMenu.style.display = '';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
@@ -118,6 +114,13 @@ $document.ready(() => {
       modal_on = 1;
      }
      return false;
+  });
+
+  $document.on('click', '.modal_title', function(event) {
+    event.preventDefault();
+    console.log('fuck');
+    event.target.backgroundColor = 'blue';
+    return false;
   });
 
 
@@ -239,83 +242,90 @@ function goto(here) {
 }
 
 function renderHierarchy(current) {
-  const currentDir = document.createElement('div');
-  currentDir.classList.add('ui', 'accordion');
-  current.children.forEach(child => {
-    const { type, name } = child
-    if (type == 'folder') {
-      const title = document.createElement('div');
-      const dropdown = document.createElement('i');
-      const icon = document.createElement('i');
-      const nameText = document.createTextNode(name);
+  function renderHierarchyRec(current) {
+    const currentDir = document.createElement('div');
+    currentDir.classList.add('ui', 'accordion');
+    current.children.forEach(child => {
+      const { type, name } = child
+      if (type == 'folder') {
+        const title = document.createElement('div');
+        const dropdown = document.createElement('i');
+        const icon = document.createElement('i');
+        const nameText = document.createTextNode(name);
 
-      title.classList.add('title', 'non_modal_title');
-      dropdown.classList.add('dropdown', 'icon');
-      icon.classList.add('folder', 'icon');
-      title.appendChild(dropdown);
-      title.appendChild(icon);
-      title.appendChild(nameText);
-      currentDir.appendChild(title);
+        title.classList.add('title', 'non_modal_title');
+        dropdown.classList.add('dropdown', 'icon');
+        icon.classList.add('folder', 'icon');
+        title.appendChild(dropdown);
+        title.appendChild(icon);
+        title.appendChild(nameText);
+        currentDir.appendChild(title);
 
-      const content = document.createElement('div');
-      content.className = 'content';
-      content.style.marginTop = '-1em';
-      content.style.padding = '0 0 0 1em';
-      content.appendChild(renderHierarchy(child));
-      currentDir.appendChild(content);
+        const content = document.createElement('div');
+        content.className = 'content';
+        content.style.marginTop = '-1em';
+        content.style.padding = '0 0 0 1em';
+        content.appendChild(renderHierarchyRec(child));
+        currentDir.appendChild(content);
 
-      icon.onclick = function() {
-        goto(child);
-        addCommand(`cd ${child.path}`);
+        icon.onclick = function() {
+          goto(child);
+          addCommand(`cd ${child.path}`);
+        }
+        dropdown.onclick = function() {
+          title.classList.toggle('active');
+          content.classList.toggle('active');
+        }
       }
-      dropdown.onclick = function() {
-        title.classList.toggle('active');
-        content.classList.toggle('active');
-      }
-    }
-  });
+    });
 
-  return currentDir;
+    return currentDir;
+  }
+  const sidebar = document.getElementById('sidebar');
+  while (sidebar.firstChild) sidebar.removeChild(sidebar.firstChild);
+  sidebar.appendChild(renderHierarchyRec(current));
 }
-
 
 function renderModalHierarchy(current) {
-  const currentDir = document.createElement('div');
-  currentDir.classList.add('ui', 'accordion');
-  current.children.forEach(child => {
-    const { type, name, path } = child
-    if (type == 'folder') {
-      const title = document.createElement('div');
-      const dropdown = document.createElement('i');
-      const icon = document.createElement('i');
-      const nameText = document.createTextNode(name);
+  function renderModalHierarchyRec(current) {
+    const currentDir = document.createElement('div');
+    currentDir.classList.add('ui', 'accordion');
+    current.children.forEach(child => {
+      const { type, name } = child
+      if (type == 'folder') {
+        const title = document.createElement('div');
+        const dropdown = document.createElement('i');
+        const icon = document.createElement('i');
+        const nameText = document.createTextNode(name);
 
-      title.classList = 'title';
-      dropdown.classList.add('dropdown', 'icon');
-      icon.classList.add('folder', 'icon');
-      title.appendChild(dropdown);
-      title.appendChild(icon);
-      title.appendChild(nameText);
-      title.id = path;
-      currentDir.appendChild(title);
+        title.classList.add('title', 'modal_title');
+        dropdown.classList.add('dropdown', 'icon');
+        icon.classList.add('folder', 'icon');
+        title.appendChild(dropdown);
+        title.appendChild(icon);
+        title.appendChild(nameText);
+        currentDir.appendChild(title);
 
-      const content = document.createElement('div');
-      content.className = 'content';
-      content.style.marginTop = '-1em';
-      content.style.padding = '0 0 0 1em';
-      content.appendChild(renderModalHierarchy(child));
-      currentDir.appendChild(content);
+        const content = document.createElement('div');
+        content.className = 'content';
+        content.style.marginTop = '-1em';
+        content.style.padding = '0 0 0 1em';
+        content.appendChild(renderModalHierarchyRec(child));
+        currentDir.appendChild(content);
 
-      dropdown.onclick = function() {
-        title.classList.toggle('active');
-        content.classList.toggle('active');
+        dropdown.onclick = function() {
+          title.classList.toggle('active');
+          content.classList.toggle('active');
+        }
       }
-    }
-  });
+    });
 
-  return currentDir;
+    return currentDir;
+  }
+  const hierarchy = document.getElementById('hierarchy');
+  while (hierarchy.firstChild) hierarchy.removeChild(hierarchy.firstChild);
+  hierarchy.appendChild(renderModalHierarchyRec(current));
 }
-
 
 function renderFinder(current) {
   const finder = document.getElementById('finder');
@@ -340,7 +350,12 @@ function renderFinder(current) {
         addCommand(`cd ${name}`);
       }
     }
-    else if (type == 'file') icon.classList.add('huge', 'file', 'icon');
+    else if (type == 'file') {
+      icon.classList.add('huge', 'file', 'icon');
+      unit.ondblclick = function () {
+        addCommand(`cat ${name}`);
+      }
+    }
 
     unit.appendChild(icon);
     unit.appendChild(nameText);
@@ -360,6 +375,8 @@ function renderBreadcrumb(current) {
   const pathArray = path.split('/');
   pathArray.slice(0, pathArray.length - 1).forEach((folderName, idx, arr) => {
     const folderNameText = document.createTextNode(folderName);
+    const divider = document.createElement('span');
+    const dividerText = document.createTextNode('/');
     if (idx == arr.length - 1) {
       const folder = document.createElement('div');
       folder.classList.add('active', 'section');
@@ -367,19 +384,17 @@ function renderBreadcrumb(current) {
       breadcrumb.appendChild(folder);
     } else {
       const folder = document.createElement('a');
-      const divider = document.createElement('span');
-      const dividerText = document.createTextNode('/');
       folder.className = 'section';
-      divider.className = 'divider';
       folder.appendChild(folderNameText);
-      divider.appendChild(dividerText);
       breadcrumb.appendChild(folder);
-      breadcrumb.appendChild(divider);
       folder.onclick = function () {
         goto(findByAbsolutePath(arr.slice(0, idx + 1).join('/')));
-        addCommand(`cd ${Array(pathArray.length - 2).fill('..').join('/')}`);
+        addCommand(`cd ${Array(pathArray.length - idx - 2).fill('..').join('/')}`);
       }
     }
+    divider.className = 'divider';
+    divider.appendChild(dividerText);
+    breadcrumb.appendChild(divider);
   });
 }
 
@@ -412,14 +427,9 @@ function addCommand(command) {
   manualButton.classList.add('one', 'wide', 'column', 'help', 'icon');
   manualButton.style.cssFloat = 'right';
   manualButton.style.margin = 0;
-  manualButton.onclick = function () { showManual() };
+  manualButton.onclick = function () { showManual(command) };
 
   history.scrollTop = history.scrollHeight;
-
-  const $addedCommand = $(`#command_${historyCount}`);
-  // TODO: Reformat to callback, decide what 'ease' is
-  $addedCommand.animate({backgroundColor: '#aa0000'}, 500);
-  $addedCommand.animate({backgroundColor: '#ffffff'}, 500);
   historyCount += 1;
 }
 
@@ -453,7 +463,6 @@ function handleDelete(filename) {
   if (fileType === 'folder') addCommand(`rm -rf ${filename}`);
   else addCommand(`rm -f ${filename}`);
 }
-
 
 /*
 function handleCommand(command){
@@ -515,8 +524,15 @@ function findByChildName(obj, childName){
   return -1;
 }
 
-function showManual() {
-  document.getElementById('manual').style.visibility = 'visible';
+function showManual(command) {
+  const manualModal = document.getElementById('manual');
+  const header = document.getElementById('manual_header');
+  const description = document.getElementById('manual_desc');
+  const loremIpsum = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+
+  header.innerHTML = command;
+  description.innerHTML = loremIpsum;
+  manualModal.style.visibility = 'visible';
 }
 
 function hideManual() {
