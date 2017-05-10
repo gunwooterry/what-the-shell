@@ -294,7 +294,7 @@ function renderModalHierarchy(current) {
     const currentDir = document.createElement('div');
     currentDir.classList.add('ui', 'accordion');
     current.children.forEach(child => {
-      const { type, name } = child
+      const { type, name, path } = child
       if (type == 'folder') {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
@@ -307,6 +307,7 @@ function renderModalHierarchy(current) {
         title.appendChild(dropdown);
         title.appendChild(icon);
         title.appendChild(nameText);
+        title.id = path;
         currentDir.appendChild(title);
 
         const content = document.createElement('div');
@@ -500,14 +501,16 @@ function handleCopy(obj, dirobj){
       content: obj.content,
     }
   }
-  dirobj.children.push(newObj)
+  console.log(current);
+  renderHierarchy(current);
+  renderFinder(current);
+  dirobj.children.push(newObj);
 }
 
 function findByAbsolutePath(path){
   let obj = root;
   const names = path.split('/');
   const currentName = obj.name;
-
   if (names[0] != '~') return -1;
   for (let i = 1; i < names.length; i++){
     if (!names[i]) return obj;
