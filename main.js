@@ -333,6 +333,8 @@ function renderBreadcrumb(current) {
   const pathArray = path.split('/');
   pathArray.slice(0, pathArray.length - 1).forEach((folderName, idx, arr) => {
     const folderNameText = document.createTextNode(folderName);
+    const divider = document.createElement('span');
+    const dividerText = document.createTextNode('/');
     if (idx == arr.length - 1) {
       const folder = document.createElement('div');
       folder.classList.add('active', 'section');
@@ -340,19 +342,17 @@ function renderBreadcrumb(current) {
       breadcrumb.appendChild(folder);
     } else {
       const folder = document.createElement('a');
-      const divider = document.createElement('span');
-      const dividerText = document.createTextNode('/');
       folder.className = 'section';
-      divider.className = 'divider';
       folder.appendChild(folderNameText);
-      divider.appendChild(dividerText);
       breadcrumb.appendChild(folder);
-      breadcrumb.appendChild(divider);
       folder.onclick = function () {
         goto(findByAbsolutePath(arr.slice(0, idx + 1).join('/')));
         addCommand(`cd ${Array(pathArray.length - idx - 2).fill('..').join('/')}`);
       }
     }
+    divider.className = 'divider';
+    divider.appendChild(dividerText);
+    breadcrumb.appendChild(divider);
   });
 }
 
