@@ -183,7 +183,10 @@ function renderHierarchy(current) {
       content.appendChild(renderHierarchy(child));
       currentDir.appendChild(content);
 
-      title.onclick = function() {
+      icon.onclick = function() {
+        goto(child);
+      }
+      dropdown.onclick = function() {
         title.classList.toggle('active');
         content.classList.toggle('active');
       }
