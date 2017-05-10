@@ -51,13 +51,13 @@ let current = root;
 
 $document.ready(() => {
   const sidebar = document.getElementById('sidebar');
-  const finder = document.getElementById('finder');
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
 
   resizeArrows(arrowSmall, arrowBig);
   sidebar.appendChild(renderHierarchy(root));
-  renderFinder(finder, current);
+  renderFinder(current);
+  renderBreadcrumb(current);
 
   arrowBtn.onmouseover = function() {
     if (currentMode == 'GUI') resizeArrows(arrowSmallHover, arrowBigHover);
@@ -136,6 +136,12 @@ function changeModeListener(clicked) {
   }
 }
 
+function goto(here) {
+  current = here;
+  renderFinder(here);
+  renderBreadcrumb(here);
+}
+
 function renderHierarchy(current) {
   const currentDir = document.createElement('div');
   currentDir.classList.add('ui', 'accordion');
@@ -172,7 +178,8 @@ function renderHierarchy(current) {
   return currentDir;
 }
 
-function renderFinder(finder, current) {
+function renderFinder(current) {
+  const finder = document.getElementById('finder');
   const grid = document.createElement('div');
   grid.classList.add('ui', 'four', 'column', 'grid');
   current.children.forEach(child => {
@@ -189,8 +196,7 @@ function renderFinder(finder, current) {
     if (type == 'folder') {
       icon.classList.add('huge', 'blue', 'folder', 'icon');
       unit.ondblclick = function () {
-        current = child;
-        renderFinder(finder, current);
+        goto(child);
       }
     }
     else if (type == 'file') icon.classList.add('huge', 'file', 'icon');
@@ -201,8 +207,35 @@ function renderFinder(finder, current) {
     grid.appendChild(column);
   });
 
-  finder.removeChild(finder.firstChild);
+  while (finder.firstChild) finder.removeChild(finder.firstChild);
   finder.appendChild(grid);
+}
+
+function renderBreadcrumb(current) {
+  const breadcrumb = document.getElementById('breadcrumb');
+  while (breadcrumb.firstChild) breadcrumb.removeChild(breadcrumb.firstChild);
+
+  const { path } = current;
+  const pathArray = path.split('/');
+  pathArray.forEach((folderName, idx, arr) => {
+    const folderNameText = document.createTextNode(folderName);
+    if (idx >= arr.length - 2) {
+      const folder = document.createElement('div');
+      folder.classList.add('active', 'section');
+      folder.appendChild(folderNameText);
+      breadcrumb.appendChild(folder);
+    } else {
+      const folder = document.createElement('a');
+      const divider = document.createElement('span');
+      const dividerText = document.createTextNode('/');
+      folder.className = 'section';
+      divider.className = 'divider';
+      folder.appendChild(folderNameText);
+      divider.appendChild(dividerText);
+      breadcrumb.appendChild(folder);
+      breadcrumb.appendChild(divider);
+    }
+  });
 }
 
 function addCommand(command) {
