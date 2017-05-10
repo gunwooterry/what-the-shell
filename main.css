@@ -121,6 +121,7 @@ input.emphasized {
     background: #FFFFFF;
     display:none;
     z-index:100;
+    position: absolute;
 }
 
 #ctxMenu:hover {
