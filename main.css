@@ -21,6 +21,10 @@ input:focus {
   font-size: 18px;
 }
 
+#logo #wink, #manual_header {
+  font-family: monospace;
+}
+
 #logo #the {
   font-weight: 400;
 }
@@ -33,6 +37,10 @@ input:focus {
   margin-top: 3%;
   margin-bottom: 3%;
   height: 88vh;
+}
+
+#breadcrumb {
+  font-size: 20px;
 }
 
 .ui.emphasized.segment {
