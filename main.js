@@ -19,11 +19,13 @@ let root = {
           type: 'file',
           name: 'hello.c',
           path: 'root/aaa/hello.c',
+          content: '#include <stdio.h> \n int main(){ \n printf("hello, world!"); \n}',
         },
         {
           type: 'file',
           name: 'hi.txt',
           path: 'root/aaa/hi.txt',
+          content: 'hi hello bonjour',
         },
       ],
     },
@@ -43,7 +45,7 @@ let root = {
       type: 'file',
       name: 'README.md',
       path: 'root/README.md',
-      children: [],
+      content: 'whattheshell mid-fi prototype',
     },
   ],
 };
@@ -53,6 +55,9 @@ $document.ready(() => {
   const sidebar = document.getElementById('sidebar');
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
+
+  let returnobj = findByAbsolutePath('~/aaa');
+  console.log(returnobj);
 
   resizeArrows(arrowSmall, arrowBig);
   sidebar.appendChild(renderHierarchy(root));
@@ -278,6 +283,26 @@ function commandInput(e) {
       if (command) addCommand(command);
       commandLine.value = '';
     }
+}
+
+function findByAbsolutePath(path){
+  let obj = root;
+  let names = path.split('/');
+  let currentName = obj.name;
+  if (names[0] != '~') return -1;
+  for (let i = 1 ; i < names.length - 1 ; i++){
+    if(names == '') return obj;
+    obj = findByChildName(obj, names[i]);
+  }
+  return obj;
+}
+
+function findByChildName(obj, childName){
+  obj.children.forEach(child => {
+    const { type, name } = child;
+    if (name === childName) return child;
+  });
+  return -1;
 }
 
 function showManual() {
