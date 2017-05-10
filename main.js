@@ -56,6 +56,7 @@ const descriptions = {
   rm: 'rm removes a folder or a file.',
   cd: 'cd changes current directory.',
   cat: 'cat shows the content of the file.',
+  cp: 'cp copies the file or folder.',
 }
 
 $document.ready(() => {
@@ -356,7 +357,7 @@ function renderFinder(current) {
     else if (type == 'file') {
       icon.classList.add('huge', 'file', 'icon');
       unit.ondblclick = function () {
-        addCommand(`cat ${name}`);
+        // addCommand(`cat ${name}`);
       }
     }
 
