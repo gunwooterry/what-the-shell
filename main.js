@@ -140,7 +140,7 @@ function renderHierarchy(current) {
       const icon = document.createElement('i');
       const nameText = document.createTextNode(name);
 
-      title.classList.add('title');
+      title.classList = 'title';
       dropdown.classList.add('dropdown', 'icon');
       icon.classList.add('folder', 'icon');
       title.appendChild(dropdown);
@@ -149,7 +149,7 @@ function renderHierarchy(current) {
       currentDir.appendChild(title);
 
       const content = document.createElement('div');
-      content.classList.add('content');
+      content.className = 'content';
       content.style.marginTop = '-1em';
       content.style.padding = '0 0 0 1em';
       content.appendChild(renderHierarchy(child));
@@ -171,17 +171,20 @@ function renderFinder(current) {
   current.children.forEach(child => {
     const { type, name } = child
     const column = document.createElement('div');
+    const unit = document.createElement('div');
     const icon = document.createElement('i');
     const nameText = document.createTextNode(name);
 
-    column.classList.add('column');
+    column.className = 'column';
     column.style.textAlign = 'center';
+    unit.className = 'unit';
     icon.style.margin = 0;
     if (type == 'folder') icon.classList.add('huge', 'blue', 'folder', 'icon');
     else if (type == 'file') icon.classList.add('huge', 'file', 'icon');
 
-    column.appendChild(icon);
-    column.appendChild(nameText);
+    unit.appendChild(icon);
+    unit.appendChild(nameText);
+    column.appendChild(unit);
     grid.appendChild(column);
   });
 
