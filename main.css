@@ -75,7 +75,9 @@ input.emphasized {
 }
 
 .command_text{
-  display: inline-block;
+  word-wrap: break-word;
+  white-space: normal;
+  display: block;
   line-height: 130%;
 }
 
@@ -119,6 +121,7 @@ input.emphasized {
     background: #FFFFFF;
     display:none;
     z-index:100;
+    position: absolute;
 }
 
 #ctxMenu:hover {

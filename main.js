@@ -1,4 +1,5 @@
 const $document = $(document);
+var modal_on = 0;
 let root = {
   type: 'folder',
   name: 'root',
@@ -50,8 +51,8 @@ let root = {
   ],
 };
 let current = root;
-
 $document.ready(() => {
+
   const sidebar = document.getElementById('sidebar');
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
@@ -59,7 +60,7 @@ $document.ready(() => {
   const modal = document.getElementById('modal_popup');
 
   resizeArrows(arrowSmall, arrowBig);
-  popup_hierarchy.appendChild(renderHierarchy(root));
+  popup_hierarchy.appendChild(renderModalHierarchy(root));
   sidebar.appendChild(renderHierarchy(root));
   renderFinder(current);
   renderBreadcrumb(current);
@@ -74,25 +75,58 @@ $document.ready(() => {
     else resizeArrows(arrowBig, arrowSmall);
   };
 
-  $document.on('contextmenu', '.title', function(event) {
+  $document.on('contextmenu', '.non_modal_title', function(event) {
     event.preventDefault();
-    ctxMenu.style.display = 'block';
+    ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
   });
+
+  $document.on('contextmenu', '#modal_popup', function(event) {
+    event.preventDefault();
+  });
+
 
   $document.on('contextmenu', '.unit', function(event) {
     event.preventDefault();
-    ctxMenu.style.display = 'block';
+    ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
   });
 
+
   $document.on('click', function(event) {
+    console.log("out");
     ctxMenu.style.display = '';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
-    modal.style.display = 'none';
+    if(modal_on == 1) {
+      $('#modal_popup').hide();
+      modal_on =0;
+    }
+  });
+
+  $document.on('click', '.copy', function(event) {
+    event.preventDefault();
+    ctxMenu.style.display = '';
+    if(modal_on == 0) {
+      console.log("ddd");
+      $('#modal_popup').show();
+      modal_on = 1;
+     }
+     return false;
+  });
+
+
+  $document.on('click', '.cut', function(event) {
+    event.preventDefault();
+    ctxMenu.style.display = '';
+    if(modal_on == 0) {
+      console.log("ddd");
+      $('#modal_popup').show();
+      modal_on = 1;
+    }
+    return false;
   });
 
   $('.modal_content').click(function(event) {
@@ -165,6 +199,46 @@ function renderHierarchy(current) {
       const icon = document.createElement('i');
       const nameText = document.createTextNode(name);
 
+      title.classList.add('title', 'non_modal_title');
+      dropdown.classList.add('dropdown', 'icon');
+      icon.classList.add('folder', 'icon');
+      title.appendChild(dropdown);
+      title.appendChild(icon);
+      title.appendChild(nameText);
+      currentDir.appendChild(title);
+
+      const content = document.createElement('div');
+      content.className = 'content';
+      content.style.marginTop = '-1em';
+      content.style.padding = '0 0 0 1em';
+      content.appendChild(renderHierarchy(child));
+      currentDir.appendChild(content);
+
+      icon.onclick = function() {
+        goto(child);
+      }
+      dropdown.onclick = function() {
+        title.classList.toggle('active');
+        content.classList.toggle('active');
+      }
+    }
+  });
+
+  return currentDir;
+}
+
+
+function renderModalHierarchy(current) {
+  const currentDir = document.createElement('div');
+  currentDir.classList.add('ui', 'accordion');
+  current.children.forEach(child => {
+    const { type, name } = child
+    if (type == 'folder') {
+      const title = document.createElement('div');
+      const dropdown = document.createElement('i');
+      const icon = document.createElement('i');
+      const nameText = document.createTextNode(name);
+
       title.classList = 'title';
       dropdown.classList.add('dropdown', 'icon');
       icon.classList.add('folder', 'icon');
@@ -180,7 +254,10 @@ function renderHierarchy(current) {
       content.appendChild(renderHierarchy(child));
       currentDir.appendChild(content);
 
-      title.onclick = function() {
+      icon.onclick = function() {
+        goto(child);
+      }
+      dropdown.onclick = function() {
         title.classList.toggle('active');
         content.classList.toggle('active');
       }
@@ -189,6 +266,7 @@ function renderHierarchy(current) {
 
   return currentDir;
 }
+
 
 function renderFinder(current) {
   const finder = document.getElementById('finder');
@@ -299,10 +377,50 @@ function commandInput(e) {
     if (currentMode == 'CUI' && e.keyCode == 13) {
       const commandLine = document.getElementById('command_line');
       const command = commandLine.value;
-      if (command) addCommand(command);
+      if (command){
+        addCommand(command);
+        //handleCommand(command);
+      }
       commandLine.value = '';
     }
 }
+
+function handleDelete(filename) {
+  const children = current['children'];
+  const fileType = findByChildName(current, filename)['type'];
+
+  for (let i = 0; i < children.length; i++) {
+    if (children[i]['name'] === filename) {
+      children.splice(i, 1);
+      break;
+    }
+  }
+
+  renderHierarchy(current);
+  renderFinder(current);
+
+  if (fileType === 'folder') addCommand(`rm -rf ${filename}`);
+  else addCommand(`rm -f ${filename}`);
+}
+
+
+/*
+function handleCommand(command){
+  // TODO : handle '>'
+  let args = command.split(' ');
+  let op = args[0];
+  let argnum = args.length - 1;
+  if (op === 'echo'){
+    if (argnum != 3) handleError('echo requires 2 argument! \n ex) echo "hi" ');
+    let newFile = {
+      type: 'file',
+      name: args[2],
+      path: 'root/aaa/hello.c',
+      content: '#include <stdio.h> \n int main(){ \n printf("hello, world!"); \n}',
+    }
+  }
+}
+*/
 
 function findByAbsolutePath(path){
   let obj = root;
