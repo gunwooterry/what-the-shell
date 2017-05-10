@@ -64,8 +64,8 @@ $document.ready(() => {
   const modal = document.getElementById('modal_popup');
 
   resizeArrows(arrowSmall, arrowBig);
-  renderModalHierarchy(root);
-  renderHierarchy(root);
+  renderHierarchy();
+  renderModalHierarchy();
   renderFinder(current);
   renderBreadcrumb(current);
 
@@ -245,7 +245,7 @@ function goto(here) {
   renderBreadcrumb(here);
 }
 
-function renderHierarchy(current) {
+function renderHierarchy() {
   function renderHierarchyRec(current) {
     const currentDir = document.createElement('div');
     currentDir.classList.add('ui', 'accordion');
@@ -286,15 +286,15 @@ function renderHierarchy(current) {
   }
   const sidebar = document.getElementById('sidebar');
   while (sidebar.firstChild) sidebar.removeChild(sidebar.firstChild);
-  sidebar.appendChild(renderHierarchyRec(current));
+  sidebar.appendChild(renderHierarchyRec(root));
 }
 
-function renderModalHierarchy(current) {
+function renderModalHierarchy() {
   function renderModalHierarchyRec(current) {
     const currentDir = document.createElement('div');
     currentDir.classList.add('ui', 'accordion');
     current.children.forEach(child => {
-      const { type, name } = child
+      const { type, name, path } = child
       if (type == 'folder') {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
@@ -307,6 +307,7 @@ function renderModalHierarchy(current) {
         title.appendChild(dropdown);
         title.appendChild(icon);
         title.appendChild(nameText);
+        title.id = path;
         currentDir.appendChild(title);
 
         const content = document.createElement('div');
@@ -326,7 +327,7 @@ function renderModalHierarchy(current) {
   }
   const hierarchy = document.getElementById('hierarchy');
   while (hierarchy.firstChild) hierarchy.removeChild(hierarchy.firstChild);
-  hierarchy.appendChild(renderModalHierarchyRec(current));
+  hierarchy.appendChild(renderModalHierarchyRec(root));
 }
 
 function renderFinder(current) {
@@ -457,7 +458,7 @@ function handleDelete(filename) {
     }
   }
 
-  renderHierarchy(current);
+  renderHierarchy();
   renderFinder(current);
 
   if (fileType === 'folder') addCommand(`rm -rf ${filename}`);
@@ -500,14 +501,16 @@ function handleCopy(obj, dirobj){
       content: obj.content,
     }
   }
-  dirobj.children.push(newObj)
+  console.log(current);
+  renderHierarchy(current);
+  renderFinder(current);
+  dirobj.children.push(newObj);
 }
 
 function findByAbsolutePath(path){
   let obj = root;
   const names = path.split('/');
   const currentName = obj.name;
-
   if (names[0] != '~') return -1;
   for (let i = 1; i < names.length; i++){
     if (!names[i]) return obj;
