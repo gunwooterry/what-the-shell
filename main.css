@@ -54,9 +54,25 @@ input.emphasized {
 }
 
 .command{
-  font-style: 'Roboto Mono', monospace;
+  font-family: monospace;
   font-size: 17px;
-  margin: 15px;
+  padding: 12px 14px 12px 16px;
+  background-color: #ffffff;
+}
+
+.command_color{
+  font-family: monospace;
+  font-size: 17px;
+  padding: 12px 14px 12px 16px;
+  background-color: #F4F4F4;
+}
+
+.command_text{
+  display: inline-block;
+}
+
+#command_line{
+  font-family: monospace;
 }
 
 .help.icon{
@@ -90,6 +106,7 @@ input.emphasized {
   transform-origin: 50% 25%;
   border-radius: 0.28571429rem;
 }
+
 
 #ctxMenu{
     background: #FFFFFF;

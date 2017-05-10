@@ -173,9 +173,21 @@ function renderFinder(current) {
 
 function addCommand(command) {
   const history = document.getElementById('history');
-  const tag = `<div id="command_${historyCount}" class="command">` + command +
-              '<i id="m_button" class="help icon"' +
-              'style="float:right;" onclick="showManual()"></i></div>';
+  let tag = "";
+  if(historyCount % 2 == 0){
+    tag = `<div id="command_${historyCount}" class="command">` +
+                `<span class="command_text" style="margin-right: 8px;"> $ </span>` +
+                `<span class="command_text">${command} </span>` +
+                '<i id="m_button" class="help icon"' +
+                'style="float:right; margin:0;" onclick="showManual()"></i></div>';
+  }
+  else{
+    tag = `<div id="command_${historyCount}" class="command_color">` +
+                `<span class="command_text" style="margin-right: 8px;"> $ </span>` +
+                `<span class="command_text">${command} </span>` +
+               '<i id="m_button" class="help icon"' +
+               'style="float:right; margin:0;" onclick="showManual()"></i> </span></div>';
+  }
   history.innerHTML += tag;
   history.scrollTop = history.scrollHeight;
 
