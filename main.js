@@ -1,55 +1,55 @@
 const $document = $(document);
-$document.ready(() => {
-  let root = {
-    type: 'folder',
-    name: 'root',
-    path: 'root/',
-    children: [
-      {
-        type: 'folder',
-        name: 'aaa',
-        path: 'root/aaa/',
-        children: [
-          {
-            type: 'folder',
-            name: 'ccc',
-            path: 'root/aaa/ccc/',
-            children: []
-          },
-          {
-            type: 'file',
-            name: 'hello.c',
-            path: 'root/aaa/hello.c',
-          },
-          {
-            type: 'file',
-            name: 'hi.txt',
-            path: 'root/aaa/hi.txt',
-          },
-        ],
-      },
-      {
-        type: 'folder',
-        name: 'bbb',
-        path: 'root/bbb/',
-        children: [
-          {
-            type: 'file',
-            name: 'trash.txt',
-            path: 'root/bbb/trash.txt',
-          },
-        ],
-      },
-      {
-        type: 'file',
-        name: 'README.md',
-        path: 'root/README.md',
-        children: [],
-      },
-    ],
-  };
-  let current = root;
+let root = {
+  type: 'folder',
+  name: 'root',
+  path: 'root/',
+  children: [
+    {
+      type: 'folder',
+      name: 'aaa',
+      path: 'root/aaa/',
+      children: [
+        {
+          type: 'folder',
+          name: 'ccc',
+          path: 'root/aaa/ccc/',
+          children: []
+        },
+        {
+          type: 'file',
+          name: 'hello.c',
+          path: 'root/aaa/hello.c',
+        },
+        {
+          type: 'file',
+          name: 'hi.txt',
+          path: 'root/aaa/hi.txt',
+        },
+      ],
+    },
+    {
+      type: 'folder',
+      name: 'bbb',
+      path: 'root/bbb/',
+      children: [
+        {
+          type: 'file',
+          name: 'trash.txt',
+          path: 'root/bbb/trash.txt',
+        },
+      ],
+    },
+    {
+      type: 'file',
+      name: 'README.md',
+      path: 'root/README.md',
+      children: [],
+    },
+  ],
+};
+let current = root;
 
+$document.ready(() => {
   const sidebar = document.getElementById('sidebar');
   const finder = document.getElementById('finder');
   const arrowBtn = document.getElementById('arrow_btn');
@@ -57,7 +57,7 @@ $document.ready(() => {
 
   resizeArrows(arrowSmall, arrowBig);
   sidebar.appendChild(renderHierarchy(root));
-  renderFinder(current);
+  renderFinder(finder, current);
 
   arrowBtn.onmouseover = function() {
     if (currentMode == 'GUI') resizeArrows(arrowSmallHover, arrowBigHover);
@@ -70,6 +70,13 @@ $document.ready(() => {
   };
 
   $document.on('contextmenu', '.title', function(event) {
+    event.preventDefault();
+    ctxMenu.style.display = 'block';
+    ctxMenu.style.left = `${event.pageX}px`;
+    ctxMenu.style.top = `${event.pageY}px`;
+  });
+
+  $document.on('contextmenu', '.unit', function(event) {
     event.preventDefault();
     ctxMenu.style.display = 'block';
     ctxMenu.style.left = `${event.pageX}px`;
@@ -140,7 +147,7 @@ function renderHierarchy(current) {
       const icon = document.createElement('i');
       const nameText = document.createTextNode(name);
 
-      title.classList.add('title');
+      title.classList = 'title';
       dropdown.classList.add('dropdown', 'icon');
       icon.classList.add('folder', 'icon');
       title.appendChild(dropdown);
@@ -149,7 +156,7 @@ function renderHierarchy(current) {
       currentDir.appendChild(title);
 
       const content = document.createElement('div');
-      content.classList.add('content');
+      content.className = 'content';
       content.style.marginTop = '-1em';
       content.style.padding = '0 0 0 1em';
       content.appendChild(renderHierarchy(child));
@@ -165,10 +172,37 @@ function renderHierarchy(current) {
   return currentDir;
 }
 
-function renderFinder(current) {
+function renderFinder(finder, current) {
+  const grid = document.createElement('div');
+  grid.classList.add('ui', 'four', 'column', 'grid');
   current.children.forEach(child => {
+    const { type, name } = child
+    const column = document.createElement('div');
+    const unit = document.createElement('div');
+    const icon = document.createElement('i');
+    const nameText = document.createTextNode(name);
 
+    column.className = 'column';
+    column.style.textAlign = 'center';
+    unit.className = 'unit';
+    icon.style.margin = 0;
+    if (type == 'folder') {
+      icon.classList.add('huge', 'blue', 'folder', 'icon');
+      unit.ondblclick = function () {
+        current = child;
+        renderFinder(finder, current);
+      }
+    }
+    else if (type == 'file') icon.classList.add('huge', 'file', 'icon');
+
+    unit.appendChild(icon);
+    unit.appendChild(nameText);
+    column.appendChild(unit);
+    grid.appendChild(column);
   });
+
+  finder.removeChild(finder.firstChild);
+  finder.appendChild(grid);
 }
 
 function addCommand(command) {
