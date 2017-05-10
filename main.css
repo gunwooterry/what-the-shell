@@ -21,6 +21,10 @@ input:focus {
   font-size: 18px;
 }
 
+#logo #wink {
+  font-family: monospace;
+}
+
 #logo #the {
   font-weight: 400;
 }
