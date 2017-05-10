@@ -60,7 +60,7 @@ $document.ready(() => {
   const modal = document.getElementById('modal_popup');
 
   resizeArrows(arrowSmall, arrowBig);
-  popup_hierarchy.appendChild(renderHierarchy(root));
+  popup_hierarchy.appendChild(renderModalHierarchy(root));
   sidebar.appendChild(renderHierarchy(root));
   renderFinder(current);
   renderBreadcrumb(current);
@@ -75,12 +75,17 @@ $document.ready(() => {
     else resizeArrows(arrowBig, arrowSmall);
   };
 
-  $document.on('contextmenu', '.title', function(event) {
+  $document.on('contextmenu', '.non_modal_title', function(event) {
     event.preventDefault();
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
   });
+
+  $document.on('contextmenu', '#modal_popup', function(event) {
+    event.preventDefault();
+  });
+
 
   $document.on('contextmenu', '.unit', function(event) {
     event.preventDefault();
@@ -88,6 +93,7 @@ $document.ready(() => {
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
   });
+
 
   $document.on('click', function(event) {
     console.log("out");
@@ -193,6 +199,46 @@ function renderHierarchy(current) {
       const icon = document.createElement('i');
       const nameText = document.createTextNode(name);
 
+      title.classList.add('title', 'non_modal_title');
+      dropdown.classList.add('dropdown', 'icon');
+      icon.classList.add('folder', 'icon');
+      title.appendChild(dropdown);
+      title.appendChild(icon);
+      title.appendChild(nameText);
+      currentDir.appendChild(title);
+
+      const content = document.createElement('div');
+      content.className = 'content';
+      content.style.marginTop = '-1em';
+      content.style.padding = '0 0 0 1em';
+      content.appendChild(renderHierarchy(child));
+      currentDir.appendChild(content);
+
+      icon.onclick = function() {
+        goto(child);
+      }
+      dropdown.onclick = function() {
+        title.classList.toggle('active');
+        content.classList.toggle('active');
+      }
+    }
+  });
+
+  return currentDir;
+}
+
+
+function renderModalHierarchy(current) {
+  const currentDir = document.createElement('div');
+  currentDir.classList.add('ui', 'accordion');
+  current.children.forEach(child => {
+    const { type, name } = child
+    if (type == 'folder') {
+      const title = document.createElement('div');
+      const dropdown = document.createElement('i');
+      const icon = document.createElement('i');
+      const nameText = document.createTextNode(name);
+
       title.classList = 'title';
       dropdown.classList.add('dropdown', 'icon');
       icon.classList.add('folder', 'icon');
@@ -220,6 +266,7 @@ function renderHierarchy(current) {
 
   return currentDir;
 }
+
 
 function renderFinder(current) {
   const finder = document.getElementById('finder');
