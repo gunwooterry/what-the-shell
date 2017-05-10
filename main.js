@@ -51,6 +51,8 @@ let root = {
   ],
 };
 let current = root;
+let selectedObj = root;
+
 $document.ready(() => {
 
   const sidebar = document.getElementById('sidebar');
@@ -89,6 +91,8 @@ $document.ready(() => {
 
   $document.on('contextmenu', '.unit', function(event) {
     event.preventDefault();
+    let targetName = event.currentTarget.id;
+    selectedObj = findByChildName(current, targetName);
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
@@ -132,6 +136,11 @@ $document.ready(() => {
       modal_on = 1;
     }
     return false;
+  });
+
+  $document.on('click', '.delete', function(event) {
+    event.preventDefault();
+    handleDelete(selectedObj.name);
   });
 
   $('.modal_content').click(function(event) {
@@ -221,6 +230,7 @@ function renderHierarchy(current) {
 
       icon.onclick = function() {
         goto(child);
+        addCommand(`cd ${child.path}`);
       }
       dropdown.onclick = function() {
         title.classList.toggle('active');
@@ -284,6 +294,7 @@ function renderFinder(current) {
     column.className = 'column';
     column.style.textAlign = 'center';
     unit.className = 'unit';
+    unit.id = name;
     icon.style.margin = 0;
     if (type == 'folder') {
       icon.classList.add('huge', 'blue', 'folder', 'icon');
@@ -388,6 +399,7 @@ function commandInput(e) {
 }
 
 function handleDelete(filename) {
+  console.log(filename);
   const children = current['children'];
   const fileType = findByChildName(current, filename)['type'];
 
@@ -423,6 +435,18 @@ function handleCommand(command){
   }
 }
 */
+
+function handleCopy(obj, dirobj){
+  if(obj.type === 'folder'){
+    let newObj = {
+      type: 'folder',
+      name: 'ccc',
+      path: 'root/aaa/ccc/',
+      children: []
+    }
+  }
+  dirobj.children.push()
+}
 
 function findByAbsolutePath(path){
   let obj = root;
