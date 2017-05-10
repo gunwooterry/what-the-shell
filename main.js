@@ -1,4 +1,5 @@
 const $document = $(document);
+var modal_on = 0;
 let root = {
   type: 'folder',
   name: 'root',
@@ -50,8 +51,8 @@ let root = {
   ],
 };
 let current = root;
-
 $document.ready(() => {
+
   const sidebar = document.getElementById('sidebar');
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
@@ -79,23 +80,50 @@ $document.ready(() => {
 
   $document.on('contextmenu', '.title', function(event) {
     event.preventDefault();
-    ctxMenu.style.display = 'block';
+    ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
   });
 
   $document.on('contextmenu', '.unit', function(event) {
     event.preventDefault();
-    ctxMenu.style.display = 'block';
+    ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
   });
 
   $document.on('click', function(event) {
+    console.log("out");
     ctxMenu.style.display = '';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
-    modal.style.display = 'none';
+    if(modal_on == 1) {
+      $('#modal_popup').hide();
+      modal_on =0;
+    }
+  });
+
+  $document.on('click', '.copy', function(event) {
+    event.preventDefault();
+    ctxMenu.style.display = '';
+    if(modal_on == 0) {
+      console.log("ddd");
+      $('#modal_popup').show();
+      modal_on = 1;
+     }
+     return false;
+  });
+
+
+  $document.on('click', '.cut', function(event) {
+    event.preventDefault();
+    ctxMenu.style.display = '';
+    if(modal_on == 0) {
+      console.log("ddd");
+      $('#modal_popup').show();
+      modal_on = 1;
+    }
+    return false;
   });
 
   $('.modal_content').click(function(event) {
