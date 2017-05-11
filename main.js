@@ -441,7 +441,7 @@ function commandInput(e) {
       const command = commandLine.value;
       if (command){
         addCommand(command);
-        //handleCommand(command);
+        handleCommand(command);
       }
       commandLine.value = '';
     }
@@ -465,23 +465,35 @@ function handleDelete(filename) {
   else addCommand(`rm -f ${filename}`);
 }
 
-/*
+
 function handleCommand(command){
   // TODO : handle '>'
-  let args = command.split(' ');
+  let branch = command.split('>');
+  let output_name = '';
+  if(branch.length == 2) output_name = branch[1];
+  let args = branch[0].split(' ');
   let op = args[0];
   let argnum = args.length - 1;
+  let rest = args.splice(0,1).join();
   if (op === 'echo'){
-    if (argnum != 3) handleError('echo requires 2 argument! \n ex) echo "hi" ');
+    //if (argnum != 1) handleError('echo requires 1 argument! \n ex) echo "hi" ');
     let newFile = {
       type: 'file',
-      name: args[2],
-      path: 'root/aaa/hello.c',
-      content: '#include <stdio.h> \n int main(){ \n printf("hello, world!"); \n}',
+      name: output_name,
+      path: current.path + output_name,
+      content: rest,
     }
+    current.children.push(newFile);
   }
+  if (op === 'cd'){
+    let rest_arr = rest.split('/');
+    if(rest_arr[0] === '~') current = findByAbsolutePath(rest);
+    //else current = findByChildName(current, rest_arr[0]);
+  }
+  renderHierarchy(current);
+  renderFinder(current);
 }
-*/
+
 
 function handleCopy(obj, dirobj){
   let newObj = 0;
@@ -492,6 +504,10 @@ function handleCopy(obj, dirobj){
       path: obj.path,
       children: []
     }
+    // TODO : deep copy -> change path
+    obj.children.forEach(child => {
+      newObj.children.push(child);
+    });
   }
   else{
     newObj = {
