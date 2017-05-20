@@ -662,19 +662,41 @@ function handleCommand(command) {
 
   } else if (op === 'mv') {
     const srcPath = getAbsolutePath(rest[0]);
-    const dstPath = getAbsolutePath(rest[0]);
-    if(srcPath == 0 || dstPath == 0) return;
+    const dstPath = getAbsolutePath(rest[1]);
+    if (srcPath == 0 || dstPath == 0) return;
     const srcObj = findByAbsolutePath(srcPath);
     const dstObj = findByAbsolutePath(dstPath);
-    if(srcObj == 0) {
-      return;
+    if (srcObj == 0) return;
+    if (dstObj != 0) {
+    } else { /* dstPathObj does not exist */
+      const dstPathFrags = dstPath.split('/');
+      const newName = dstPathFrags[dstPathFrags.length - 1];
+      dstPathFrags.splice(dstPathFrags.length - 1, 1);
+
+      let dstPrevObj;
+      if (dstPathFrags.length == 0) dstPrevObj = deepcopy(current);
+      else dstPrevObj = findByAbsolutePath(dstPathFrags.join('/'));
+
+      if (dstPrevObj == 0 || dstPrevObj.type != 'folder') { /* dstPrevObj does not exist or it is not a folder */
+        // reject(no such directory: rest[0])
+        return;
+      } else { /* dstPrevObj is a folder */
+        /* rename */
+        if (dstPrevObj.path == current.path) { /* dstPrevObj is the current directory */
+          /* just rename srcObj */
+          srcObj.name = newName;
+        } else {
+          /* move srcObj to dstPrevObj and rename it */
+          srcObj.name = newName;
+          handleCopy(srcObj, dstPrevObj);
+          handleDelete(srcObj);
+
+          renderFinder(current);
+          renderHierarchy();
+        }
+        addCommand(command);
+      }
     }
-    if(dstObj != 0) {
-
-    } else {
-
-    }
-
   } else {
     $('#command_line').popup('show');
   }
@@ -694,21 +716,18 @@ function handleCopy(obj, dirObj) {
 
 function getAbsolutePath(path) {
   let currObj = deepcopy(current);
+  const currPathFrags = current.path.split('/');
+  currPathFrags.splice(currPathFrags.length - 1, 1);
   const pathFrags = path.split('/');
   for (let i = 0; i < pathFrags.length; i++) {
     if (pathFrags[i] == '.') {}
-    else if (pathFrags[i] == '..') { currObj = getParentObject(currObj); }
-    else {
-      let nextObjPath;
-      if (i < pathFrags.length - 1) nextObjPath = currObj.path + pathFrags[i] + '/';
-      else nextObjPath = currObj.path + pathFrags[i];
-      currObj = findByAbsolutePath(nextObjPath);
-    }
-
-    if (currObj == 0) return 0;
+    else if (pathFrags[i] == '..') {
+      currPathFrags.splice(currPathFrags.length - 1, 1);
+      if (currPathFrags.length == 0) return 0;
+    } else { currPathFrags.push(pathFrags[i]) }
   }
 
-  return currObj;
+  return currPathFrags.join('/');
 }
 
 function parentPath(path) {
