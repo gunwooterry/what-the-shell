@@ -660,6 +660,21 @@ function handleCommand(command) {
      console.log('Not found');
    }
 
+  } else if (op === 'mv') {
+    const srcPath = getAbsolutePath(rest[0]);
+    const dstPath = getAbsolutePath(rest[0]);
+    if(srcPath == 0 || dstPath == 0) return;
+    const srcObj = findByAbsolutePath(srcPath);
+    const dstObj = findByAbsolutePath(dstPath);
+    if(srcObj == 0) {
+      return;
+    }
+    if(dstObj != 0) {
+
+    } else {
+
+    }
+
   } else {
     $('#command_line').popup('show');
   }
