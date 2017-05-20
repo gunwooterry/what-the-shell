@@ -250,39 +250,42 @@ $document.ready(() => {
   });
 
   $('#submit_copy').click(function(event) {
-    if(copyorcut == "copy") {
-      if(!$('#submit_copy').hasClass('disabled')){
-        let targetObj = findByAbsolutePath(target.id);
-        handleCopy(selectedObj, targetObj);
-        addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
-        if (current === targetObj) {
-          renderFinder(current);
+    let targetObj = findByAbsolutePath(target.id);
+    if (targetObj.path.indexOf(selectedObj.path) == -1) {
+      if(copyorcut == "copy") {
+        if(!$('#submit_copy').hasClass('disabled')){
+          handleCopy(selectedObj, targetObj);
+          addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+          if (current === targetObj) {
+            renderFinder(current);
+          }
+          renderHierarchy();
+          if(modal_on == 1) {
+            if(prev_target != 0) prev_target.style.color = '#000000';
+            $('#submit_copy').addClass('disabled');
+            $('#modal_popup').hide();
+            modal_on =0;
+          }
         }
-        renderHierarchy();
-        if(modal_on == 1) {
-          if(prev_target != 0) prev_target.style.color = '#000000';
-          $('#submit_copy').addClass('disabled');
-          $('#modal_popup').hide();
-          modal_on =0;
+      } else if(copyorcut == "cut") {
+        if(!$('#submit_copy').hasClass('disabled')){
+          handleCopy(selectedObj, targetObj);
+          handleDelete(selectedObj);
+          if (current === targetObj) {
+            renderFinder(current);
+          }
+          renderHierarchy();
+          addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
+          if(modal_on == 1) {
+            if(prev_target != 0) prev_target.style.color = '#000000';
+            $('#submit_copy').addClass('disabled');
+            $('#modal_popup').hide();
+            modal_on =0;
+          }
         }
       }
-    } else if(copyorcut == "cut") {
-      if(!$('#submit_copy').hasClass('disabled')){
-        let targetObj = findByAbsolutePath(target.id);
-        handleCopy(selectedObj, targetObj);
-        handleDelete(selectedObj);
-        if (current === targetObj) {
-          renderFinder(current);
-        }
-        renderHierarchy();
-        addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
-        if(modal_on == 1) {
-          if(prev_target != 0) prev_target.style.color = '#000000';
-          $('#submit_copy').addClass('disabled');
-          $('#modal_popup').hide();
-          modal_on =0;
-        }
-      }
+    } else {
+      alert('you cannot do recursive copy or move');
     }
   });
 })
