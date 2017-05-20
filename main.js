@@ -61,6 +61,8 @@ const descriptions = {
 }
 
 $document.ready(() => {
+  $('#welcome').modal('show');
+
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
   const modal = document.getElementById('modal_popup');
@@ -172,6 +174,8 @@ $document.ready(() => {
   $document.on('click', '.delete', function(event) {
     event.preventDefault();
     handleDelete(selectedObj);
+    if (selectedObj.fileType === 'folder') addCommand(`rm -rf ${ selectedObj.name }`);
+    else addCommand(`rm -f ${ selectedObj.name }`);
   });
 
   $('#rename_input').on('input', function(){
@@ -611,9 +615,6 @@ function handleDelete(fileObj) {
 
   renderHierarchy();
   renderFinder(current);
-
-  if (fileObj.fileType === 'folder') addCommand(`rm -rf ${fileObj.name}`);
-  else addCommand(`rm -f ${fileObj.name}`);
 }
 
 function handleCommand(command) {
@@ -650,6 +651,7 @@ function handleCommand(command) {
     const pathArray = path.split('/');
 
     if (!flag.includes('-')) {
+      console.log('No flags');
       return;
     }
 
@@ -827,6 +829,129 @@ function handleCommand(command) {
         }
       }
     }
+  } else if (op === 'mv') {
+    const srcPath = getAbsolutePath(rest[0]);
+    const dstPath = getAbsolutePath(rest[1]);
+    if(srcPath == 0 || dstPath == 0) return;
+    const srcObj = findByAbsolutePath(srcPath);
+    console.log(dstPath);
+    const dstObj = findByAbsolutePath(dstPath);
+    if(srcObj == 0) {
+      return;
+    }
+    if(dstObj != 0) {
+      if(dstObj.type == 'file') {
+        if(srcObj.type == 'folder') {
+          return;
+        } else {
+          const newObj = deepcopy(srcObj);
+          const orgPath = parentPath(newObj.path);
+          const srcParentObj = getParentObject(srcObj);
+          const dstParentObj = getParentObject(dstObj);
+
+          replacePath(newObj, `${orgPath}/`, parentPath(dstObj.path));
+          newObj.name = dstObj.name;
+          for(let i = 0; i < srcParentObj.children.length; i++) {
+            if(srcParentObj.children[i].name === srcObj.name) {
+              srcParentObj.children.splice(i, 1);
+              break;
+            }
+          }
+          for(let i = 0; i < dstParentObj.children.length; i++) {
+            if(dstParentObj.children[i].name === dstObj.name) {
+              dstParentObj.children.splice(i, 1);
+              break;
+            }
+          }
+          dstParentObj.children.push(newObj);
+        }
+      } else {
+        let dup = 0;
+        let dup_index = 0;
+        const newObj = deepcopy(srcObj);
+        const orgPath = parentPath(newObj.path);
+        replacePath(newObj, `${orgPath}/`, dstObj.path);
+        for(let i = 0; i < dstObj.children.length; i++) {
+          if (dstObj.children[i].name === srcObj.name) {
+            dup = 1;
+            dup_index = i;
+            break;
+          }
+        }
+        if(dup == 1) {
+          const srcParentObj = getParentObject(srcObj);
+          const newObj = deepcopy(srcObj);
+          const orgPath = parentPath(newObj.path);
+          replacePath(newObj, `${orgPath}/`, dstObj.path);
+
+          if(srcObj.type == 'folder' && dstObj.children[dup_index].type == 'folder') {
+            if(dstObj.children[dup_index].children.length == 0) {
+              for(let i = 0; i < srcParentObj.children.length; i++) {
+                if(srcParentObj.children[i].name === srcObj.name) {
+                  srcParentObj.children.splice(i, 1);
+                  break;
+                }
+              }
+              dstObj.children.splice(dup_index, 1);
+              dstObj.children.push(newObj);
+            } else {
+              return;
+            }
+          } else if(srcObj.type == 'file' && dstObj.children[dup_index].type == 'file') {
+            for(let i = 0; i < srcParentObj.children.length; i++) {
+              if(srcParentObj.children[i].name === srcObj.name) {
+                srcParentObj.children.splice(i, 1);
+                break;
+              }
+            }
+            dstObj.children.splice(dup_index, 1);
+            dstObj.children.push(newObj);
+          } else {
+            return;
+          }
+        } else {
+          const srcParentObj = getParentObject(srcObj);
+          for(let i = 0; i < srcParentObj.children.length; i++) {
+            if(srcParentObj.children[i].name === srcObj.name) {
+              srcParentObj.children.splice(i, 1);
+              break;
+            }
+          }
+          dstObj.children.push(newObj);
+        }
+      }
+      renderHierarchy();
+      addCommand(command);
+      renderFinder(current);
+    } else { /* dstPathObj does not exist */
+      const dstPathFrags = dstPath.split('/');
+      const newName = dstPathFrags[dstPathFrags.length - 1];
+      dstPathFrags.splice(dstPathFrags.length - 1, 1);
+
+      let dstPrevObj;
+      if (dstPathFrags.length == 0) dstPrevObj = deepcopy(current);
+      else dstPrevObj = findByAbsolutePath(dstPathFrags.join('/'));
+
+      if (dstPrevObj == 0 || dstPrevObj.type != 'folder') { /* dstPrevObj does not exist or it is not a folder */
+        // reject(no such directory: rest[0])
+        return;
+      } else { /* dstPrevObj is a folder */
+        /* rename */
+        if (dstPrevObj.path == current.path) { /* dstPrevObj is the current directory */
+          /* just rename srcObj */
+          srcObj.name = newName;
+        } else {
+          /* move srcObj to dstPrevObj and rename it */
+          srcObj.name = newName;
+          handleCopy(srcObj, dstPrevObj);
+          handleDelete(srcObj);
+
+          renderFinder(current);
+          renderHierarchy();
+        }
+        addCommand(command);
+      }
+    }
   } else {
     $('#command_line').popup('show', function(){
       setTimeout(function(){
@@ -849,6 +974,22 @@ function handleCopy(obj, dirObj) {
   dirObj.children.push(newObj);
   renderHierarchy();
   renderFinder(current);
+}
+
+function getAbsolutePath(path) {
+  let currObj = deepcopy(current);
+  const currPathFrags = current.path.split('/');
+  currPathFrags.splice(currPathFrags.length - 1, 1);
+  const pathFrags = path.split('/');
+  for (let i = 0; i < pathFrags.length; i++) {
+    if (pathFrags[i] == '.') {}
+    else if (pathFrags[i] == '..') {
+      currPathFrags.splice(currPathFrags.length - 1, 1);
+      if (currPathFrags.length == 0) return 0;
+    } else { currPathFrags.push(pathFrags[i]) }
+  }
+
+  return currPathFrags.join('/');
 }
 
 function parentPath(path) {
@@ -884,6 +1025,7 @@ function findByAbsolutePath(path) {
     console.log('gogo');
     if (!names[i]) return obj;
     obj = findByChildName(obj, names[i]);
+    if (obj == 0) return 0;
   }
   return obj;
 }
