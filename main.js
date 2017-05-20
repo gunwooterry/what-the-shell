@@ -259,39 +259,42 @@ $document.ready(() => {
   });
 
   $('#submit_copy').click(function(event) {
-    if(copyorcut == "copy") {
-      if(!$('#submit_copy').hasClass('disabled')){
-        let targetObj = findByAbsolutePath(target.id);
-        handleCopy(selectedObj, targetObj);
-        addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
-        if (current === targetObj) {
-          renderFinder(current);
+    let targetObj = findByAbsolutePath(target.id);
+    if (targetObj.path.indexOf(selectedObj.path) == -1) {
+      if(copyorcut == "copy") {
+        if(!$('#submit_copy').hasClass('disabled')){
+          handleCopy(selectedObj, targetObj);
+          addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+          if (current === targetObj) {
+            renderFinder(current);
+          }
+          renderHierarchy();
+          if(modal_on == 1) {
+            if(prev_target != 0) prev_target.style.color = '#000000';
+            $('#submit_copy').addClass('disabled');
+            $('#modal_popup').hide();
+            modal_on =0;
+          }
         }
-        renderHierarchy();
-        if(modal_on == 1) {
-          if(prev_target != 0) prev_target.style.color = '#000000';
-          $('#submit_copy').addClass('disabled');
-          $('#modal_popup').hide();
-          modal_on =0;
+      } else if(copyorcut == "cut") {
+        if(!$('#submit_copy').hasClass('disabled')){
+          handleCopy(selectedObj, targetObj);
+          handleDelete(selectedObj);
+          if (current === targetObj) {
+            renderFinder(current);
+          }
+          renderHierarchy();
+          addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
+          if(modal_on == 1) {
+            if(prev_target != 0) prev_target.style.color = '#000000';
+            $('#submit_copy').addClass('disabled');
+            $('#modal_popup').hide();
+            modal_on =0;
+          }
         }
       }
-    } else if(copyorcut == "cut") {
-      if(!$('#submit_copy').hasClass('disabled')){
-        let targetObj = findByAbsolutePath(target.id);
-        handleCopy(selectedObj, targetObj);
-        handleDelete(selectedObj);
-        if (current === targetObj) {
-          renderFinder(current);
-        }
-        renderHierarchy();
-        addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
-        if(modal_on == 1) {
-          if(prev_target != 0) prev_target.style.color = '#000000';
-          $('#submit_copy').addClass('disabled');
-          $('#modal_popup').hide();
-          modal_on =0;
-        }
-      }
+    } else {
+      alert('you cannot do recursive copy or move');
     }
   });
 })
@@ -556,7 +559,6 @@ function commandInput(e) {
       const commandLine = document.getElementById('command_line');
       const command = commandLine.value;
       if (command){
-        addCommand(command);
         handleCommand(command);
       }
       commandLine.value = '';
@@ -588,32 +590,34 @@ function handleDelete(fileObj) {
   else addCommand(`rm -f ${fileObj.name}`);
 }
 
-
 function handleCommand(command) {
   // TODO : handle '>'
-  let branch = command.split('>');
-  let output_name = '';
-  console.log(branch);
-  if(branch.length == 2) output_name = branch[1];
-  let args = branch[0].split(' ');
-  console.log(args);
-  let op = args[0];
-  let argnum = args.length - 1;
-  let rest = args.splice(0,1).join();
-  if (op === 'echo'){
-    //if (argnum != 1) handleError('echo requires 1 argument! \n ex) echo "hi" ');
-    let newFile = {
-      type: 'file',
-      name: output_name,
-      path: current.path + output_name,
-      content: rest,
+  const redirect = command.split(' > ');
+  const args = redirect[0].split(' ');
+  const op = args[0];                     // operator
+  const rest = args.slice(1).join();
+
+  if (op === 'echo') {
+    if (redirect.length === 2) {
+      const outputName = branch[1];
+      const newFile = {
+        type: 'file',
+        name: outputName,
+        path: current.path + outputName,
+        content: rest,
+      }
+      current.children.push(newFile);
     }
-    current.children.push(newFile);
-  }
-  if (op === 'cd'){
-    let rest_arr = rest.split('/');
-    if(rest_arr[0] === '~') current = findByAbsolutePath(rest);
-    //else current = findByChildName(current, rest_arr[0]);
+    addCommand(command);
+  } else if (op === 'cd') {
+    const restArray = rest.split('/');
+    if (restArray[0] === '~') current = findByAbsolutePath(rest);
+    else current = findByAbsolutePath(current.path + rest);
+    renderFinder(current);
+    renderBreadcrumb(current);
+    addCommand(command);
+  } else {
+    $('#command_line').popup('show');
   }
   renderHierarchy();
   renderFinder(current);
