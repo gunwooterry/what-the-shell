@@ -190,6 +190,15 @@ $document.ready(() => {
       let prev_name = selectedObj.name;
       addCommand(`mv ${prev_name} ${new_name}`);
       selectedObj.name = new_name;
+      let parentObj = getParentObject(selectedObj);
+      let new_path = parentObj.path;
+      if(selectedObj.type === 'folder'){
+        new_path += (new_name + '/');
+      }
+      else {
+        new_path += new_name;
+      }
+      selectedObj.path = new_path;
       renderHierarchy();
       renderFinder(current);
       $('#rename_input').val('');
@@ -543,7 +552,6 @@ function addCommand(command) {
 }
 
 function commandInput(e) {
-    console.log(e.keyCode);
     if (currentMode == 'CUI' && e.keyCode == 13) {
       const commandLine = document.getElementById('command_line');
       const command = commandLine.value;
@@ -565,12 +573,7 @@ function commandInput(e) {
 }
 
 function handleDelete(fileObj) {
-  const filePathFragments = fileObj.path.split('/');
-  if (fileObj.type === 'folder') filePathFragments.splice(filePathFragments.length - 2, 1);
-  else filePathFragments.splice(filePathFragments.length - 1, 1);
-  const parentPath = filePathFragments.join('/');
-  const parentObj = findByAbsolutePath(parentPath);
-
+  let parentObj = getParentObject(fileObj);
   for (let i = 0; i < parentObj.children.length; i++) {
     if (parentObj.children[i].name === fileObj.name) {
       parentObj.children.splice(i, 1);
@@ -654,6 +657,17 @@ function findByChildName(obj, childName) {
     if (name === childName) return child;
   }
   return -1;
+}
+
+function getParentObject(fileObj) {
+  const filePathFragments = fileObj.path.split('/');
+  if (fileObj.type === 'folder')
+    filePathFragments.splice(filePathFragments.length - 2, 1);
+  else
+    filePathFragments.splice(filePathFragments.length - 1, 1);
+  const parentPath = filePathFragments.join('/');
+  const parentObj = findByAbsolutePath(parentPath);
+  return parentObj;
 }
 
 function showManual(command) {
