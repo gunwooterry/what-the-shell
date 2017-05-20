@@ -82,6 +82,8 @@ $document.ready(() => {
 
   $document.on('contextmenu', '.non_modal_title', function(event) {
     event.preventDefault();
+    let targetPath = event.currentTarget.id;
+    selectedObj = findByAbsolutePath(targetPath);
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
@@ -95,6 +97,7 @@ $document.ready(() => {
   $document.on('contextmenu', '.unit', function(event) {
     event.preventDefault();
     let targetName = event.currentTarget.id;
+    console.log(event.currentTarget);
     selectedObj = findByChildName(current, targetName);
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
@@ -187,10 +190,14 @@ $document.ready(() => {
   })
 
   $('#submit_copy').click(function(event) {
-    if(!$('#submit_copy').hasClass('disabled')){
+    if(!$('#submit_copy').hasClass('disabled')) {
       let targetObj = findByAbsolutePath(target.id);
       handleCopy(selectedObj, targetObj);
       addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+      if (current === targetObj) {
+        renderFinder(current);
+      }
+      renderHierarchy();
       if(modal_on == 1) {
         if(prev_target != 0) prev_target.style.color = '#000000';
         $('#submit_copy').addClass('disabled');
@@ -261,7 +268,7 @@ function renderHierarchy() {
     const currentDir = document.createElement('div');
     currentDir.classList.add('ui', 'accordion');
     current.children.forEach(child => {
-      const { type, name } = child
+      const { type, name, path } = child
       if (type == 'folder') {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
@@ -270,6 +277,7 @@ function renderHierarchy() {
 
         nameText.innerHTML = name;
         title.classList.add('title', 'non_modal_title');
+        title.id = child.path;
         dropdown.classList.add('dropdown', 'icon');
         icon.classList.add('folder', 'icon');
         icon.onclick = () => {
