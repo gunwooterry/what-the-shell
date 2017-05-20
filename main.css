@@ -16,6 +16,10 @@ input:focus {
 	outline: none;
 }
 
+#arrow_btn {
+  cursor: pointer;
+}
+
 #logo {
   font-weight: 900;
   font-size: 18px;

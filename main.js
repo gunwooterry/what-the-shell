@@ -124,6 +124,7 @@ $document.ready(() => {
     copyorcut = "copy";
     ctxMenu.style.display = '';
     if(modal_on == 0) {
+      renderModalHierarchy();
       $('#modal_popup').show();
       modal_on = 1;
      }
@@ -142,6 +143,7 @@ $document.ready(() => {
     copyorcut = "cut";
     ctxMenu.style.display = '';
     if(modal_on == 0) {
+      renderModalHierarchy();
       $('#modal_popup').show();
       modal_on = 1;
     }
