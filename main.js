@@ -589,27 +589,59 @@ function handleCommand(command) {
   const redirect = command.split(' > ');
   const args = redirect[0].split(' ');
   const op = args[0];                     // operator
-  const rest = args.slice(1).join();
+  const rest = args.slice(1);
 
   if (op === 'echo') {
     if (redirect.length === 2) {
-      const outputName = branch[1];
+      const outputName = redirect[1];
+      const message = rest.join(' ');
       const newFile = {
         type: 'file',
         name: outputName,
         path: current.path + outputName,
-        content: rest,
+        content: message,
       }
       current.children.push(newFile);
     }
     addCommand(command);
   } else if (op === 'cd') {
-    const restArray = rest.split('/');
-    if (restArray[0] === '~') current = findByAbsolutePath(rest);
-    else current = findByAbsolutePath(current.path + rest);
+    const path = rest[0];
+    const pathArray = path.split('/');
+    if (pathArray[0] === '~') current = findByAbsolutePath(path);
+    else current = findByAbsolutePath(current.path + path);
     renderFinder(current);
     renderBreadcrumb(current);
     addCommand(command);
+  } else if (op === 'rm') {
+    const flag = rest[0];
+    const path = rest[1];
+    const pathArray = path.split('/');
+
+    if (!flag.includes('-')) {
+      return;
+    }
+
+    let found;
+    if (pathArray[0] === '~') found = findByAbsolutePath(path);
+    else found = findByAbsolutePath(current.path + path);
+    if (found !== -1) {
+      const parent = findByAbsolutePath(parentPath(found.path));
+      if (found.type === 'folder') {
+        if (!flag.includes('r')) {
+          console.log('Cannot remove directory');
+          return;
+        }
+      }
+      for (let i = 0; i < parent.children.length; i++) {
+        if (parent.children[i].name === found.name) {
+          parent.children.splice(i, 1);
+          break;
+        }
+      }
+    } else {
+     console.log('Not found');
+   }
+
   } else {
     $('#command_line').popup('show');
   }
@@ -619,15 +651,17 @@ function handleCommand(command) {
 
 function handleCopy(obj, dirObj) {
   const newObj = deepcopy(obj);
+  const orgPath = parentPath(newObj.path);
 
-  let orgPath;
-  if (newObj.type === 'folder') orgPath = newObj.path.split('/').slice(0, -2);
-  else orgPath = newObj.path.split('/').slice(0, -1);
-
-  replacePath(newObj, `${orgPath.join('/')}/`, dirObj.path);
+  replacePath(newObj, `${orgPath}/`, dirObj.path);
   dirObj.children.push(newObj);
   renderHierarchy();
   renderFinder(current);
+}
+
+function parentPath(path) {
+  if (path.endsWith('/')) return path.split('/').slice(0, -2).join('/');
+  else return path.split('/').slice(0, -1).join('/');
 }
 
 function replacePath(target, orgPath, newPath) {
