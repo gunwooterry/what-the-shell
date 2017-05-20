@@ -704,9 +704,11 @@ function handleCommand(command) {
                   content: src_obj.content,
                 };
                 dst_obj.children.push(newChild);
+                addCommand(command);
               }
               else if(child.type === 'file'){
                 child.content = src_obj.content;
+                addCommand(command);
               }
               else{
                 console.log('cp: cannot overwrite directory' + child.name + 'with non-directory' + src_obj.name);
@@ -741,6 +743,7 @@ function handleCommand(command) {
                   content: src_obj.content,
                 };
                 dst_dir_obj.children.push(newChild);
+                addCommand(command);
               }
               else if(dst_folder_child.type === 'folder'){
                 let last_child = hasChildNamed(dst_folder_child, src_obj.name);
@@ -752,16 +755,19 @@ function handleCommand(command) {
                     content: src_obj.content,
                   };
                   dst_folder_child.children.push(newChild);
+                  addCommand(command);
                 }
                 else if (last_child.type === 'folder'){
                   console.log('cp: cannot overwrite directory' + last_child.name + 'with non-directory' + src_obj.name);
                 }
                 else{
                   last_child.content = src_obj.content;
+                  addCommand(command);
                 }
               }
               else{
                 dst_folder_child.content = src_obj.content;
+                addCommand(command);
               }
             }
           }
@@ -801,6 +807,7 @@ function handleCommand(command) {
               };
               replacePath(newChild, src_obj.path, dst_dir_obj.path + dst_filename + '/');
               dst_dir_obj.children.push(newChild);
+              addCommand(command);
             }
             else if(dst_folder_child.type === 'folder'){
               let last_child = hasChildNamed(dst_folder_child, src_obj.name);
@@ -813,10 +820,12 @@ function handleCommand(command) {
                 };
                 replacePath(newChild, src_obj.path, dst_folder_child.path + src_obj.name + '/');
                 dst_folder_child.children.push(newChild);
+                addCommand(command);
               }
               else if (last_child.type === 'folder'){
                 last_child.children = src_obj.children;
                 replacePath(last_child, src_obj.path, dst_folder_child.path + src_obj.name + '/');
+                addCommand(command);
               }
               else{
                 console.log('cp: cannot overwrite non-directory' + last_child.name + 'with directory' + src_obj.name);
