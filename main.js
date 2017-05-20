@@ -549,7 +549,8 @@ function commandInput(e) {
 
 function handleDelete(fileObj) {
   const filePathFragments = fileObj.path.split('/');
-  filePathFragments.splice(filePathFragments.length - 2, 1);
+  if (fileObj.type === 'folder') filePathFragments.splice(filePathFragments.length - 2, 1);
+  else filePathFragments.splice(filePathFragments.length - 1, 1);
   const parentPath = filePathFragments.join('/');
   const parentObj = findByAbsolutePath(parentPath);
 
