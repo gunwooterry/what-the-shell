@@ -174,6 +174,8 @@ $document.ready(() => {
   $document.on('click', '.delete', function(event) {
     event.preventDefault();
     handleDelete(selectedObj);
+    if (selectedObj.fileType === 'folder') addCommand(`rm -rf ${ selectedObj.name }`);
+    else addCommand(`rm -f ${ selectedObj.name }`);
   });
 
   $('#rename_input').on('input', function(){
@@ -599,9 +601,6 @@ function handleDelete(fileObj) {
 
   renderHierarchy();
   renderFinder(current);
-
-  if (fileObj.fileType === 'folder') addCommand(`rm -rf ${fileObj.name}`);
-  else addCommand(`rm -f ${fileObj.name}`);
 }
 
 function handleCommand(command) {
