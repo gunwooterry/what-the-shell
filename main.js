@@ -667,7 +667,6 @@ function handleCommand(command) {
     const dstPath = getAbsolutePath(rest[1]);
     if(srcPath == 0 || dstPath == 0) return;
     const srcObj = findByAbsolutePath(srcPath);
-    console.log(dstPath);
     const dstObj = findByAbsolutePath(dstPath);
     if(srcObj == 0) {
       return;
