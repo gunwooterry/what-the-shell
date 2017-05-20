@@ -475,7 +475,6 @@ function commandInput(e) {
       const commandLine = document.getElementById('command_line');
       const command = commandLine.value;
       if (command){
-        addCommand(command);
         handleCommand(command);
       }
       commandLine.value = '';
@@ -500,30 +499,34 @@ function handleDelete(filename) {
   else addCommand(`rm -f ${filename}`);
 }
 
-
 function handleCommand(command) {
   // TODO : handle '>'
-  let branch = command.split('>');
-  let output_name = '';
-  if(branch.length == 2) output_name = branch[1];
-  let args = branch[0].split(' ');
-  let op = args[0];
-  let argnum = args.length - 1;
-  let rest = args.splice(0,1).join();
-  if (op === 'echo'){
-    //if (argnum != 1) handleError('echo requires 1 argument! \n ex) echo "hi" ');
-    let newFile = {
-      type: 'file',
-      name: output_name,
-      path: current.path + output_name,
-      content: rest,
+  const redirect = command.split(' > ');
+  const args = redirect[0].split(' ');
+  const op = args[0];                     // operator
+  const rest = args.slice(1).join();
+
+  if (op === 'echo') {
+    if (redirect.length === 2) {
+      const outputName = branch[1];
+      const newFile = {
+        type: 'file',
+        name: outputName,
+        path: current.path + outputName,
+        content: rest,
+      }
+      current.children.push(newFile);
     }
-    current.children.push(newFile);
-  }
-  if (op === 'cd'){
-    let rest_arr = rest.split('/');
-    if(rest_arr[0] === '~') current = findByAbsolutePath(rest);
-    //else current = findByChildName(current, rest_arr[0]);
+    addCommand(command);
+  } else if (op === 'cd') {
+    const restArray = rest.split('/');
+    if (restArray[0] === '~') current = findByAbsolutePath(rest);
+    else current = findByAbsolutePath(current.path + rest);
+    renderFinder(current);
+    renderBreadcrumb(current);
+    addCommand(command);
+  } else {
+    $('#command_line').popup('show');
   }
   renderHierarchy();
   renderFinder(current);
