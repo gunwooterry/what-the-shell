@@ -41,14 +41,14 @@
               <div class="header" id="rename_header" >TYPE NEW FILE NAME</div>
               <hr/>
               <div class="ui focus input rename">
-                <input id="rename_input" autofocus type="text" placeholder="aaa" style="padding-left: 10px;" onkeypress="commandInput(event)">
+                <input id="rename_input" type="text" placeholder="aaa" style="padding-left: 10px;" onkeydown="commandInput(event)">
               </div>
               <br>
               <button class="ui blue button disabled" id="rename_submit" style="float:right;">Submit</button>
             </div>
          </div>
 
-          <div class="ui" id="modal_popup" style="display:none;width:100%; height:100%; position:absolute; top:0;left:0;padding:70px 100px;background-color: rgba(0,0,0,0.6);">
+          <div class="ui" id="modal_popup" style="display:none;width:100%; height:100%; position:absolute; top:0;left:0;padding:70px 100px;background-color: rgba(0,0,0,0.6);" tabindex="1">
             <div class="ui segment modal_content" style="width:100%;height:100%;position:relative;background-color:#FFFFFF;">
               <div class="header">CHOOSE FOLDER TO COPY</div>
               <hr/>

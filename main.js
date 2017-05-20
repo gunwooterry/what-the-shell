@@ -125,6 +125,7 @@ $document.ready(() => {
     if(modal_on == 0) {
       renderModalHierarchy();
       $('#modal_popup').show();
+      $('#modal_popup').focus();
       modal_on = 1;
      }
      return false;
@@ -142,6 +143,7 @@ $document.ready(() => {
         $("#rename_header").html("TYPE NEW FILE NAME");
       }
       $('#rename_input').attr("placeholder", selectedObj.name);
+      $('#rename_input').focus();
       modal_on = 2;
      }
      return false;
@@ -184,15 +186,17 @@ $document.ready(() => {
 
   $('#rename_submit').click(function(event){
     let new_name = $('#rename_input').val();
-    let prev_name = selectedObj.name;
-    addCommand(`mv ${prev_name} ${new_name}`);
-    selectedObj.name = new_name;
-    renderHierarchy();
-    renderFinder(current);
-    $('#rename_input').val('');
-    $('#rename_submit').addClass('disabled');
-    $('#modal_popup_rename').hide();
-    modal_on = 0;
+    if(new_name !== ''){
+      let prev_name = selectedObj.name;
+      addCommand(`mv ${prev_name} ${new_name}`);
+      selectedObj.name = new_name;
+      renderHierarchy();
+      renderFinder(current);
+      $('#rename_input').val('');
+      $('#rename_submit').addClass('disabled');
+      $('#modal_popup_rename').hide();
+      modal_on = 0;
+    }
   });
 
   $document.on('click', '.unit', function(event) {
@@ -217,6 +221,10 @@ $document.ready(() => {
       $('#modal_popup').hide();
       modal_on = 0;
     }
+  });
+
+  $('#modal_popup').bind('keydown', function(event) {
+    commandInput(event);
   })
 
   $('#modal_popup_rename').click(function(event) {
@@ -225,7 +233,7 @@ $document.ready(() => {
       $('#modal_popup_rename').hide();
       modal_on = 0;
     }
-  })
+  });
 
   let prev_target = 0;
   let target = 0;
@@ -442,7 +450,9 @@ function renderFinder(current) {
     column.style.textAlign = 'center';
     unit.className = 'unit';
     unit.id = name;
-    icon.style.margin = 0;
+    icon.style.margin = 'auto';
+    icon.style.display = 'block';
+    nameText.display = 'block';
     if (type == 'folder') {
       icon.classList.add('huge', 'blue', 'folder', 'icon');
       unit.ondblclick = function () {
@@ -533,6 +543,7 @@ function addCommand(command) {
 }
 
 function commandInput(e) {
+    console.log(e.keyCode);
     if (currentMode == 'CUI' && e.keyCode == 13) {
       const commandLine = document.getElementById('command_line');
       const command = commandLine.value;
@@ -544,6 +555,12 @@ function commandInput(e) {
     }
     else if (currentMode == 'GUI' && modal_on == 2 && e.keyCode == 13) {
       $('#rename_submit').trigger('click');
+    }
+    else if (currentMode == 'GUI' && modal_on == 2 && e.keyCode == 27) {
+      $('#modal_popup_rename').trigger('click');
+    }
+    else if (currentMode == 'GUI' && modal_on == 1 && e.keyCode == 27) {
+      $('#modal_popup').trigger('click');
     }
 }
 
