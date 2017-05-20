@@ -1,5 +1,6 @@
 const $document = $(document);
 var modal_on = 0;
+let copyorcut = "copy";
 let root = {
   type: 'folder',
   name: '~',
@@ -99,21 +100,25 @@ $document.ready(() => {
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
+    $('.unit').css("background-color", "rgba(0,0,0,0)");
+    $(this).css("background-color", "#AAAAAA");
   });
 
 
   $document.on('click', function(event) {
-    ctxMenu.style.display = '';
+    ctxMenu.style.display = 'none';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
     // if(modal_on == 1) {
     //   $('#modal_popup').hide();
     //   modal_on =0;
     // }
+    $('.unit').css("background-color", "rgba(0,0,0,0)");
   });
 
   $document.on('click', '.copy', function(event) {
     //event.preventDefault();
+    copyorcut = "copy";
     ctxMenu.style.display = '';
     if(modal_on == 0) {
       $('#modal_popup').show();
@@ -131,6 +136,7 @@ $document.ready(() => {
 
   $document.on('click', '.cut', function(event) {
     //event.preventDefault();
+    copyorcut = "cut";
     ctxMenu.style.display = '';
     if(modal_on == 0) {
       $('#modal_popup').show();
@@ -144,6 +150,13 @@ $document.ready(() => {
     handleDelete(selectedObj.name);
   });
 
+  $document.on('click', '.unit', function(event) {
+    event.preventDefault();
+    $('.unit').css("background-color", "rgba(0,0,0,0)");
+    $(this).css("background-color", "#AAAAAA");
+    ctxMenu.style.display = 'none';
+    return false;
+  });
 
 
   // $document.on('click', '.title', function(event) {
@@ -176,15 +189,30 @@ $document.ready(() => {
   });
 
   $('#submit_copy').click(function(event) {
-    if(!$('#submit_copy').hasClass('disabled')){
-      let targetObj = findByAbsolutePath(target.id);
-      handleCopy(selectedObj, targetObj);
-      addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
-      if(modal_on == 1) {
-        if(prev_target != 0) prev_target.style.color = '#000000';
-        $('#submit_copy').addClass('disabled');
-        $('#modal_popup').hide();
-        modal_on =0;
+    if(copyorcut == "copy") {
+      if(!$('#submit_copy').hasClass('disabled')){
+        let targetObj = findByAbsolutePath(target.id);
+        handleCopy(selectedObj, targetObj);
+        addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+        if(modal_on == 1) {
+          if(prev_target != 0) prev_target.style.color = '#000000';
+          $('#submit_copy').addClass('disabled');
+          $('#modal_popup').hide();
+          modal_on =0;
+        }
+      }
+    } else if(copyorcut == "cut") {
+      if(!$('#submit_copy').hasClass('disabled')){
+        let targetObj = findByAbsolutePath(target.id);
+        handleCopy(selectedObj, targetObj);
+        handleDelete(selectedObj.name);
+        addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
+        if(modal_on == 1) {
+          if(prev_target != 0) prev_target.style.color = '#000000';
+          $('#submit_copy').addClass('disabled');
+          $('#modal_popup').hide();
+          modal_on =0;
+        }
       }
     }
   });
@@ -257,11 +285,20 @@ function renderHierarchy() {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
         const icon = document.createElement('i');
-        const nameText = document.createTextNode(name);
+        const nameText = document.createElement('span');
 
+        nameText.innerHTML = name;
         title.classList.add('title', 'non_modal_title');
         dropdown.classList.add('dropdown', 'icon');
         icon.classList.add('folder', 'icon');
+        icon.onclick = () => {
+          goto(child);
+          addCommand(`cd ${child.path}`);
+        }
+        nameText.onclick = () => {
+          goto(child);
+          addCommand(`cd ${child.path}`);
+        }
         title.appendChild(dropdown);
         title.appendChild(icon);
         title.appendChild(nameText);
@@ -274,10 +311,6 @@ function renderHierarchy() {
         content.appendChild(renderHierarchyRec(child));
         currentDir.appendChild(content);
 
-        icon.onclick = function() {
-          goto(child);
-          addCommand(`cd ${child.path}`);
-        }
         dropdown.onclick = function() {
           title.classList.toggle('active');
           content.classList.toggle('active');
