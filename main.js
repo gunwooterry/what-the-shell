@@ -61,7 +61,14 @@ const descriptions = {
 }
 
 $document.ready(() => {
-  $('#welcome').modal({ blurring: true }).modal('show');
+  $('#welcome').modal({ blurring: true }).modal('show', function(){
+    $('#welcome').focus();
+    $('#welcome').bind('keydown', function(e) {
+      console.log('hi');
+      if(e.keyCode == 13 || e.keyCode == 27)
+        $('#welcome').modal('hide');
+    });
+  });
 
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
