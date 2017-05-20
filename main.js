@@ -715,7 +715,7 @@ function handleCommand(command) {
           const newObj = deepcopy(srcObj);
           const orgPath = parentPath(newObj.path);
           replacePath(newObj, `${orgPath}/`, dstObj.path);
-          
+
           if(srcObj.type == 'folder' && dstObj.children[dup_index].type == 'folder') {
             if(dstObj.children[dup_index].children.length == 0) {
               for(let i = 0; i < srcParentObj.children.length; i++) {
@@ -836,6 +836,7 @@ function findByAbsolutePath(path) {
   for (let i = 1; i < names.length; i++){
     if (!names[i]) return obj;
     obj = findByChildName(obj, names[i]);
+    if (obj == 0) return 0;
   }
   return obj;
 }
