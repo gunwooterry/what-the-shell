@@ -662,6 +662,20 @@ function handleCommand(command) {
     } else {
      console.log('Not found');
    }
+  } else if (op === 'mv') {
+    const srcPath = getAbsolutePath(rest[0]);
+    const dstPath = getAbsolutePath(rest[0]);
+    if(srcPath == 0 || dstPath == 0) return;
+    const srcObj = findByAbsolutePath(srcPath);
+    const dstObj = findByAbsolutePath(dstPath);
+    if(srcObj == 0) {
+      return;
+    }
+    if(dstObj != 0) {
+
+    } else {
+
+    }
   } else {
     $('#command_line').popup('show');
   }
@@ -677,6 +691,25 @@ function handleCopy(obj, dirObj) {
   dirObj.children.push(newObj);
   renderHierarchy();
   renderFinder(current);
+}
+
+function getAbsolutePath(path) {
+  let currObj = deepcopy(current);
+  const pathFrags = path.split('/');
+  for (let i = 0; i < pathFrags.length; i++) {
+    if (pathFrags[i] == '.') {}
+    else if (pathFrags[i] == '..') { currObj = getParentObject(currObj); }
+    else {
+      let nextObjPath;
+      if (i < pathFrags.length - 1) nextObjPath = currObj.path + pathFrags[i] + '/';
+      else nextObjPath = currObj.path + pathFrags[i];
+      currObj = findByAbsolutePath(nextObjPath);
+    }
+
+    if (currObj == 0) return 0;
+  }
+
+  return currObj;
 }
 
 function parentPath(path) {
@@ -695,7 +728,7 @@ function findByAbsolutePath(path) {
   let obj = root;
   const names = path.split('/');
   const currentName = obj.name;
-  if (names[0] != '~') return -1;
+  if (names[0] != '~') return 0;
   for (let i = 1; i < names.length; i++){
     if (!names[i]) return obj;
     obj = findByChildName(obj, names[i]);
