@@ -256,11 +256,20 @@ function renderHierarchy() {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
         const icon = document.createElement('i');
-        const nameText = document.createTextNode(name);
+        const nameText = document.createElement('span');
 
+        nameText.innerHTML = name;
         title.classList.add('title', 'non_modal_title');
         dropdown.classList.add('dropdown', 'icon');
         icon.classList.add('folder', 'icon');
+        icon.onclick = () => {
+          goto(child);
+          addCommand(`cd ${child.path}`);
+        }
+        nameText.onclick = () => {
+          goto(child);
+          addCommand(`cd ${child.path}`);
+        }
         title.appendChild(dropdown);
         title.appendChild(icon);
         title.appendChild(nameText);
@@ -273,10 +282,6 @@ function renderHierarchy() {
         content.appendChild(renderHierarchyRec(child));
         currentDir.appendChild(content);
 
-        icon.onclick = function() {
-          goto(child);
-          addCommand(`cd ${child.path}`);
-        }
         dropdown.onclick = function() {
           title.classList.toggle('active');
           content.classList.toggle('active');
