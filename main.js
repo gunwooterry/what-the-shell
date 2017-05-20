@@ -648,6 +648,25 @@ function handleCopy(obj, dirObj) {
   renderFinder(current);
 }
 
+function getAbsolutePath(path) {
+  let currObj = deepcopy(current);
+  const pathFrags = path.split('/');
+  for (let i = 0; i < pathFrags.length; i++) {
+    if (pathFrags[i] == '.') {}
+    else if (pathFrags[i] == '..') { currObj = getParentObject(currObj); }
+    else {
+      let nextObjPath;
+      if (i < pathFrags.length - 1) nextObjPath = currObj.path + pathFrags[i] + '/';
+      else nextObjPath = currObj.path + pathFrags[i];
+      currObj = findByAbsolutePath(nextObjPath);
+    }
+
+    if (currObj == 0) return 0;
+  }
+
+  return currObj;
+}
+
 function replacePath(target, orgPath, newPath) {
   target.path = target.path.replace(orgPath, newPath);
   if (target.children) {
@@ -659,7 +678,7 @@ function findByAbsolutePath(path) {
   let obj = root;
   const names = path.split('/');
   const currentName = obj.name;
-  if (names[0] != '~') return -1;
+  if (names[0] != '~') return 0;
   for (let i = 1; i < names.length; i++){
     if (!names[i]) return obj;
     obj = findByChildName(obj, names[i]);
