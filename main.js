@@ -214,12 +214,26 @@ $document.ready(() => {
         }
         else {
           $('#rename_input').attr('data-content', 'There is a file using same name!');
-          $('#rename_input').popup('show');
+          $('#rename_input').popup('show', function(){
+            setTimeout(function(){
+              console.log('callback');
+              $('#rename_input').popup('hide', function(){
+                $('#rename_input').popup('destroy');
+              });
+            }, 2000);
+          });
         }
       }
       else{
         $('#rename_input').attr('data-content', 'Whitespace on name is not supported yet.. sorry');
-        $('#rename_input').popup('show');
+        $('#rename_input').popup('show', function(){
+          setTimeout(function(){
+            console.log('callback');
+            $('#rename_input').popup('hide', function(){
+              $('#rename_input').popup('destroy');
+            });
+          }, 2000);
+        });
       }
     }
   });
@@ -660,7 +674,161 @@ function handleCommand(command) {
       }
     } else {
      console.log('Not found');
-   }
+    }
+  } else if(op === 'cp'){
+    if(rest.length == 2){
+      const src = rest[0];
+      const dst = rest[1];
+      let src_obj = findByPath(src);
+      console.log(src_obj);
+      if(src_obj == 0){
+        console.log('No such file named' + src);
+      }
+      else {
+        if(src_obj.type === 'file'){
+          if (dst[dst.length-1] === '/'){
+            let dst_obj = findByPath(dst);
+            if(dst_obj == 0){
+              console.log('cp: directory' + dst + 'does not exist');
+            }
+            else if(dst_obj.type === 'file'){
+              console.log('cp: directory' + dst + 'does not exist');
+            }
+            else{
+              let child = hasChildNamed(dst_obj, src_obj.name);
+              if(child == 0){
+                let newChild = {
+                  type: 'file',
+                  name: src_obj.name,
+                  path: dst + src_obj.name,
+                  content: src_obj.content,
+                };
+                dst_obj.children.push(newChild);
+              }
+              else if(child.type === 'file'){
+                child.content = src_obj.content;
+              }
+              else{
+                console.log('cp: cannot overwrite directory' + child.name + 'with non-directory' + src_obj.name);
+              }
+            }
+          }
+          else{
+            let dst_arr = dst.split('/');
+            let dst_len = dst_arr.length;
+            let dst_filename = dst_arr[dst_len - 1];
+            let dir_string = '';
+            let dst_dir_obj = current;
+            if(dst_len - 1 > 0){
+              dir_string = dst_arr.splice(dst_len - 1, 1).join('/') + '/';
+              dst_dir_obj = findByPath(dir_string);
+            }
+            else if(dst[0] == '~'){
+              dst_dir_obj = root;
+            }
+            console.log('dir_string = ' + dir_string);
+            console.log(dst_dir_obj);
+            if(dst_dir_obj == 0 || dst_dir_obj == -1){
+              console.log('cp: directory' + dst + 'does not exist');
+            }
+            else if(dst_dir_obj.type === 'folder'){
+              let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
+              if(dst_folder_child == 0){
+                let newChild = {
+                  type: 'file',
+                  name: dst_filename,
+                  path: dst_dir_obj.path + src_obj.name,
+                  content: src_obj.content,
+                };
+                dst_dir_obj.children.push(newChild);
+              }
+              else if(dst_folder_child.type === 'folder'){
+                let last_child = hasChildNamed(dst_folder_child, src_obj.name);
+                if(last_child == 0){
+                  let newChild = {
+                    type: 'file',
+                    name: src_obj.name,
+                    path: dst_folder_child.path + src_obj.name,
+                    content: src_obj.content,
+                  };
+                  dst_folder_child.children.push(newChild);
+                }
+                else if (last_child.type === 'folder'){
+                  console.log('cp: cannot overwrite directory' + last_child.name + 'with non-directory' + src_obj.name);
+                }
+                else{
+                  last_child.content = src_obj.content;
+                }
+              }
+              else{
+                dst_folder_child.content = src_obj.content;
+              }
+            }
+          }
+        }
+        else {
+          let dst_arr = dst.split('/');
+          if (dst[dst.length-1] === '/'){
+            dst_arr.splice(dst_arr.length - 1, 1);
+          }
+          let dst_len = dst_arr.length;
+          let dst_filename = dst_arr[dst_len - 1];
+          let dir_string = '';
+          let dst_dir_obj = current;
+          console.log(dst_arr);
+          if(dst_len - 1 > 0){
+            dst_arr.splice(dst_len - 1, 1);
+            dir_string = dst_arr.join('/') + '/';
+            console.log(dir_string);
+            dst_dir_obj = findByPath(dir_string);
+          }
+          else if(dst[0] == '~'){
+            dst_dir_obj = root;
+          }
+          console.log('dir_string = ' + dir_string);
+          console.log(dst_dir_obj);
+          if(dst_dir_obj == 0 || dst_dir_obj == -1){
+            console.log('cp: directory' + dst + 'does not exist');
+          }
+          else if(dst_dir_obj.type === 'folder'){
+            let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
+            if(dst_folder_child == 0){
+              let newChild = {
+                type: 'folder',
+                name: dst_filename,
+                path: dst_dir_obj.path + dst_filename + '/',
+                children: src_obj.children,
+              };
+              replacePath(newChild, src_obj.path, dst_dir_obj.path + dst_filename + '/');
+              dst_dir_obj.children.push(newChild);
+            }
+            else if(dst_folder_child.type === 'folder'){
+              let last_child = hasChildNamed(dst_folder_child, src_obj.name);
+              if(last_child == 0){
+                let newChild = {
+                  type: 'folder',
+                  name: src_obj.name,
+                  path: dst_folder_child.path + src_obj.name + '/',
+                  children: src_obj.children,
+                };
+                replacePath(newChild, src_obj.path, dst_folder_child.path + src_obj.name + '/');
+                dst_folder_child.children.push(newChild);
+              }
+              else if (last_child.type === 'folder'){
+                last_child.children = src_obj.children;
+                replacePath(last_child, src_obj.path, dst_folder_child.path + src_obj.name + '/');
+              }
+              else{
+                console.log('cp: cannot overwrite non-directory' + last_child.name + 'with directory' + src_obj.name);
+              }
+            }
+            else{
+              console.log('cp: cannot overwrite non-directory' + dst_folder_child.name + 'with directory' + src_obj.name);
+            }
+          }
+        }
+      }
+    }
   } else if (op === 'mv') {
     const srcPath = getAbsolutePath(rest[0]);
     const dstPath = getAbsolutePath(rest[1]);
@@ -784,7 +952,14 @@ function handleCommand(command) {
       }
     }
   } else {
-    $('#command_line').popup('show');
+    $('#command_line').popup('show', function(){
+      setTimeout(function(){
+        console.log('callback');
+        $('#command_line').popup('hide', function(){
+          $('#command_line').popup('destroy');
+        });
+      }, 2000);
+    });
   }
   renderHierarchy();
   renderFinder(current);
@@ -828,17 +1003,58 @@ function replacePath(target, orgPath, newPath) {
   }
 }
 
+function findByPath(path){
+  if(path === ''){
+    return -10; //
+  }
+  if(path[0] === '~' || path[0] === '/'){
+    return findByAbsolutePath(path);
+  }
+  else{
+    return findByRelativePath(path);
+  }
+}
+
 function findByAbsolutePath(path) {
   let obj = root;
   const names = path.split('/');
   const currentName = obj.name;
-  if (names[0] != '~') return 0;
+  if (names[0] != '~' && names[0] != '') return 0;
   for (let i = 1; i < names.length; i++){
+    console.log('gogo');
     if (!names[i]) return obj;
     obj = findByChildName(obj, names[i]);
     if (obj == 0) return 0;
   }
   return obj;
+}
+
+function findByRelativePath(path) {
+  let path_arr = path.split('/');
+  let iter_obj = current;
+  let path_name = path_arr[0];
+  for(let i = 0 ; i < path_arr.length ; i++){
+    path_name = path_arr[i];
+    if(iter_obj == 0){
+      return 0;
+    }
+    if(path_name === '.'){
+      continue;
+    }
+    else if(path_name === ''){
+      if(iter_obj.type === 'folder')
+        return iter_obj;
+      else
+        return -1; // is not a directory
+    }
+    else if(path_name === '..'){
+      iter_obj = getParentObject(iter_obj);
+    }
+    else{
+      iter_obj = findByChildName(iter_obj, path_name);
+    }
+  }
+  return iter_obj;
 }
 
 function findByChildName(obj, childName) {
@@ -859,6 +1075,7 @@ function getParentObject(fileObj) {
   const parentObj = findByAbsolutePath(parentPath);
   return parentObj;
 }
+
 
 function hasChildNamed(parentObj, name){
   if(parentObj.type === 'folder'){
