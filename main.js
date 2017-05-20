@@ -165,7 +165,6 @@ $document.ready(() => {
   let target = 0;
 
   $('.modal_content').click(function(event) {
-
     if($(event.target).closest('.title').length == 1){
       if(prev_target != 0) prev_target.style.color = '#000000';
       target = $(event.target).closest('.title')[0];
@@ -174,7 +173,7 @@ $document.ready(() => {
       $('#submit_copy').removeClass('disabled');
     }
     return false;
-  })
+  });
 
   $('#submit_copy').click(function(event) {
     if(!$('#submit_copy').hasClass('disabled')){
@@ -188,10 +187,7 @@ $document.ready(() => {
         modal_on =0;
       }
     }
-  })
-
-
-
+  });
 })
 
 const arrowBig = 4;
@@ -244,6 +240,11 @@ function goto(here) {
   current = here;
   renderFinder(here);
   renderBreadcrumb(here);
+}
+
+function deepcopy(obj) {
+  if (obj) return JSON.parse(JSON.stringify(obj));
+  else return {};
 }
 
 function renderHierarchy() {
@@ -467,7 +468,7 @@ function handleDelete(filename) {
 }
 
 
-function handleCommand(command){
+function handleCommand(command) {
   // TODO : handle '>'
   let branch = command.split('>');
   let output_name = '';
@@ -491,40 +492,32 @@ function handleCommand(command){
     if(rest_arr[0] === '~') current = findByAbsolutePath(rest);
     //else current = findByChildName(current, rest_arr[0]);
   }
-  renderHierarchy(current);
+  renderHierarchy();
   renderFinder(current);
 }
 
-
-function handleCopy(obj, dirobj){
-  let newObj = 0;
-  if(obj.type === 'folder'){
-    newObj = {
-      type: obj.type,
-      name: obj.name,
-      path: obj.path,
-      children: []
-    }
-    // TODO : deep copy -> change path
-    obj.children.forEach(child => {
-      newObj.children.push(child);
-    });
-  }
-  else{
-    newObj = {
-      type: obj.type,
-      name: obj.name,
-      path: obj.path,
-      content: obj.content,
-    }
-  }
-  console.log(current);
+function handleCopy(obj, dirobj) {
+  const newObj = deepcopy(obj);
   renderHierarchy(current);
   renderFinder(current);
+
+  let orgPath;
+  if (newObj.type === 'folder') orgPath = newObj.path.split('/').slice(0, -2);
+  else orgPath = newObj.path.split('/').slice(0, -1);
+
+  replacePath(newObj, `${orgPath.join('/')}/`, dirobj.path);
   dirobj.children.push(newObj);
+  renderHierarchy();
 }
 
-function findByAbsolutePath(path){
+function replacePath(target, orgPath, newPath) {
+  target.path = target.path.replace(orgPath, newPath);
+  if (target.children) {
+    target.children.forEach((child) => replacePath(child, orgPath, newPath))
+  }
+}
+
+function findByAbsolutePath(path) {
   let obj = root;
   const names = path.split('/');
   const currentName = obj.name;
@@ -536,7 +529,7 @@ function findByAbsolutePath(path){
   return obj;
 }
 
-function findByChildName(obj, childName){
+function findByChildName(obj, childName) {
   for (child of obj.children) {
     const { type, name } = child;
     if (name === childName) return child;
