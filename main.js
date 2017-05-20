@@ -662,7 +662,7 @@ function handleCommand(command) {
 
   } else if (op === 'mv') {
     const srcPath = getAbsolutePath(rest[0]);
-    const dstPath = getAbsolutePath(rest[0]);
+    const dstPath = getAbsolutePath(rest[1]);
     if(srcPath == 0 || dstPath == 0) return;
     const srcObj = findByAbsolutePath(srcPath);
     const dstObj = findByAbsolutePath(dstPath);
@@ -670,7 +670,88 @@ function handleCommand(command) {
       return;
     }
     if(dstObj != 0) {
+      if(dstObj.type == 'file') {
+        if(srcObj.type == 'folder') {
+          return;
+        } else {
+          const newObj = deepcopy(srcObj);
+          const orgPath = parentPath(newObj.path);
+          const srcParentObj = getParentObject(srcObj);
+          const dstparentObj = getParentObject(dstObj);
 
+          replacePath(newObj, `${orgPath}/`, parentPath(dstObj.path));
+          newObj.name = dstObj.name;
+          for(let i = 0; i < srcParentObj.children.length; i++) {
+            if(srcParentObj.children[i].name === srcObj.name) {
+              srcParentObj.children.splice(i, 1);
+              break;
+            }
+          }
+          for(let i = 0; i < dstParentObj.children.length; i++) {
+            if(dstParentObj.children[i].name === dstObj.name) {
+              dstParentObj.children.splice(i, 1);
+              break;
+            }
+          }
+          dstParentObj.children.push(newObj);
+        }
+      } else {
+        const dup = 0;
+        const dup_index = 0;
+        const newObj = deepcopy(srcObj);
+        const orgPath = parentPath(newObj.path);
+        replacePath(newObj, `${orgPath}/`, dstObj.path);
+        for(let i = 0; i < dstObj.children.length; i++) {
+          if (dstObj.children[i].name === srcObj.name) {
+            dup = 1;
+            dup_index = i;
+            break;
+          }
+        }
+        if(dup == 1) {
+          const srcParentObj = getParentObject(srcObj);
+          const newObj = deepcopy(srcObj);
+          const orgPath = parentPath(newObj.path);
+          replacePath(newObj, `${orgPath}/`, dstObj.path);
+          
+          if(srcObj.type == 'folder' && dstObj.children[dup_index].type == 'folder') {
+            if(dstObj.children[dup_index].children.length == 0) {
+              for(let i = 0; i < srcParentObj.children.length; i++) {
+                if(srcParentObj.children[i].name === srcObj.name) {
+                  srcParentObj.children.splice(i, 1);
+                  break;
+                }
+              }
+              dstObj.children.splice(dup_index, 1);
+              dstObj.children.push(newObj);
+            } else {
+              return;
+            }
+          } else if(srcObj.type = 'file' && dstObj.children[dup_index].type == 'file') {
+            for(let i = 0; i < srcParentObj.children.length; i++) {
+              if(srcParentObj.children[i].name === srcObj.name) {
+                srcParentObj.children.splice(i, 1);
+                break;
+              }
+            }
+            dstObj.children.splice(dup_index, 1);
+            dstObj.children.push(newObj);
+          } else {
+            return;
+          }
+        } else {
+          const srcParentObj = getParentObject(srcObj);
+          for(let i = 0; i < srcParentObj.children.length; i++) {
+            if(srcParentObj.children[i].name === srcObj.name) {
+              srcParentObj.children.splice(i, 1);
+              break;
+            }
+          }
+          dstObj.children.push(newObj);
+        }
+      }
+      renderHierarchy();
+      renderFinder(current);
     } else {
 
     }
