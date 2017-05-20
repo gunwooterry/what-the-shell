@@ -83,6 +83,8 @@ $document.ready(() => {
 
   $document.on('contextmenu', '.non_modal_title', function(event) {
     event.preventDefault();
+    let targetPath = event.currentTarget.id;
+    selectedObj = findByAbsolutePath(targetPath);
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
@@ -121,11 +123,32 @@ $document.ready(() => {
     copyorcut = "copy";
     ctxMenu.style.display = '';
     if(modal_on == 0) {
+      renderModalHierarchy();
       $('#modal_popup').show();
+      $('#modal_popup').focus();
       modal_on = 1;
      }
      return false;
   });
+
+  $document.on('click', '.rename', function(event) {
+    //event.preventDefault();
+    ctxMenu.style.display = '';
+    if(modal_on == 0) {
+      $('#modal_popup_rename').show();
+      if(selectedObj.type === 'folder'){
+        $("#rename_header").html("TYPE NEW FOLDER NAME");
+      }
+      else{
+        $("#rename_header").html("TYPE NEW FILE NAME");
+      }
+      $('#rename_input').attr("placeholder", selectedObj.name);
+      $('#rename_input').focus();
+      modal_on = 2;
+     }
+     return false;
+  });
+
 
   $document.on('click', '.modal_title', function(event) {
     event.preventDefault();
@@ -139,6 +162,7 @@ $document.ready(() => {
     copyorcut = "cut";
     ctxMenu.style.display = '';
     if(modal_on == 0) {
+      renderModalHierarchy();
       $('#modal_popup').show();
       modal_on = 1;
     }
@@ -147,7 +171,32 @@ $document.ready(() => {
 
   $document.on('click', '.delete', function(event) {
     event.preventDefault();
-    handleDelete(selectedObj.name);
+    handleDelete(selectedObj);
+  });
+
+  $('#rename_input').on('input', function(){
+    let input_value = this.value;
+    if(input_value === ''){
+      $('#rename_submit').addClass('disabled');
+    }
+    else{
+      $('#rename_submit').removeClass('disabled');
+    }
+  });
+
+  $('#rename_submit').click(function(event){
+    let new_name = $('#rename_input').val();
+    if(new_name !== ''){
+      let prev_name = selectedObj.name;
+      addCommand(`mv ${prev_name} ${new_name}`);
+      selectedObj.name = new_name;
+      renderHierarchy();
+      renderFinder(current);
+      $('#rename_input').val('');
+      $('#rename_submit').addClass('disabled');
+      $('#modal_popup_rename').hide();
+      modal_on = 0;
+    }
   });
 
   $document.on('click', '.unit', function(event) {
@@ -166,13 +215,25 @@ $document.ready(() => {
   // });
 
   $('#modal_popup').click(function(event) {
-    if(modal_on == 1) {
+    if(modal_on != 0) {
       if(prev_target != 0) prev_target.style.color = '#000000';
       $('#submit_copy').addClass('disabled');
       $('#modal_popup').hide();
-      modal_on =0;
+      modal_on = 0;
     }
+  });
+
+  $('#modal_popup').bind('keydown', function(event) {
+    commandInput(event);
   })
+
+  $('#modal_popup_rename').click(function(event) {
+    if(modal_on == 2) {
+      $('#rename_submit').addClass('disabled');
+      $('#modal_popup_rename').hide();
+      modal_on = 0;
+    }
+  });
 
   let prev_target = 0;
   let target = 0;
@@ -194,6 +255,10 @@ $document.ready(() => {
         let targetObj = findByAbsolutePath(target.id);
         handleCopy(selectedObj, targetObj);
         addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+        if (current === targetObj) {
+          renderFinder(current);
+        }
+        renderHierarchy();
         if(modal_on == 1) {
           if(prev_target != 0) prev_target.style.color = '#000000';
           $('#submit_copy').addClass('disabled');
@@ -205,7 +270,11 @@ $document.ready(() => {
       if(!$('#submit_copy').hasClass('disabled')){
         let targetObj = findByAbsolutePath(target.id);
         handleCopy(selectedObj, targetObj);
-        handleDelete(selectedObj.name);
+        handleDelete(selectedObj);
+        if (current === targetObj) {
+          renderFinder(current);
+        }
+        renderHierarchy();
         addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
         if(modal_on == 1) {
           if(prev_target != 0) prev_target.style.color = '#000000';
@@ -280,7 +349,7 @@ function renderHierarchy() {
     const currentDir = document.createElement('div');
     currentDir.classList.add('ui', 'accordion');
     current.children.forEach(child => {
-      const { type, name } = child
+      const { type, name, path } = child
       if (type == 'folder') {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
@@ -289,6 +358,7 @@ function renderHierarchy() {
 
         nameText.innerHTML = name;
         title.classList.add('title', 'non_modal_title');
+        title.id = child.path;
         dropdown.classList.add('dropdown', 'icon');
         icon.classList.add('folder', 'icon');
         icon.onclick = () => {
@@ -380,7 +450,9 @@ function renderFinder(current) {
     column.style.textAlign = 'center';
     unit.className = 'unit';
     unit.id = name;
-    icon.style.margin = 0;
+    icon.style.margin = 'auto';
+    icon.style.display = 'block';
+    nameText.display = 'block';
     if (type == 'folder') {
       icon.classList.add('huge', 'blue', 'folder', 'icon');
       unit.ondblclick = function () {
@@ -471,6 +543,7 @@ function addCommand(command) {
 }
 
 function commandInput(e) {
+    console.log(e.keyCode);
     if (currentMode == 'CUI' && e.keyCode == 13) {
       const commandLine = document.getElementById('command_line');
       const command = commandLine.value;
@@ -479,15 +552,27 @@ function commandInput(e) {
       }
       commandLine.value = '';
     }
+    else if (currentMode == 'GUI' && modal_on == 2 && e.keyCode == 13) {
+      $('#rename_submit').trigger('click');
+    }
+    else if (currentMode == 'GUI' && modal_on == 2 && e.keyCode == 27) {
+      $('#modal_popup_rename').trigger('click');
+    }
+    else if (currentMode == 'GUI' && modal_on == 1 && e.keyCode == 27) {
+      $('#modal_popup').trigger('click');
+    }
 }
 
-function handleDelete(filename) {
-  const children = current['children'];
-  const fileType = findByChildName(current, filename)['type'];
+function handleDelete(fileObj) {
+  const filePathFragments = fileObj.path.split('/');
+  if (fileObj.type === 'folder') filePathFragments.splice(filePathFragments.length - 2, 1);
+  else filePathFragments.splice(filePathFragments.length - 1, 1);
+  const parentPath = filePathFragments.join('/');
+  const parentObj = findByAbsolutePath(parentPath);
 
-  for (let i = 0; i < children.length; i++) {
-    if (children[i]['name'] === filename) {
-      children.splice(i, 1);
+  for (let i = 0; i < parentObj.children.length; i++) {
+    if (parentObj.children[i].name === fileObj.name) {
+      parentObj.children.splice(i, 1);
       break;
     }
   }
@@ -495,8 +580,8 @@ function handleDelete(filename) {
   renderHierarchy();
   renderFinder(current);
 
-  if (fileType === 'folder') addCommand(`rm -rf ${filename}`);
-  else addCommand(`rm -f ${filename}`);
+  if (fileObj.fileType === 'folder') addCommand(`rm -rf ${fileObj.name}`);
+  else addCommand(`rm -f ${fileObj.name}`);
 }
 
 function handleCommand(command) {
@@ -532,18 +617,17 @@ function handleCommand(command) {
   renderFinder(current);
 }
 
-function handleCopy(obj, dirobj) {
+function handleCopy(obj, dirObj) {
   const newObj = deepcopy(obj);
-  renderHierarchy(current);
-  renderFinder(current);
 
   let orgPath;
   if (newObj.type === 'folder') orgPath = newObj.path.split('/').slice(0, -2);
   else orgPath = newObj.path.split('/').slice(0, -1);
 
-  replacePath(newObj, `${orgPath.join('/')}/`, dirobj.path);
-  dirobj.children.push(newObj);
+  replacePath(newObj, `${orgPath.join('/')}/`, dirObj.path);
+  dirObj.children.push(newObj);
   renderHierarchy();
+  renderFinder(current);
 }
 
 function replacePath(target, orgPath, newPath) {
