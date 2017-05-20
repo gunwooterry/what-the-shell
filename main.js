@@ -98,7 +98,6 @@ $document.ready(() => {
   $document.on('contextmenu', '.unit', function(event) {
     event.preventDefault();
     let targetName = event.currentTarget.id;
-    console.log(event.currentTarget);
     selectedObj = findByChildName(current, targetName);
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
@@ -150,7 +149,7 @@ $document.ready(() => {
 
   $document.on('click', '.delete', function(event) {
     event.preventDefault();
-    handleDelete(selectedObj.name);
+    handleDelete(selectedObj);
   });
 
   $document.on('click', '.unit', function(event) {
@@ -212,7 +211,7 @@ $document.ready(() => {
       if(!$('#submit_copy').hasClass('disabled')){
         let targetObj = findByAbsolutePath(target.id);
         handleCopy(selectedObj, targetObj);
-        handleDelete(selectedObj.name);
+        handleDelete(selectedObj);
         if (current === targetObj) {
           renderFinder(current);
         }
@@ -494,13 +493,15 @@ function commandInput(e) {
     }
 }
 
-function handleDelete(filename) {
-  const children = current['children'];
-  const fileType = findByChildName(current, filename)['type'];
+function handleDelete(fileObj) {
+  const filePathFragments = fileObj.path.split('/');
+  filePathFragments.splice(filePathFragments.length - 2, 1);
+  const parentPath = filePathFragments.join('/');
+  const parentObj = findByAbsolutePath(parentPath);
 
-  for (let i = 0; i < children.length; i++) {
-    if (children[i]['name'] === filename) {
-      children.splice(i, 1);
+  for (let i = 0; i < parentObj.children.length; i++) {
+    if (parentObj.children[i].name === fileObj.name) {
+      parentObj.children.splice(i, 1);
       break;
     }
   }
@@ -508,8 +509,8 @@ function handleDelete(filename) {
   renderHierarchy();
   renderFinder(current);
 
-  if (fileType === 'folder') addCommand(`rm -rf ${filename}`);
-  else addCommand(`rm -f ${filename}`);
+  if (fileObj.fileType === 'folder') addCommand(`rm -rf ${fileObj.name}`);
+  else addCommand(`rm -f ${fileObj.name}`);
 }
 
 
@@ -541,18 +542,17 @@ function handleCommand(command) {
   renderFinder(current);
 }
 
-function handleCopy(obj, dirobj) {
+function handleCopy(obj, dirObj) {
   const newObj = deepcopy(obj);
-  renderHierarchy(current);
-  renderFinder(current);
 
   let orgPath;
   if (newObj.type === 'folder') orgPath = newObj.path.split('/').slice(0, -2);
   else orgPath = newObj.path.split('/').slice(0, -1);
 
-  replacePath(newObj, `${orgPath.join('/')}/`, dirobj.path);
-  dirobj.children.push(newObj);
+  replacePath(newObj, `${orgPath.join('/')}/`, dirObj.path);
+  dirObj.children.push(newObj);
   renderHierarchy();
+  renderFinder(current);
 }
 
 function replacePath(target, orgPath, newPath) {
