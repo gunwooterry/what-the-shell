@@ -659,12 +659,37 @@ function findByAbsolutePath(path) {
   let obj = root;
   const names = path.split('/');
   const currentName = obj.name;
-  if (names[0] != '~') return -1;
+  if (names[0] != '~') return 0;
   for (let i = 1; i < names.length; i++){
     if (!names[i]) return obj;
     obj = findByChildName(obj, names[i]);
   }
   return obj;
+}
+
+function findByRelativePath(path) {
+  let path_arr = path.split('/');
+  let iter_obj = current;
+  let path_name = path_arr[0];
+  for(let i = 0 ; i < path_arr.length ; i++){
+    path_name = path_arr[i];
+    if(iter_obj == 0){
+      return 0;
+    }
+    if(path_name === '.'){
+      continue;
+    }
+    else if(path_name === ''){
+      return iter_obj;
+    }
+    else if(path_name === '..'){
+      iter_obj = getParentObject(iter_obj);
+    }
+    else{
+      iter_obj = findByChildName(iter_obj, path_name);
+    }
+  }
+  return iter_obj;
 }
 
 function findByChildName(obj, childName) {
@@ -685,6 +710,7 @@ function getParentObject(fileObj) {
   const parentObj = findByAbsolutePath(parentPath);
   return parentObj;
 }
+
 
 function hasChildNamed(parentObj, name){
   if(parentObj.type === 'folder'){
