@@ -12,12 +12,33 @@
 <body>
   <div class="ui small secondary pointing menu">
   	<div class="ui container">
-      <a class="item" id="logo" onClick="window.location.reload();">
+      <a class="item" id="logo" onclick="window.location.reload();">
         <span id="wink">>_</span>What<span id="the">The</span><span id="shell">Shell</span>
       </a>
     </div>
   </div>
   <div class="ui container" id="screen">
+    <div class="ui modal" id="welcome">
+      <i class="close icon"></i>
+      <div class="header">
+        Introducing WhatTheShell
+      </div>
+      <div class="content">
+        <div class="description">
+          <div class="ui header">WhatTheShell is a translator between GUI actions (Finder) and Linux commands (Shell).</div>
+          <div class="ui header">Finder to Shell</div>
+          <p>Take actions on the finder view. Then you will get a corresponding command.</p>
+          <div class="ui header">Shell to Finder</div>
+          <p>Enter your own command. Then you will see the predicted action.</p>
+        </div>
+      </div>
+      <div class="actions">
+        <div class="ui green ok inverted button">
+          <i class="checkmark icon"></i>
+          Get started!
+        </div>
+      </div>
+    </div>
     <div class="ui middle aligned grid ui-box">
       <div class="eight wide column" style="padding: 0">
         <div class="ui emphasized segment" id="gui_window" onclick="changeModeListener(this.id)" style="padding: 0">

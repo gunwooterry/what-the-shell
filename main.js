@@ -61,6 +61,8 @@ const descriptions = {
 }
 
 $document.ready(() => {
+  $('#welcome').modal('show');
+
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
   const modal = document.getElementById('modal_popup');
@@ -636,6 +638,7 @@ function handleCommand(command) {
     const pathArray = path.split('/');
 
     if (!flag.includes('-')) {
+      console.log('No flags');
       return;
     }
 
@@ -659,7 +662,6 @@ function handleCommand(command) {
     } else {
      console.log('Not found');
    }
-
   } else {
     $('#command_line').popup('show');
   }
