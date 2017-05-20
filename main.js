@@ -1,5 +1,6 @@
 const $document = $(document);
 var modal_on = 0;
+let copyorcut = "copy";
 let root = {
   type: 'folder',
   name: '~',
@@ -117,6 +118,7 @@ $document.ready(() => {
 
   $document.on('click', '.copy', function(event) {
     //event.preventDefault();
+    copyorcut = "copy";
     ctxMenu.style.display = '';
     if(modal_on == 0) {
       $('#modal_popup').show();
@@ -134,6 +136,7 @@ $document.ready(() => {
 
   $document.on('click', '.cut', function(event) {
     //event.preventDefault();
+    copyorcut = "cut";
     ctxMenu.style.display = '';
     if(modal_on == 0) {
       $('#modal_popup').show();
@@ -184,25 +187,42 @@ $document.ready(() => {
       $('#submit_copy').removeClass('disabled');
     }
     return false;
-  })
+  });
 
   $('#submit_copy').click(function(event) {
-    if(!$('#submit_copy').hasClass('disabled')){
-      let targetObj = findByAbsolutePath(target.id);
-      handleCopy(selectedObj, targetObj);
-      addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
-      if(modal_on == 1) {
-        if(prev_target != 0) prev_target.style.color = '#000000';
-        $('#submit_copy').addClass('disabled');
-        $('#modal_popup').hide();
-        modal_on =0;
+    if(copyorcut == "copy") {
+      if(!$('#submit_copy').hasClass('disabled')){
+        let targetObj = findByAbsolutePath(target.id);
+        handleCopy(selectedObj, targetObj);
+        addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+        if(modal_on == 1) {
+          if(prev_target != 0) prev_target.style.color = '#000000';
+          $('#submit_copy').addClass('disabled');
+          $('#modal_popup').hide();
+          modal_on =0;
+        }
+      }
+    } else if(copyorcut == "cut") {
+      if(!$('#submit_copy').hasClass('disabled')){
+        let targetObj = findByAbsolutePath(target.id);
+        handleCopy(selectedObj, targetObj);
+        handleDelete(selectedObj.name);
+        addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
+        if(modal_on == 1) {
+          if(prev_target != 0) prev_target.style.color = '#000000';
+          $('#submit_copy').addClass('disabled');
+          $('#modal_popup').hide();
+          modal_on =0;
+        }
       }
     }
-  })
+
+    
+  });
 
 
 
-})
+});
 
 const arrowBig = 4;
 const arrowSmall = 1;
