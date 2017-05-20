@@ -187,24 +187,36 @@ $document.ready(() => {
   $('#rename_submit').click(function(event){
     let new_name = $('#rename_input').val();
     if(new_name !== ''){
-      let prev_name = selectedObj.name;
-      addCommand(`mv ${prev_name} ${new_name}`);
-      selectedObj.name = new_name;
       let parentObj = getParentObject(selectedObj);
-      let new_path = parentObj.path;
-      if(selectedObj.type === 'folder'){
-        new_path += (new_name + '/');
+      let prev_name = selectedObj.name;
+      if(new_name.indexOf(' ') == -1){
+        if(prev_name === new_name || hasChildNamed(parentObj, new_name) == 0){
+          addCommand(`mv ${prev_name} ${new_name}`);
+          selectedObj.name = new_name;
+          let new_path = parentObj.path;
+          if(selectedObj.type === 'folder'){
+            new_path += (new_name + '/');
+          }
+          else {
+            new_path += new_name;
+          }
+          selectedObj.path = new_path;
+          renderHierarchy();
+          renderFinder(current);
+          $('#rename_input').val('');
+          $('#rename_submit').addClass('disabled');
+          $('#modal_popup_rename').hide();
+          modal_on = 0;
+        }
+        else {
+          $('#rename_input').attr('data-content', 'There is a file using same name!');
+          $('#rename_input').popup('show');
+        }
       }
-      else {
-        new_path += new_name;
+      else{
+        $('#rename_input').attr('data-content', 'Whitespace on name is not supported yet.. sorry');
+        $('#rename_input').popup('show');
       }
-      selectedObj.path = new_path;
-      renderHierarchy();
-      renderFinder(current);
-      $('#rename_input').val('');
-      $('#rename_submit').addClass('disabled');
-      $('#modal_popup_rename').hide();
-      modal_on = 0;
     }
   });
 
@@ -660,7 +672,7 @@ function findByChildName(obj, childName) {
     const { type, name } = child;
     if (name === childName) return child;
   }
-  return -1;
+  return 0;
 }
 
 function getParentObject(fileObj) {
@@ -672,6 +684,20 @@ function getParentObject(fileObj) {
   const parentPath = filePathFragments.join('/');
   const parentObj = findByAbsolutePath(parentPath);
   return parentObj;
+}
+
+function hasChildNamed(parentObj, name){
+  if(parentObj.type === 'folder'){
+    let child_arr = parentObj.children;
+    for(let i = 0 ; i < child_arr.length ; i++){
+      if(child_arr[i].name === name){
+        return child_arr[i];
+        break;
+      }
+    }
+    return 0;
+  }
+  return 0;
 }
 
 function showManual(command) {
