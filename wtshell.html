@@ -12,7 +12,7 @@
 <body>
   <div class="ui small secondary pointing menu">
   	<div class="ui container">
-      <a class="item" id="logo">
+      <a class="item" id="logo" onClick="window.location.reload();">
         <span id="wink">>_</span>What<span id="the">The</span><span id="shell">Shell</span>
       </a>
     </div>
@@ -40,8 +40,8 @@
             <div class="ui segment modal_content" style="width:100%;height:100%;position:relative;background-color:#FFFFFF;">
               <div class="header" id="rename_header" >TYPE NEW FILE NAME</div>
               <hr/>
-              <div class="ui input rename">
-                <input id="rename_input" type="text" placeholder="aaa" style="padding-left: 10px;">
+              <div class="ui focus input rename">
+                <input id="rename_input" autofocus type="text" placeholder="aaa" style="padding-left: 10px;" onkeypress="commandInput(event)">
               </div>
               <br>
               <button class="ui blue button disabled" id="rename_submit" style="float:right;">Submit</button>
@@ -94,8 +94,8 @@
     </div>
   </div>
   <div class="ui vertical basic buttons" id="ctxMenu">
-  <button class="ui button copy">Copy</button>
-  <button class="ui button cut">Cut</button>
+  <button class="ui button copy">Copy to ..</button>
+  <button class="ui button cut">Move to ..</button>
   <button class="ui button delete">Delete</button>
   <button class="ui button rename">Rename</button>
 </div>

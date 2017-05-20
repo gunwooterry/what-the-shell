@@ -1,5 +1,6 @@
 const $document = $(document);
 var modal_on = 0;
+let copyorcut = "copy";
 let root = {
   type: 'folder',
   name: '~',
@@ -82,6 +83,8 @@ $document.ready(() => {
 
   $document.on('contextmenu', '.non_modal_title', function(event) {
     event.preventDefault();
+    let targetPath = event.currentTarget.id;
+    selectedObj = findByAbsolutePath(targetPath);
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
@@ -95,27 +98,33 @@ $document.ready(() => {
   $document.on('contextmenu', '.unit', function(event) {
     event.preventDefault();
     let targetName = event.currentTarget.id;
+    console.log(event.currentTarget);
     selectedObj = findByChildName(current, targetName);
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
+    $('.unit').css("background-color", "rgba(0,0,0,0)");
+    $(this).css("background-color", "#AAAAAA");
   });
 
 
   $document.on('click', function(event) {
-    ctxMenu.style.display = '';
+    ctxMenu.style.display = 'none';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
     // if(modal_on == 1) {
     //   $('#modal_popup').hide();
     //   modal_on =0;
     // }
+    $('.unit').css("background-color", "rgba(0,0,0,0)");
   });
 
   $document.on('click', '.copy', function(event) {
     //event.preventDefault();
+    copyorcut = "copy";
     ctxMenu.style.display = '';
     if(modal_on == 0) {
+      renderModalHierarchy();
       $('#modal_popup').show();
       modal_on = 1;
      }
@@ -134,7 +143,7 @@ $document.ready(() => {
         $("#rename_header").html("TYPE NEW FILE NAME");
       }
       $('#rename_input').attr("placeholder", selectedObj.name);
-      modal_on = 1;
+      modal_on = 2;
      }
      return false;
   });
@@ -149,8 +158,10 @@ $document.ready(() => {
 
   $document.on('click', '.cut', function(event) {
     //event.preventDefault();
+    copyorcut = "cut";
     ctxMenu.style.display = '';
     if(modal_on == 0) {
+      renderModalHierarchy();
       $('#modal_popup').show();
       modal_on = 1;
     }
@@ -185,6 +196,13 @@ $document.ready(() => {
     modal_on = 0;
   });
 
+  $document.on('click', '.unit', function(event) {
+    event.preventDefault();
+    $('.unit').css("background-color", "rgba(0,0,0,0)");
+    $(this).css("background-color", "#AAAAAA");
+    ctxMenu.style.display = 'none';
+    return false;
+  });
 
 
   // $document.on('click', '.title', function(event) {
@@ -194,7 +212,7 @@ $document.ready(() => {
   // });
 
   $('#modal_popup').click(function(event) {
-    if(modal_on == 1) {
+    if(modal_on != 0) {
       if(prev_target != 0) prev_target.style.color = '#000000';
       $('#submit_copy').addClass('disabled');
       $('#modal_popup').hide();
@@ -203,10 +221,10 @@ $document.ready(() => {
   })
 
   $('#modal_popup_rename').click(function(event) {
-    if(modal_on == 1) {
+    if(modal_on == 2) {
       $('#rename_submit').addClass('disabled');
       $('#modal_popup_rename').hide();
-      modal_on =0;
+      modal_on = 0;
     }
   })
 
@@ -214,7 +232,6 @@ $document.ready(() => {
   let target = 0;
 
   $('.modal_content').click(function(event) {
-
     if($(event.target).closest('.title').length == 1){
       if(prev_target != 0) prev_target.style.color = '#000000';
       target = $(event.target).closest('.title')[0];
@@ -223,24 +240,44 @@ $document.ready(() => {
       $('#submit_copy').removeClass('disabled');
     }
     return false;
-  })
+  });
 
   $('#submit_copy').click(function(event) {
-    if(!$('#submit_copy').hasClass('disabled')){
-      let targetObj = findByAbsolutePath(target.id);
-      handleCopy(selectedObj, targetObj);
-      addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
-      if(modal_on == 1) {
-        if(prev_target != 0) prev_target.style.color = '#000000';
-        $('#submit_copy').addClass('disabled');
-        $('#modal_popup').hide();
-        modal_on =0;
+    if(copyorcut == "copy") {
+      if(!$('#submit_copy').hasClass('disabled')){
+        let targetObj = findByAbsolutePath(target.id);
+        handleCopy(selectedObj, targetObj);
+        addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+        if (current === targetObj) {
+          renderFinder(current);
+        }
+        renderHierarchy();
+        if(modal_on == 1) {
+          if(prev_target != 0) prev_target.style.color = '#000000';
+          $('#submit_copy').addClass('disabled');
+          $('#modal_popup').hide();
+          modal_on =0;
+        }
+      }
+    } else if(copyorcut == "cut") {
+      if(!$('#submit_copy').hasClass('disabled')){
+        let targetObj = findByAbsolutePath(target.id);
+        handleCopy(selectedObj, targetObj);
+        handleDelete(selectedObj.name);
+        if (current === targetObj) {
+          renderFinder(current);
+        }
+        renderHierarchy();
+        addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
+        if(modal_on == 1) {
+          if(prev_target != 0) prev_target.style.color = '#000000';
+          $('#submit_copy').addClass('disabled');
+          $('#modal_popup').hide();
+          modal_on =0;
+        }
       }
     }
-  })
-
-
-
+  });
 })
 
 const arrowBig = 4;
@@ -295,21 +332,36 @@ function goto(here) {
   renderBreadcrumb(here);
 }
 
+function deepcopy(obj) {
+  if (obj) return JSON.parse(JSON.stringify(obj));
+  else return {};
+}
+
 function renderHierarchy() {
   function renderHierarchyRec(current) {
     const currentDir = document.createElement('div');
     currentDir.classList.add('ui', 'accordion');
     current.children.forEach(child => {
-      const { type, name } = child
+      const { type, name, path } = child
       if (type == 'folder') {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
         const icon = document.createElement('i');
-        const nameText = document.createTextNode(name);
+        const nameText = document.createElement('span');
 
+        nameText.innerHTML = name;
         title.classList.add('title', 'non_modal_title');
+        title.id = child.path;
         dropdown.classList.add('dropdown', 'icon');
         icon.classList.add('folder', 'icon');
+        icon.onclick = () => {
+          goto(child);
+          addCommand(`cd ${child.path}`);
+        }
+        nameText.onclick = () => {
+          goto(child);
+          addCommand(`cd ${child.path}`);
+        }
         title.appendChild(dropdown);
         title.appendChild(icon);
         title.appendChild(nameText);
@@ -322,10 +374,6 @@ function renderHierarchy() {
         content.appendChild(renderHierarchyRec(child));
         currentDir.appendChild(content);
 
-        icon.onclick = function() {
-          goto(child);
-          addCommand(`cd ${child.path}`);
-        }
         dropdown.onclick = function() {
           title.classList.toggle('active');
           content.classList.toggle('active');
@@ -495,6 +543,9 @@ function commandInput(e) {
       }
       commandLine.value = '';
     }
+    else if (currentMode == 'GUI' && modal_on == 2 && e.keyCode == 13) {
+      $('#rename_submit').trigger('click');
+    }
 }
 
 function handleDelete(filename) {
@@ -516,7 +567,7 @@ function handleDelete(filename) {
 }
 
 
-function handleCommand(command){
+function handleCommand(command) {
   // TODO : handle '>'
   let branch = command.split('>');
   let output_name = '';
@@ -542,40 +593,32 @@ function handleCommand(command){
     if(rest_arr[0] === '~') current = findByAbsolutePath(rest);
     //else current = findByChildName(current, rest_arr[0]);
   }
-  renderHierarchy(current);
+  renderHierarchy();
   renderFinder(current);
 }
 
-
-function handleCopy(obj, dirobj){
-  let newObj = 0;
-  if(obj.type === 'folder'){
-    newObj = {
-      type: obj.type,
-      name: obj.name,
-      path: obj.path,
-      children: []
-    }
-    // TODO : deep copy -> change path
-    obj.children.forEach(child => {
-      newObj.children.push(child);
-    });
-  }
-  else{
-    newObj = {
-      type: obj.type,
-      name: obj.name,
-      path: obj.path,
-      content: obj.content,
-    }
-  }
-  console.log(current);
+function handleCopy(obj, dirobj) {
+  const newObj = deepcopy(obj);
   renderHierarchy(current);
   renderFinder(current);
+
+  let orgPath;
+  if (newObj.type === 'folder') orgPath = newObj.path.split('/').slice(0, -2);
+  else orgPath = newObj.path.split('/').slice(0, -1);
+
+  replacePath(newObj, `${orgPath.join('/')}/`, dirobj.path);
   dirobj.children.push(newObj);
+  renderHierarchy();
 }
 
-function findByAbsolutePath(path){
+function replacePath(target, orgPath, newPath) {
+  target.path = target.path.replace(orgPath, newPath);
+  if (target.children) {
+    target.children.forEach((child) => replacePath(child, orgPath, newPath))
+  }
+}
+
+function findByAbsolutePath(path) {
   let obj = root;
   const names = path.split('/');
   const currentName = obj.name;
@@ -587,7 +630,7 @@ function findByAbsolutePath(path){
   return obj;
 }
 
-function findByChildName(obj, childName){
+function findByChildName(obj, childName) {
   for (child of obj.children) {
     const { type, name } = child;
     if (name === childName) return child;
