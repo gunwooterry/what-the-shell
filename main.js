@@ -667,6 +667,7 @@ function handleCommand(command) {
     const dstPath = getAbsolutePath(rest[1]);
     if(srcPath == 0 || dstPath == 0) return;
     const srcObj = findByAbsolutePath(srcPath);
+    console.log(dstPath);
     const dstObj = findByAbsolutePath(dstPath);
     if(srcObj == 0) {
       return;
@@ -679,7 +680,7 @@ function handleCommand(command) {
           const newObj = deepcopy(srcObj);
           const orgPath = parentPath(newObj.path);
           const srcParentObj = getParentObject(srcObj);
-          const dstparentObj = getParentObject(dstObj);
+          const dstParentObj = getParentObject(dstObj);
 
           replacePath(newObj, `${orgPath}/`, parentPath(dstObj.path));
           newObj.name = dstObj.name;
@@ -698,8 +699,8 @@ function handleCommand(command) {
           dstParentObj.children.push(newObj);
         }
       } else {
-        const dup = 0;
-        const dup_index = 0;
+        let dup = 0;
+        let dup_index = 0;
         const newObj = deepcopy(srcObj);
         const orgPath = parentPath(newObj.path);
         replacePath(newObj, `${orgPath}/`, dstObj.path);
@@ -729,7 +730,7 @@ function handleCommand(command) {
             } else {
               return;
             }
-          } else if(srcObj.type = 'file' && dstObj.children[dup_index].type == 'file') {
+          } else if(srcObj.type == 'file' && dstObj.children[dup_index].type == 'file') {
             for(let i = 0; i < srcParentObj.children.length; i++) {
               if(srcParentObj.children[i].name === srcObj.name) {
                 srcParentObj.children.splice(i, 1);
@@ -753,6 +754,7 @@ function handleCommand(command) {
         }
       }
       renderHierarchy();
+      addCommand(command);
       renderFinder(current);
     } else { /* dstPathObj does not exist */
       const dstPathFrags = dstPath.split('/');
