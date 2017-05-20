@@ -61,7 +61,7 @@ const descriptions = {
 }
 
 $document.ready(() => {
-  $('#welcome').modal('show');
+  $('#welcome').modal({ blurring: true }).modal('show');
 
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
