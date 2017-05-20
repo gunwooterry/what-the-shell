@@ -122,6 +122,24 @@ $document.ready(() => {
      return false;
   });
 
+  $document.on('click', '.rename', function(event) {
+    //event.preventDefault();
+    ctxMenu.style.display = '';
+    if(modal_on == 0) {
+      $('#modal_popup_rename').show();
+      if(selectedObj.type === 'folder'){
+        $("#rename_header").html("TYPE NEW FOLDER NAME");
+      }
+      else{
+        $("#rename_header").html("TYPE NEW FILE NAME");
+      }
+      $('#rename_input').attr("placeholder", selectedObj.name);
+      modal_on = 1;
+     }
+     return false;
+  });
+
+
   $document.on('click', '.modal_title', function(event) {
     event.preventDefault();
     event.target.backgroundColor = 'blue';
@@ -144,6 +162,29 @@ $document.ready(() => {
     handleDelete(selectedObj.name);
   });
 
+  $('#rename_input').on('input', function(){
+    let input_value = this.value;
+    if(input_value === ''){
+      $('#rename_submit').addClass('disabled');
+    }
+    else{
+      $('#rename_submit').removeClass('disabled');
+    }
+  });
+
+  $('#rename_submit').click(function(event){
+    let new_name = $('#rename_input').val();
+    let prev_name = selectedObj.name;
+    addCommand(`mv ${prev_name} ${new_name}`);
+    selectedObj.name = new_name;
+    renderHierarchy();
+    renderFinder(current);
+    $('#rename_input').val('');
+    $('#rename_submit').addClass('disabled');
+    $('#modal_popup_rename').hide();
+    modal_on = 0;
+  });
+
 
 
   // $document.on('click', '.title', function(event) {
@@ -157,6 +198,14 @@ $document.ready(() => {
       if(prev_target != 0) prev_target.style.color = '#000000';
       $('#submit_copy').addClass('disabled');
       $('#modal_popup').hide();
+      modal_on = 0;
+    }
+  })
+
+  $('#modal_popup_rename').click(function(event) {
+    if(modal_on == 1) {
+      $('#rename_submit').addClass('disabled');
+      $('#modal_popup_rename').hide();
       modal_on =0;
     }
   })
@@ -471,8 +520,10 @@ function handleCommand(command){
   // TODO : handle '>'
   let branch = command.split('>');
   let output_name = '';
+  console.log(branch);
   if(branch.length == 2) output_name = branch[1];
   let args = branch[0].split(' ');
+  console.log(args);
   let op = args[0];
   let argnum = args.length - 1;
   let rest = args.splice(0,1).join();

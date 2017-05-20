@@ -66,6 +66,23 @@ input.emphasized {
   padding-left: 5px !important;
 }
 
+.rename_desc{
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.input.rename{
+  width: 100% !important;
+  font-size: 15px;
+  box-shadow: 0 0 0 0 !important;
+  height: 30px;
+  margin-left: 0px !important;
+}
+
+#rename_submit{
+  margin-top: 10px;
+}
+
 .command {
   font-family: monospace;
   font-size: 17px;
