@@ -99,17 +99,20 @@ $document.ready(() => {
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
+    $('.unit').css("background-color", "rgba(0,0,0,0)");
+    $(this).css("background-color", "#AAAAAA");
   });
 
 
   $document.on('click', function(event) {
-    ctxMenu.style.display = '';
+    ctxMenu.style.display = 'none';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
     // if(modal_on == 1) {
     //   $('#modal_popup').hide();
     //   modal_on =0;
     // }
+    $('.unit').css("background-color", "rgba(0,0,0,0)");
   });
 
   $document.on('click', '.copy', function(event) {
@@ -144,6 +147,13 @@ $document.ready(() => {
     handleDelete(selectedObj.name);
   });
 
+  $document.on('click', '.unit', function(event) {
+    event.preventDefault();
+    $('.unit').css("background-color", "rgba(0,0,0,0)");
+    $(this).css("background-color", "#AAAAAA");
+    ctxMenu.style.display = 'none';
+    return false;
+  });
 
 
   // $document.on('click', '.title', function(event) {
