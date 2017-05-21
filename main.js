@@ -656,6 +656,7 @@ function renderBreadcrumb(current) {
 }
 
 function addCommand(command) {
+  $('#command_line').popup('destroy');
   const history = document.getElementById('history');
   const newCommand = document.createElement('div');
   const dollarColumn = document.createElement('div');
@@ -817,14 +818,19 @@ function handleCommand(command) {
           showErrorMsg('rm : no such file or directory ' + path);
         }
         else{
-          let parent_obj = getParentObject(remove_obj);
-          for(let i = 0 ; i < parent_obj.children.length ; i++){
-            if(parent_obj.children[i].name === remove_obj.name){
-              parent_obj.children.splice(i, 1);
-              break;
-            }
+          if(remove_obj.name === '~'){
+            showErrorMsg('rm : cannot remove the root folder');
           }
-          addCommand(command);
+          else{
+            let parent_obj = getParentObject(remove_obj);
+            for(let i = 0 ; i < parent_obj.children.length ; i++){
+              if(parent_obj.children[i].name === remove_obj.name){
+                parent_obj.children.splice(i, 1);
+                break;
+              }
+            }
+            addCommand(command);
+          }
         }
       }
       else if(flag === '-f'){
@@ -1013,6 +1019,10 @@ function handleCommand(command) {
       }
     }
   } else if (op === 'mv') {
+    if(rest.length == 0 || rest.length == 1){
+      showErrorMsg('mv usage : mv [source] [destination] ex) mv file1 folder1');
+      return;
+    }
     const srcPath = getAbsolutePath(rest[0]);
     const dstPath = getAbsolutePath(rest[1]);
     if(srcPath == 0 || dstPath == 0) return;
@@ -1153,15 +1163,10 @@ function showErrorMsg(msg){
   else{
     $('#command_line').attr('data-content', msg);
   }
-  $('#command_line').popup('show', function(){
-    setTimeout(function(){
-      console.log('callback');
-      $('#command_line').popup('hide', function(){
-        $('#command_line').popup('destroy');
-      });
-    }, 2000);
-  });
+  $('#command_line').popup('destroy');
+  $('#command_line').popup('show');
 }
+
 
 function handleCopy(obj, dirObj) {
   const newObj = deepcopy(obj);
@@ -1292,7 +1297,7 @@ function makeDirectory(name) {
   const newDir = {
     type: 'folder',
     name,
-    path: `${current.path}name/`,
+    path: `${current.path}${name}/`,
     children: [],
   };
   current.children.push(newDir);
