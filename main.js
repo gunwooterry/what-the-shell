@@ -61,7 +61,14 @@ const descriptions = {
 }
 
 $document.ready(() => {
-  $('#welcome').modal({ blurring: true }).modal('show');
+  $('#welcome').modal({ blurring: true }).modal('show', function(){
+    $('#welcome').focus();
+    $('#welcome').bind('keydown', function(e) {
+      console.log('hi');
+      if(e.keyCode == 13 || e.keyCode == 27)
+        $('#welcome').modal('hide');
+    });
+  });
 
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
@@ -505,7 +512,8 @@ function renderFinder(current) {
     else if (type == 'file') {
       icon.classList.add('huge', 'file', 'icon');
       unit.ondblclick = function () {
-        // addCommand(`cat ${name}`);
+        openFile(child);
+        addCommand(`cat ${name}`);
       }
     }
 
@@ -704,9 +712,11 @@ function handleCommand(command) {
                   content: src_obj.content,
                 };
                 dst_obj.children.push(newChild);
+                addCommand(command);
               }
               else if(child.type === 'file'){
                 child.content = src_obj.content;
+                addCommand(command);
               }
               else{
                 console.log('cp: cannot overwrite directory' + child.name + 'with non-directory' + src_obj.name);
@@ -741,6 +751,7 @@ function handleCommand(command) {
                   content: src_obj.content,
                 };
                 dst_dir_obj.children.push(newChild);
+                addCommand(command);
               }
               else if(dst_folder_child.type === 'folder'){
                 let last_child = hasChildNamed(dst_folder_child, src_obj.name);
@@ -752,16 +763,19 @@ function handleCommand(command) {
                     content: src_obj.content,
                   };
                   dst_folder_child.children.push(newChild);
+                  addCommand(command);
                 }
                 else if (last_child.type === 'folder'){
                   console.log('cp: cannot overwrite directory' + last_child.name + 'with non-directory' + src_obj.name);
                 }
                 else{
                   last_child.content = src_obj.content;
+                  addCommand(command);
                 }
               }
               else{
                 dst_folder_child.content = src_obj.content;
+                addCommand(command);
               }
             }
           }
@@ -801,6 +815,7 @@ function handleCommand(command) {
               };
               replacePath(newChild, src_obj.path, dst_dir_obj.path + dst_filename + '/');
               dst_dir_obj.children.push(newChild);
+              addCommand(command);
             }
             else if(dst_folder_child.type === 'folder'){
               let last_child = hasChildNamed(dst_folder_child, src_obj.name);
@@ -813,10 +828,12 @@ function handleCommand(command) {
                 };
                 replacePath(newChild, src_obj.path, dst_folder_child.path + src_obj.name + '/');
                 dst_folder_child.children.push(newChild);
+                addCommand(command);
               }
               else if (last_child.type === 'folder'){
                 last_child.children = src_obj.children;
                 replacePath(last_child, src_obj.path, dst_folder_child.path + src_obj.name + '/');
+                addCommand(command);
               }
               else{
                 console.log('cp: cannot overwrite non-directory' + last_child.name + 'with directory' + src_obj.name);
@@ -1077,7 +1094,6 @@ function getParentObject(fileObj) {
   return parentObj;
 }
 
-
 function hasChildNamed(parentObj, name){
   if(parentObj.type === 'folder'){
     let child_arr = parentObj.children;
@@ -1102,6 +1118,20 @@ function makeDirectory(name) {
   current.children.push(newDir);
   renderFinder(current);
   renderHierarchy();
+
+function openFile(obj) {
+  const fileModal = document.getElementById('modal_open_file');
+  const fileName = document.getElementById('file_name');
+  const fileContent = document.getElementById('file_content');
+
+  fileName.innerHTML = obj.name;
+  fileContent.innerHTML = obj.content;
+  fileModal.style.display = '';
+}
+
+function closeFile() {
+  const fileModal = document.getElementById('modal_open_file');
+  fileModal.style.display = 'none';
 }
 
 function showManual(command) {
