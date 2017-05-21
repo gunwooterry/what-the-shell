@@ -1092,6 +1092,18 @@ function hasChildNamed(parentObj, name){
   return 0;
 }
 
+function makeDirectory(name) {
+  const newDir = {
+    type: 'folder',
+    name,
+    path: `${current.path}name/`,
+    children: [],
+  };
+  current.children.push(newDir);
+  renderFinder(current);
+  renderHierarchy();
+}
+
 function showManual(command) {
   const manualModal = document.getElementById('manual');
   const header = document.getElementById('manual_header');
