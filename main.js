@@ -91,6 +91,7 @@ $document.ready(() => {
     else resizeArrows(arrowBig, arrowSmall);
   };
 
+
   $document.on('contextmenu', '.non_modal_title', function(event) {
     event.preventDefault();
     let targetPath = event.currentTarget.id;
@@ -758,10 +759,12 @@ function handleCommand(command) {
           addCommand(`mkdir ${new_name}`);
           makeDirectory(new_name);
         } else {
+          showErrorMsg(`${new_name} already exists!`);
           return;
         }
       }
     } else {
+      showErrorMsg('Whitespace on name is not supported yet.. sorry');
       return;
     }
   } else if (op === 'rm') {
@@ -963,6 +966,7 @@ function handleCommand(command) {
     if(dstObj != 0) {
       if(dstObj.type == 'file') {
         if(srcObj.type == 'folder') {
+          showErrorMsg(`${dstObj.name} already exists and is not a directory`);
           return;
         } else {
           const newObj = deepcopy(srcObj);
@@ -1016,6 +1020,7 @@ function handleCommand(command) {
               dstObj.children.splice(dup_index, 1);
               dstObj.children.push(newObj);
             } else {
+              showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not empty!`);
               return;
             }
           } else if(srcObj.type == 'file' && dstObj.children[dup_index].type == 'file') {
@@ -1028,6 +1033,8 @@ function handleCommand(command) {
             dstObj.children.splice(dup_index, 1);
             dstObj.children.push(newObj);
           } else {
+            if(dstObj.children[dup_index].type == 'folder') showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not a file!`);
+            else if(dstObj.children[dup_index].type == 'file') showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not a folder!`);
             return;
           }
         } else {
