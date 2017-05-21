@@ -750,6 +750,20 @@ function handleCommand(command) {
     renderFinder(current);
     renderBreadcrumb(current);
     addCommand(command);
+  } else if (op === 'mkdir'){
+    let new_name = rest[0];
+    if(new_name !== '') {
+      if(new_name.indexOf(' ') == -1) {
+        if(hasChildNamed(current, new_name) == 0) {
+          addCommand(`mkdir ${new_name}`);
+          makeDirectory(new_name);
+        } else {
+          return;
+        }
+      }
+    } else {
+      return;
+    }
   } else if (op === 'rm') {
     const flag = rest[0];
     const path = rest[1];
