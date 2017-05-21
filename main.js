@@ -1117,6 +1117,7 @@ function makeDirectory(name) {
   current.children.push(newDir);
   renderFinder(current);
   renderHierarchy();
+}
 
 function openFile(obj) {
   const fileModal = document.getElementById('modal_open_file');
