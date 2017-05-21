@@ -72,6 +72,7 @@ $document.ready(() => {
 
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
+  const ctxMenu2 = document.getElementById('ctxMenu2');
   const modal = document.getElementById('modal_popup');
 
   resizeArrows(arrowSmall, arrowBig);
@@ -90,6 +91,7 @@ $document.ready(() => {
     else resizeArrows(arrowBig, arrowSmall);
   };
 
+
   $document.on('contextmenu', '.non_modal_title', function(event) {
     event.preventDefault();
     let targetPath = event.currentTarget.id;
@@ -97,10 +99,20 @@ $document.ready(() => {
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
+    return false;
   });
 
   $document.on('contextmenu', '#modal_popup', function(event) {
     event.preventDefault();
+  });
+
+  $document.on('contextmenu', '#finder', function(event) {
+    event.preventDefault();
+    ctxMenu.style.display = 'none';
+    ctxMenu2.style.display = 'inline-block';
+    ctxMenu2.style.left = `${event.pageX}px`;
+    ctxMenu2.style.top = `${event.pageY}px`;
+    $('.unit').css("background-color", "rgba(0,0,0,0)");
   });
 
 
@@ -111,12 +123,16 @@ $document.ready(() => {
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
+    ctxMenu2.style.display = 'none';
     $('.unit').css("background-color", "rgba(0,0,0,0)");
     $(this).css("background-color", "#AAAAAA");
+    event.stopPropagation();
   });
 
 
   $document.on('click', function(event) {
+    console.log('fuck1');
+    ctxMenu2.style.display = 'none';
     ctxMenu.style.display = 'none';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
@@ -128,6 +144,7 @@ $document.ready(() => {
   });
 
   $document.on('click', '.copy', function(event) {
+    console.log('fuck2');
     //event.preventDefault();
     copyorcut = "copy";
     ctxMenu.style.display = '';
@@ -141,6 +158,7 @@ $document.ready(() => {
   });
 
   $document.on('click', '.rename', function(event) {
+    console.log('fuck3');
     //event.preventDefault();
     ctxMenu.style.display = '';
     if(modal_on == 0) {
@@ -159,7 +177,20 @@ $document.ready(() => {
   });
 
 
+  $document.on('click', '.mkdir1', function(event) {
+    console.log('fuck4');
+    ctxMenu2.style.display = '';
+    if(modal_on == 0) {
+      $('#modal_popup_mkdir').show();
+      $('#mkdir_input').attr("placeholder", "");
+      $('#mkdir_input').focus();
+      modal_on = 3;
+    }
+    return false;
+  });
+
   $document.on('click', '.modal_title', function(event) {
+    console.log('fuck5');
     event.preventDefault();
     event.target.backgroundColor = 'blue';
     return false;
@@ -167,6 +198,7 @@ $document.ready(() => {
 
 
   $document.on('click', '.cut', function(event) {
+    console.log('fuck6');
     //event.preventDefault();
     copyorcut = "cut";
     ctxMenu.style.display = '';
@@ -179,6 +211,7 @@ $document.ready(() => {
   });
 
   $document.on('click', '.delete', function(event) {
+    console.log('fuck8');
     event.preventDefault();
     handleDelete(selectedObj);
     if (selectedObj.fileType === 'folder') addCommand(`rm -rf ${ selectedObj.name }`);
@@ -195,7 +228,56 @@ $document.ready(() => {
     }
   });
 
+
+  $('#mkdir_input').on('input', function(){
+    let input_value = this.value;
+    if(input_value === ''){
+      $('#mkdir_submit').addClass('disabled');
+    }
+    else{
+      $('#mkdir_submit').removeClass('disabled');
+    }
+  });
+
+  $('#mkdir_submit').click(function(event){
+    console.log('fuck9');
+    let new_name = $('#mkdir_input').val();
+    if(new_name !== '') {
+      if(new_name.indexOf(' ') == -1) {
+        if(hasChildNamed(current, new_name) == 0) {
+          addCommand(`mkdir ${new_name}`);
+          makeDirectory(new_name);
+          $('#mkdir_input').val('');
+          $('#rename_submit').addClass('disabled');
+          $('#modal_popup_mkdir').hide();
+          modal_on = 0;
+        } else {
+          $('#mkdir_input').attr('data-content', 'Directory already exists!');
+          $('#mkdir_input').popup('show', function(){
+            setTimeout(function(){
+              console.log('callback');
+              $('#mkdir_input').popup('hide', function(){
+                $('#mkdir_input').popup('destroy');
+              });
+            }, 2000);
+          })
+        }
+      }
+    } else {
+      $('#mkdir_input').attr('data-content', 'Whitespace on name is not supported yet.. sorry');
+      $('#mkdir_input').popup('show', function(){
+        setTimeout(function(){
+          console.log('callback');
+          $('#mkdir_input').popup('hide', function(){
+            $('#mkdir_input').popup('destroy');
+          });
+        }, 2000);
+      });
+    }
+  });
+
   $('#rename_submit').click(function(event){
+    console.log('fuck10');
     let new_name = $('#rename_input').val();
     if(new_name !== ''){
       let parentObj = getParentObject(selectedObj);
@@ -246,10 +328,12 @@ $document.ready(() => {
   });
 
   $document.on('click', '.unit', function(event) {
+    console.log('fuck11');
     event.preventDefault();
     $('.unit').css("background-color", "rgba(0,0,0,0)");
     $(this).css("background-color", "#AAAAAA");
     ctxMenu.style.display = 'none';
+    ctxMenu2.style.display = 'none';
     return false;
   });
 
@@ -261,6 +345,7 @@ $document.ready(() => {
   // });
 
   $('#modal_popup').click(function(event) {
+    console.log('fuck12');
     if(modal_on != 0) {
       if(prev_target != 0) prev_target.style.color = '#000000';
       $('#submit_copy').addClass('disabled');
@@ -270,13 +355,24 @@ $document.ready(() => {
   });
 
   $('#modal_popup').bind('keydown', function(event) {
+    console.log('fuck13');
     commandInput(event);
   })
 
   $('#modal_popup_rename').click(function(event) {
+    console.log('fuck14');
     if(modal_on == 2) {
       $('#rename_submit').addClass('disabled');
       $('#modal_popup_rename').hide();
+      modal_on = 0;
+    }
+  });
+
+  $('#modal_popup_mkdir').click(function(event) {
+    console.log('fuck15');
+    if(modal_on == 3) {
+      $('#mkdir_submit').addClass('disabled');
+      $('#modal_popup_mkdir').hide();
       modal_on = 0;
     }
   });
@@ -285,6 +381,7 @@ $document.ready(() => {
   let target = 0;
 
   $('.modal_content').click(function(event) {
+    console.log('fuck16');
     if($(event.target).closest('.title').length == 1){
       if(prev_target != 0) prev_target.style.color = '#000000';
       target = $(event.target).closest('.title')[0];
@@ -296,6 +393,7 @@ $document.ready(() => {
   });
 
   $('#submit_copy').click(function(event) {
+    console.log('fuck18');
     let targetObj = findByAbsolutePath(target.id);
     if (targetObj.path.indexOf(selectedObj.path) == -1) {
       if(copyorcut == "copy") {
@@ -601,11 +699,13 @@ function commandInput(e) {
       }
       commandLine.value = '';
     }
-    else if (currentMode == 'GUI' && modal_on == 2 && e.keyCode == 13) {
-      $('#rename_submit').trigger('click');
+    else if (currentMode == 'GUI' && modal_on >= 2 && e.keyCode == 13) {
+      if(modal_on == 2) $('#rename_submit').trigger('click');
+      if(modal_on == 3) $('#mkdir_submit').trigger('click');
     }
-    else if (currentMode == 'GUI' && modal_on == 2 && e.keyCode == 27) {
-      $('#modal_popup_rename').trigger('click');
+    else if (currentMode == 'GUI' && modal_on >= 2 && e.keyCode == 27) {
+      if(modal_on == 2) $('#modal_popup_rename').trigger('click');
+      if(modal_on == 3) $('#modal_popup_mkdir').trigger('click');
     }
     else if (currentMode == 'GUI' && modal_on == 1 && e.keyCode == 27) {
       $('#modal_popup').trigger('click');
@@ -658,35 +758,102 @@ function handleCommand(command) {
     else{
       showErrorMsg('cd usage : cd [folder name] ex) cd aaa');
     }
-  } else if (op === 'rm') {
-    const flag = rest[0];
-    const path = rest[1];
-    const pathArray = path.split('/');
-
-    if (!flag.includes('-')) {
-      showErrorMsg('No flags');
-      return;
-    }
-
-    let found;
-    if (pathArray[0] === '~') found = findByAbsolutePath(path);
-    else found = findByAbsolutePath(current.path + path);
-    if (found !== -1) {
-      const parent = findByAbsolutePath(parentPath(found.path));
-      if (found.type === 'folder') {
-        if (!flag.includes('r')) {
-          showErrorMsg('Cannot remove directory');
+  } else if (op === 'mkdir'){
+    let new_name = rest[0];
+    if(new_name !== '') {
+      if(new_name.indexOf(' ') == -1) {
+        if(hasChildNamed(current, new_name) == 0) {
+          addCommand(`mkdir ${new_name}`);
+          makeDirectory(new_name);
+        } else {
+          showErrorMsg(`${new_name} already exists!`);
           return;
         }
       }
-      for (let i = 0; i < parent.children.length; i++) {
-        if (parent.children[i].name === found.name) {
-          parent.children.splice(i, 1);
-          break;
+    } else {
+      showErrorMsg('Whitespace on name is not supported yet.. sorry');
+      return;
+    }
+  } else if (op === 'rm') {
+    if(rest.length == 0){
+      showErrorMsg('rm usage : rm [flag (optional)][folder/file name] ex) rm -r aaa or rm README.md');
+    }
+    else if(rest.length == 1){
+      const path = rest[0];
+      if (path.includes('-')) {
+        showErrorMsg('rm usage : rm [flag (optional)][folder/file name] ex) rm -r aaa or rm README.md');
+      }
+      else{
+        let remove_obj = findByPath(path);
+        if(remove_obj == 0){
+          showErrorMsg('rm : no such file or directory ' + path);
+        }
+        else{
+          if(remove_obj.type === 'file'){
+            let parent_obj = getParentObject(remove_obj);
+            for(let i = 0 ; i < parent_obj.children.length ; i++){
+              if(parent_obj.children[i].name === remove_obj.name){
+                parent_obj.children.splice(i, 1);
+                break;
+              }
+            }
+            addCommand(command);
+          }
+          else{
+            showErrorMsg('rm : ' + path + ' is a directory. Try rm -r ' + path);
+          }
         }
       }
-    } else {
-     showErrorMsg('Not found');
+    }
+    else if(rest.length == 2){
+      const flag = rest[0];
+      const path = rest[1];
+      if (!flag.includes('-')){
+        showErrorMsg('rm usage : rm [flag (optional)][folder/file name] ex) rm -r aaa or rm README.md');
+      }
+      else if(flag === '-r'){
+        let remove_obj = findByPath(path);
+        if(remove_obj == 0){
+          showErrorMsg('rm : no such file or directory ' + path);
+        }
+        else{
+          let parent_obj = getParentObject(remove_obj);
+          for(let i = 0 ; i < parent_obj.children.length ; i++){
+            if(parent_obj.children[i].name === remove_obj.name){
+              parent_obj.children.splice(i, 1);
+              break;
+            }
+          }
+          addCommand(command);
+        }
+      }
+      else if(flag === '-f'){
+        let remove_obj = findByPath(path);
+        if(remove_obj == 0){
+          showErrorMsg('rm : no such file or directory ' + path);
+        }
+        else{
+          if(remove_obj.type === 'file'){
+            let parent_obj = getParentObject(remove_obj);
+            for(let i = 0 ; i < parent_obj.children.length ; i++){
+              if(parent_obj.children[i].name === remove_obj.name){
+                parent_obj.children.splice(i, 1);
+                break;
+              }
+            }
+            addCommand(command);
+          }
+          else{
+            showErrorMsg('rm : ' + path + ' is a directory. Try rm -r ' + path);
+          }
+        }
+      }
+      else{
+        showErrorMsg('');
+      }
+    }
+    else{
+      showErrorMsg('rm usage : rm [flag (optional)][folder/file name] ex) rm -r aaa or rm README.md');
     }
   } else if(op === 'cp'){
     if(rest.length == 2){
@@ -850,7 +1017,6 @@ function handleCommand(command) {
     const dstPath = getAbsolutePath(rest[1]);
     if(srcPath == 0 || dstPath == 0) return;
     const srcObj = findByAbsolutePath(srcPath);
-    console.log(dstPath);
     const dstObj = findByAbsolutePath(dstPath);
     if(srcObj == 0) {
       return;
@@ -858,6 +1024,7 @@ function handleCommand(command) {
     if(dstObj != 0) {
       if(dstObj.type == 'file') {
         if(srcObj.type == 'folder') {
+          showErrorMsg(`${dstObj.name} already exists and is not a directory`);
           return;
         } else {
           const newObj = deepcopy(srcObj);
@@ -911,6 +1078,7 @@ function handleCommand(command) {
               dstObj.children.splice(dup_index, 1);
               dstObj.children.push(newObj);
             } else {
+              showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not empty!`);
               return;
             }
           } else if(srcObj.type == 'file' && dstObj.children[dup_index].type == 'file') {
@@ -923,6 +1091,8 @@ function handleCommand(command) {
             dstObj.children.splice(dup_index, 1);
             dstObj.children.push(newObj);
           } else {
+            if(dstObj.children[dup_index].type == 'folder') showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not a file!`);
+            else if(dstObj.children[dup_index].type == 'file') showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not a folder!`);
             return;
           }
         } else {
