@@ -72,6 +72,7 @@ $document.ready(() => {
 
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
+  const ctxMenu2 = document.getElementById('ctxMenu2');
   const modal = document.getElementById('modal_popup');
 
   resizeArrows(arrowSmall, arrowBig);
@@ -97,10 +98,19 @@ $document.ready(() => {
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
+    return false;
   });
 
   $document.on('contextmenu', '#modal_popup', function(event) {
     event.preventDefault();
+  });
+
+  $document.on('contextmenu', '#finder', function(event) {
+    event.preventDefault();
+    ctxMenu.style.display = 'none';
+    ctxMenu2.style.display = 'inline-block';
+    ctxMenu2.style.left = `${event.pageX}px`;
+    ctxMenu2.style.top = `${event.pageY}px`;
   });
 
 
@@ -111,12 +121,16 @@ $document.ready(() => {
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
+    ctxMenu2.style.display = 'none';
     $('.unit').css("background-color", "rgba(0,0,0,0)");
     $(this).css("background-color", "#AAAAAA");
+    event.stopPropagation();
   });
 
 
   $document.on('click', function(event) {
+    console.log('fuck1');
+    ctxMenu2.style.display = 'none';
     ctxMenu.style.display = 'none';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
@@ -128,6 +142,7 @@ $document.ready(() => {
   });
 
   $document.on('click', '.copy', function(event) {
+    console.log('fuck2');
     //event.preventDefault();
     copyorcut = "copy";
     ctxMenu.style.display = '';
@@ -141,6 +156,7 @@ $document.ready(() => {
   });
 
   $document.on('click', '.rename', function(event) {
+    console.log('fuck3');
     //event.preventDefault();
     ctxMenu.style.display = '';
     if(modal_on == 0) {
@@ -159,7 +175,20 @@ $document.ready(() => {
   });
 
 
+  $document.on('click', '.mkdir1', function(event) {
+    console.log('fuck4');
+    ctxMenu2.style.display = '';
+    if(modal_on == 0) {
+      $('#modal_popup_mkdir').show();
+      $('#mkdir_input').attr("placeholder", "");
+      $('#mkdir_input').focus();
+      modal_on = 3;
+    }
+    return false;
+  });
+
   $document.on('click', '.modal_title', function(event) {
+    console.log('fuck5');
     event.preventDefault();
     event.target.backgroundColor = 'blue';
     return false;
@@ -167,6 +196,7 @@ $document.ready(() => {
 
 
   $document.on('click', '.cut', function(event) {
+    console.log('fuck6');
     //event.preventDefault();
     copyorcut = "cut";
     ctxMenu.style.display = '';
@@ -179,6 +209,7 @@ $document.ready(() => {
   });
 
   $document.on('click', '.delete', function(event) {
+    console.log('fuck8');
     event.preventDefault();
     handleDelete(selectedObj);
     if (selectedObj.fileType === 'folder') addCommand(`rm -rf ${ selectedObj.name }`);
@@ -195,7 +226,56 @@ $document.ready(() => {
     }
   });
 
+
+  $('#mkdir_input').on('input', function(){
+    let input_value = this.value;
+    if(input_value === ''){
+      $('#mkdir_submit').addClass('disabled');
+    }
+    else{
+      $('#mkdir_submit').removeClass('disabled');
+    }
+  });
+
+  $('#mkdir_submit').click(function(event){
+    console.log('fuck9');
+    let new_name = $('#mkdir_input').val();
+    if(new_name !== '') {
+      if(new_name.indexOf(' ') == -1) {
+        if(hasChildNamed(current, new_name) == 0) {
+          addCommand(`mkdir ${new_name}`);
+          makeDirectory(new_name);
+          $('#mkdir_input').val('');
+          $('#rename_submit').addClass('disabled');
+          $('#modal_popup_mkdir').hide();
+          modal_on = 0;
+        } else {
+          $('#mkdir_input').attr('data-content', 'Directory already exists!');
+          $('#mkdir_input').popup('show', function(){
+            setTimeout(function(){
+              console.log('callback');
+              $('#mkdir_input').popup('hide', function(){
+                $('#mkdir_input').popup('destroy');
+              });
+            }, 2000);
+          })
+        }
+      }
+    } else {
+      $('#mkdir_input').attr('data-content', 'Whitespace on name is not supported yet.. sorry');
+      $('#mkdir_input').popup('show', function(){
+        setTimeout(function(){
+          console.log('callback');
+          $('#mkdir_input').popup('hide', function(){
+            $('#mkdir_input').popup('destroy');
+          });
+        }, 2000);
+      });
+    }
+  });
+
   $('#rename_submit').click(function(event){
+    console.log('fuck10');
     let new_name = $('#rename_input').val();
     if(new_name !== ''){
       let parentObj = getParentObject(selectedObj);
@@ -246,6 +326,7 @@ $document.ready(() => {
   });
 
   $document.on('click', '.unit', function(event) {
+    console.log('fuck11');
     event.preventDefault();
     $('.unit').css("background-color", "rgba(0,0,0,0)");
     $(this).css("background-color", "#AAAAAA");
@@ -261,6 +342,7 @@ $document.ready(() => {
   // });
 
   $('#modal_popup').click(function(event) {
+    console.log('fuck12');
     if(modal_on != 0) {
       if(prev_target != 0) prev_target.style.color = '#000000';
       $('#submit_copy').addClass('disabled');
@@ -270,13 +352,24 @@ $document.ready(() => {
   });
 
   $('#modal_popup').bind('keydown', function(event) {
+    console.log('fuck13');
     commandInput(event);
   })
 
   $('#modal_popup_rename').click(function(event) {
+    console.log('fuck14');
     if(modal_on == 2) {
       $('#rename_submit').addClass('disabled');
       $('#modal_popup_rename').hide();
+      modal_on = 0;
+    }
+  });
+
+  $('#modal_popup_mkdir').click(function(event) {
+    console.log('fuck15');
+    if(modal_on == 3) {
+      $('#mkdir_submit').addClass('disabled');
+      $('#modal_popup_mkdir').hide();
       modal_on = 0;
     }
   });
@@ -285,6 +378,7 @@ $document.ready(() => {
   let target = 0;
 
   $('.modal_content').click(function(event) {
+    console.log('fuck16');
     if($(event.target).closest('.title').length == 1){
       if(prev_target != 0) prev_target.style.color = '#000000';
       target = $(event.target).closest('.title')[0];
@@ -296,6 +390,7 @@ $document.ready(() => {
   });
 
   $('#submit_copy').click(function(event) {
+    console.log('fuck18');
     let targetObj = findByAbsolutePath(target.id);
     if (targetObj.path.indexOf(selectedObj.path) == -1) {
       if(copyorcut == "copy") {
@@ -601,11 +696,13 @@ function commandInput(e) {
       }
       commandLine.value = '';
     }
-    else if (currentMode == 'GUI' && modal_on == 2 && e.keyCode == 13) {
-      $('#rename_submit').trigger('click');
+    else if (currentMode == 'GUI' && modal_on >= 2 && e.keyCode == 13) {
+      if(modal_on == 2) $('#rename_submit').trigger('click');
+      if(modal_on == 3) $('#mkdir_submit').trigger('click');
     }
-    else if (currentMode == 'GUI' && modal_on == 2 && e.keyCode == 27) {
-      $('#modal_popup_rename').trigger('click');
+    else if (currentMode == 'GUI' && modal_on >= 2 && e.keyCode == 27) {
+      if(modal_on == 2) $('#modal_popup_rename').trigger('click');
+      if(modal_on == 3) $('#modal_popup_mkdir').trigger('click');
     }
     else if (currentMode == 'GUI' && modal_on == 1 && e.keyCode == 27) {
       $('#modal_popup').trigger('click');

@@ -81,7 +81,7 @@ input.emphasized {
   margin-bottom: 5px;
 }
 
-.input.rename{
+.input.rename, .input.mkdir {
   width: 100% !important;
   font-size: 15px;
   box-shadow: 0 0 0 0 !important;
@@ -89,7 +89,7 @@ input.emphasized {
   margin-left: 0px !important;
 }
 
-#rename_submit{
+#rename_submit, #mkdir_submit {
   margin-top: 10px;
 }
 
@@ -163,6 +163,16 @@ input.emphasized {
   font-weight:bold;
 }
 
+#ctxMenu2{
+    background: #FFFFFF;
+    display:none;
+    z-index:100;
+    position: absolute;
+}
+
+#ctxMenu2:hover {
+  font-weight:bold;
+}
 .ui-box {
   width: 1200px;
 }
