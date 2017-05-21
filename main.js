@@ -61,7 +61,14 @@ const descriptions = {
 }
 
 $document.ready(() => {
-  $('#welcome').modal({ blurring: true }).modal('show');
+  $('#welcome').modal({ blurring: true }).modal('show', function(){
+    $('#welcome').focus();
+    $('#welcome').bind('keydown', function(e) {
+      console.log('hi');
+      if(e.keyCode == 13 || e.keyCode == 27)
+        $('#welcome').modal('hide');
+    });
+  });
 
   const arrowBtn = document.getElementById('arrow_btn');
   const ctxMenu = document.getElementById('ctxMenu');
@@ -505,7 +512,8 @@ function renderFinder(current) {
     else if (type == 'file') {
       icon.classList.add('huge', 'file', 'icon');
       unit.ondblclick = function () {
-        // addCommand(`cat ${name}`);
+        openFile(child);
+        addCommand(`cat ${name}`);
       }
     }
 
@@ -1085,7 +1093,6 @@ function getParentObject(fileObj) {
   return parentObj;
 }
 
-
 function hasChildNamed(parentObj, name){
   if(parentObj.type === 'folder'){
     let child_arr = parentObj.children;
@@ -1098,6 +1105,32 @@ function hasChildNamed(parentObj, name){
     return 0;
   }
   return 0;
+}
+
+function makeDirectory(name) {
+  const newDir = {
+    type: 'folder',
+    name,
+    path: `${current.path}name/`,
+    children: [],
+  };
+  current.children.push(newDir);
+  renderFinder(current);
+  renderHierarchy();
+
+function openFile(obj) {
+  const fileModal = document.getElementById('modal_open_file');
+  const fileName = document.getElementById('file_name');
+  const fileContent = document.getElementById('file_content');
+
+  fileName.innerHTML = obj.name;
+  fileContent.innerHTML = obj.content;
+  fileModal.style.display = '';
+}
+
+function closeFile() {
+  const fileModal = document.getElementById('modal_open_file');
+  fileModal.style.display = 'none';
 }
 
 function showManual(command) {
