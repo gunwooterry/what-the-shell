@@ -57,6 +57,20 @@
             </div>
           </div>
 
+          <div class="ui" id="modal_open_file" style="display:none;width:100%; height:100%; position:absolute; top:0;left:0;padding:70px 100px; background-color: rgba(0,0,0,0.6);">
+            <div class="ui segment modal_content" style="width:100%;height:100%;position:relative;background-color:#FFFFFF;">
+              <div class="header" style="overflow: auto">
+                <span id="file_name" style="float: left"></span>
+                <span style="float: right">
+                  <i class="remove icon" area-hidden="true" onclick="closeFile()" style="cursor: pointer" onmouseover="this.style.fontSize = '120%'" onmouseout="this.style.fontSize = '100%'"></i>
+                </span>
+              </div>
+              <div class="ui basic segment" style="height: 90%; background: #F4F4F4;">
+                <p id="file_content"></p>
+              </div>
+            </div>
+          </div>
+
           <div class="ui" id="modal_popup_rename" style="display:none;width:100%; height:100%; position:absolute; top:0;left:0;padding:230px 100px;background-color: rgba(0,0,0,0.6);">
             <div class="ui segment modal_content" style="width:100%;height:100%;position:relative;background-color:#FFFFFF;">
               <div class="header" id="rename_header" >TYPE NEW FILE NAME</div>
