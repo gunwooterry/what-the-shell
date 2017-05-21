@@ -112,6 +112,7 @@ $document.ready(() => {
     ctxMenu2.style.display = 'inline-block';
     ctxMenu2.style.left = `${event.pageX}px`;
     ctxMenu2.style.top = `${event.pageY}px`;
+    $('.unit').css("background-color", "rgba(0,0,0,0)");
   });
 
 
@@ -332,6 +333,7 @@ $document.ready(() => {
     $('.unit').css("background-color", "rgba(0,0,0,0)");
     $(this).css("background-color", "#AAAAAA");
     ctxMenu.style.display = 'none';
+    ctxMenu2.style.display = 'none';
     return false;
   });
 
