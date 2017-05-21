@@ -646,13 +646,18 @@ function handleCommand(command) {
     }
     addCommand(command);
   } else if (op === 'cd') {
-    const path = rest[0];
-    const pathArray = path.split('/');
-    if (pathArray[0] === '~') current = findByAbsolutePath(path);
-    else current = findByAbsolutePath(current.path + path);
-    renderFinder(current);
-    renderBreadcrumb(current);
-    addCommand(command);
+    if(rest.length == 0){
+      current = root;
+      addCommand(command);
+    }
+    else if(rest.length == 1){
+      const path = rest[0];
+      current = findByPath(path);
+      addCommand(command);
+    }
+    else{
+      showErrorMsg('cd usage : cd [folder name] ex) cd aaa');
+    }
   } else if (op === 'rm') {
     const flag = rest[0];
     const path = rest[1];
@@ -968,6 +973,7 @@ function handleCommand(command) {
   }
   renderHierarchy();
   renderFinder(current);
+  renderBreadcrumb(current);
 }
 
 function showErrorMsg(msg){
