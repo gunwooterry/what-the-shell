@@ -659,7 +659,7 @@ function handleCommand(command) {
     const pathArray = path.split('/');
 
     if (!flag.includes('-')) {
-      console.log('No flags');
+      showErrorMsg('No flags');
       return;
     }
 
@@ -670,7 +670,7 @@ function handleCommand(command) {
       const parent = findByAbsolutePath(parentPath(found.path));
       if (found.type === 'folder') {
         if (!flag.includes('r')) {
-          console.log('Cannot remove directory');
+          showErrorMsg('Cannot remove directory');
           return;
         }
       }
@@ -681,26 +681,25 @@ function handleCommand(command) {
         }
       }
     } else {
-     console.log('Not found');
+     showErrorMsg('Not found');
     }
   } else if(op === 'cp'){
     if(rest.length == 2){
       const src = rest[0];
       const dst = rest[1];
       let src_obj = findByPath(src);
-      console.log(src_obj);
       if(src_obj == 0){
-        console.log('No such file named' + src);
+        showErrorMsg('No such file named ' + src);
       }
       else {
         if(src_obj.type === 'file'){
           if (dst[dst.length-1] === '/'){
             let dst_obj = findByPath(dst);
             if(dst_obj == 0){
-              console.log('cp: directory' + dst + 'does not exist');
+              showErrorMsg('cp: directory ' + dst + ' does not exist');
             }
             else if(dst_obj.type === 'file'){
-              console.log('cp: directory' + dst + 'does not exist');
+              showErrorMsg('cp: directory ' + dst + ' does not exist');
             }
             else{
               let child = hasChildNamed(dst_obj, src_obj.name);
@@ -719,7 +718,7 @@ function handleCommand(command) {
                 addCommand(command);
               }
               else{
-                console.log('cp: cannot overwrite directory' + child.name + 'with non-directory' + src_obj.name);
+                showErrorMsg('cp: cannot overwrite directory ' + child.name + ' with non-directory ' + src_obj.name);
               }
             }
           }
@@ -736,10 +735,8 @@ function handleCommand(command) {
             else if(dst[0] == '~'){
               dst_dir_obj = root;
             }
-            console.log('dir_string = ' + dir_string);
-            console.log(dst_dir_obj);
             if(dst_dir_obj == 0 || dst_dir_obj == -1){
-              console.log('cp: directory' + dst + 'does not exist');
+              showErrorMsg('cp: directory ' + dst + ' does not exist');
             }
             else if(dst_dir_obj.type === 'folder'){
               let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
@@ -766,7 +763,7 @@ function handleCommand(command) {
                   addCommand(command);
                 }
                 else if (last_child.type === 'folder'){
-                  console.log('cp: cannot overwrite directory' + last_child.name + 'with non-directory' + src_obj.name);
+                  showErrorMsg('cp: cannot overwrite directory ' + last_child.name + ' with non-directory ' + src_obj.name);
                 }
                 else{
                   last_child.content = src_obj.content;
@@ -789,20 +786,16 @@ function handleCommand(command) {
           let dst_filename = dst_arr[dst_len - 1];
           let dir_string = '';
           let dst_dir_obj = current;
-          console.log(dst_arr);
           if(dst_len - 1 > 0){
             dst_arr.splice(dst_len - 1, 1);
             dir_string = dst_arr.join('/') + '/';
-            console.log(dir_string);
             dst_dir_obj = findByPath(dir_string);
           }
           else if(dst[0] == '~'){
             dst_dir_obj = root;
           }
-          console.log('dir_string = ' + dir_string);
-          console.log(dst_dir_obj);
           if(dst_dir_obj == 0 || dst_dir_obj == -1){
-            console.log('cp: directory' + dst + 'does not exist');
+            showErrorMsg('cp: directory ' + dst + ' does not exist');
           }
           else if(dst_dir_obj.type === 'folder'){
             let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
@@ -836,11 +829,12 @@ function handleCommand(command) {
                 addCommand(command);
               }
               else{
-                console.log('cp: cannot overwrite non-directory' + last_child.name + 'with directory' + src_obj.name);
+                showErrorMsg('cp: cannot overwrite non-directory ' + last_child.name + ' with directory ' + src_obj.name);
+
               }
             }
             else{
-              console.log('cp: cannot overwrite non-directory' + dst_folder_child.name + 'with directory' + src_obj.name);
+              showErrorMsg('cp: cannot overwrite non-directory ' + dst_folder_child.name + ' with directory ' + src_obj.name);
             }
           }
         }
@@ -970,17 +964,27 @@ function handleCommand(command) {
       }
     }
   } else {
-    $('#command_line').popup('show', function(){
-      setTimeout(function(){
-        console.log('callback');
-        $('#command_line').popup('hide', function(){
-          $('#command_line').popup('destroy');
-        });
-      }, 2000);
-    });
+    showErrorMsg(''); // default is Sorry, we do not support your command yet.
   }
   renderHierarchy();
   renderFinder(current);
+}
+
+function showErrorMsg(msg){
+  if(msg === ''){
+    $('#command_line').attr('data-content', 'Sorry, we do not support your command yet.');
+  }
+  else{
+    $('#command_line').attr('data-content', msg);
+  }
+  $('#command_line').popup('show', function(){
+    setTimeout(function(){
+      console.log('callback');
+      $('#command_line').popup('hide', function(){
+        $('#command_line').popup('destroy');
+      });
+    }, 2000);
+  });
 }
 
 function handleCopy(obj, dirObj) {
@@ -1119,6 +1123,7 @@ function makeDirectory(name) {
   renderFinder(current);
   renderHierarchy();
 }
+
 
 function openFile(obj) {
   const fileModal = document.getElementById('modal_open_file');
