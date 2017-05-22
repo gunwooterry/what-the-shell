@@ -1,3 +1,4 @@
+const descriptions = manuals;
 const $document = $(document);
 var modal_on = 0;
 let copyorcut = "copy";
@@ -53,12 +54,6 @@ let root = {
 };
 let current = root;
 let selectedObj = root;
-const descriptions = {
-  rm: 'rm removes a folder or a file.',
-  cd: 'cd changes current directory.',
-  cat: 'cat shows the content of the file.',
-  cp: 'cp copies the file or folder.',
-}
 
 $document.ready(() => {
   $('#welcome').modal({ blurring: true }).modal('show', function(){
@@ -169,6 +164,7 @@ $document.ready(() => {
       else{
         $("#rename_header").html("TYPE NEW FILE NAME");
       }
+      $('#rename_input').popup('destroy');
       $('#rename_input').attr("placeholder", selectedObj.name);
       $('#rename_input').focus();
       modal_on = 2;
@@ -182,6 +178,7 @@ $document.ready(() => {
     ctxMenu2.style.display = '';
     if(modal_on == 0) {
       $('#modal_popup_mkdir').show();
+      $('#mkdir_input').popup('destroy');
       $('#mkdir_input').attr("placeholder", "");
       $('#mkdir_input').focus();
       modal_on = 3;
@@ -256,9 +253,7 @@ $document.ready(() => {
           $('#mkdir_input').popup('show', function(){
             setTimeout(function(){
               console.log('callback');
-              $('#mkdir_input').popup('hide', function(){
-                $('#mkdir_input').popup('destroy');
-              });
+              $('#mkdir_input').popup('destroy');
             }, 2000);
           })
         }
@@ -268,9 +263,7 @@ $document.ready(() => {
       $('#mkdir_input').popup('show', function(){
         setTimeout(function(){
           console.log('callback');
-          $('#mkdir_input').popup('hide', function(){
-            $('#mkdir_input').popup('destroy');
-          });
+          $('#mkdir_input').popup('destroy');
         }, 2000);
       });
     }
@@ -282,7 +275,7 @@ $document.ready(() => {
     if(new_name !== ''){
       let parentObj = getParentObject(selectedObj);
       let prev_name = selectedObj.name;
-      if(new_name.indexOf(' ') == -1){
+      if(!new_name.includes(' ')){
         if(prev_name === new_name || hasChildNamed(parentObj, new_name) == 0){
           addCommand(`mv ${prev_name} ${new_name}`);
           selectedObj.name = new_name;
@@ -362,8 +355,10 @@ $document.ready(() => {
   $('#modal_popup_rename').click(function(event) {
     console.log('fuck14');
     if(modal_on == 2) {
+      $('#rename_input').popup('destroy');
       $('#rename_submit').addClass('disabled');
       $('#modal_popup_rename').hide();
+      $('#rename_input').val('');
       modal_on = 0;
     }
   });
@@ -371,8 +366,10 @@ $document.ready(() => {
   $('#modal_popup_mkdir').click(function(event) {
     console.log('fuck15');
     if(modal_on == 3) {
+      $('#mkdir_input').popup('destroy');
       $('#mkdir_submit').addClass('disabled');
       $('#modal_popup_mkdir').hide();
+      $('#mkdir_input').val('');
       modal_on = 0;
     }
   });
@@ -739,7 +736,11 @@ function handleCommand(command) {
   const rest = args.slice(1);
 
   if (op === 'echo') {
-    if (redirect.length === 2) {
+    if(rest.length == 0){
+      showErrorMsg(`echo usage : echo [string] > [output name] ex) echo "hello,world" > hello.txt`);
+      return;
+    }
+    else if (redirect.length === 2) {
       const outputName = redirect[1];
       const message = rest.join(' ');
       const newFile = {
@@ -765,19 +766,34 @@ function handleCommand(command) {
       showErrorMsg('cd usage : cd [folder name] ex) cd aaa');
     }
   } else if (op === 'mkdir'){
-    let new_name = rest[0];
-    if(new_name !== '') {
-      if(new_name.indexOf(' ') == -1) {
-        if(hasChildNamed(current, new_name) == 0) {
-          addCommand(`mkdir ${new_name}`);
-          makeDirectory(new_name);
-        } else {
-          showErrorMsg(`${new_name} already exists!`);
+    if(rest.length == 0){
+      showErrorMsg(`mkdir usage : mkdir [new folder name] ex) mkdir folder1`);
+      return;
+    }
+    else if(rest.length == 1){
+      let new_name = rest[0];
+      if(new_name !== '') {
+        if(new_name === ' '){
+          showErrorMsg(`mkdir usage : mkdir [new folder name] ex) mkdir folder1`);
+          return;
+        }
+        else if(!new_name.includes(' ')) {
+          if(hasChildNamed(current, new_name) == 0) {
+            addCommand(`mkdir ${new_name}`);
+            makeDirectory(new_name);
+          } else {
+            showErrorMsg(`${new_name} already exists!`);
+            return;
+          }
+        }
+        else {
+          showErrorMsg('Whitespace on name is not supported yet.. sorry');
           return;
         }
       }
-    } else {
-      showErrorMsg('Whitespace on name is not supported yet.. sorry');
+    }
+    else{
+      showErrorMsg('');
       return;
     }
   } else if (op === 'rm') {
@@ -867,7 +883,11 @@ function handleCommand(command) {
       showErrorMsg('rm usage : rm [flag (optional)][folder/file name] ex) rm -r aaa or rm README.md');
     }
   } else if(op === 'cp'){
-    if(rest.length == 2){
+    if(rest.length == 0 || rest.length == 1){
+      showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] ex) cp README.md bbb');
+      return;
+    }
+    else if(rest.length == 2){
       const src = rest[0];
       const dst = rest[1];
       if(src.includes('-')){
