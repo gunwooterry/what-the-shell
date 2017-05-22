@@ -1129,6 +1129,7 @@ function handleCommand(command) {
       else dstPrevObj = findByAbsolutePath(dstPathFrags.join('/'));
 
       if (dstPrevObj == 0 || dstPrevObj.type != 'folder') { /* dstPrevObj does not exist or it is not a folder */
+        showErrorMsg(`no such directory: ${ rest[0] }`)
         // reject(no such directory: rest[0])
         return;
       } else { /* dstPrevObj is a folder */
