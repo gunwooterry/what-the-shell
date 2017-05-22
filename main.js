@@ -102,7 +102,7 @@ $document.ready(() => {
     const guiWindow = document.getElementById('gui_window');
     const commandLine = document.getElementById('command_line');
 
-  
+
     commandLine.value = '';
     commandLine.placeholder='Type your command here';
     emphasize(guiWindow);
@@ -139,7 +139,7 @@ $document.ready(() => {
     const guiWindow = document.getElementById('gui_window');
     const commandLine = document.getElementById('command_line');
 
-  
+
     commandLine.value = '';
     commandLine.placeholder='Type your command here';
     emphasize(guiWindow);
@@ -341,7 +341,8 @@ $document.ready(() => {
   $document.on('click', '.unit', function(event) {
     event.preventDefault();
     $('.unit').css("background-color", "rgba(0,0,0,0)");
-    $(this).css("background-color", "#AAAAAA");
+    if (!this.classList.contains('sidebar_item'))
+      $(this).css("background-color", "#AAAAAA");
     ctxMenu.style.display = 'none';
     ctxMenu2.style.display = 'none';
     return false;
@@ -496,7 +497,7 @@ $(document).on('contextmenu', '#gui_window', function(e) {
   const guiWindow = document.getElementById('gui_window');
   const commandLine = document.getElementById('command_line');
 
-  
+
   commandLine.value = '';
   commandLine.placeholder='Type your command here';
   emphasize(guiWindow);
@@ -525,10 +526,12 @@ function renderHierarchy() {
       if (type == 'folder') {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
+        const item = document.createElement('span');
         const icon = document.createElement('i');
         const nameText = document.createElement('span');
 
         nameText.innerHTML = name;
+        item.classList.add('unit', 'sidebar_item');
         title.classList.add('title', 'non_modal_title');
         title.id = child.path;
         dropdown.classList.add('dropdown', 'icon');
@@ -541,9 +544,11 @@ function renderHierarchy() {
           goto(child);
           addCommand(`cd ${child.path}`);
         }
+
         title.appendChild(dropdown);
-        title.appendChild(icon);
-        title.appendChild(nameText);
+        item.appendChild(icon);
+        item.appendChild(nameText);
+        title.appendChild(item);
         currentDir.appendChild(title);
 
         const content = document.createElement('div');
