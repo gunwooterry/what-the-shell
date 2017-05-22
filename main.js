@@ -33,13 +33,13 @@ let root = {
     },
     {
       type: 'folder',
-      name: 'bbb',
-      path: '~/bbb/',
+      name: 'rename_me',
+      path: '~/rename_me/',
       children: [
         {
           type: 'file',
           name: 'trash.txt',
-          path: '~/bbb/trash.txt',
+          path: '~/rename_me/trash.txt',
         },
       ],
     },
@@ -61,12 +61,13 @@ const descriptions = {
 }
 
 $document.ready(() => {
-  $('#welcome').modal({ blurring: true }).modal('show', function(){
-    $('#welcome').focus();
-    $('#welcome').bind('keydown', function(e) {
+  const $welcome = $('#welcome');
+  $welcome.modal({ blurring: true }).modal('show', function(){
+    $welcome.focus();
+    $welcome.bind('keydown', function(e) {
       console.log('hi');
       if(e.keyCode == 13 || e.keyCode == 27)
-        $('#welcome').modal('hide');
+        $welcome.modal('hide');
     });
   });
 
@@ -90,7 +91,6 @@ $document.ready(() => {
     if (currentMode == 'GUI') resizeArrows(arrowSmall, arrowBig);
     else resizeArrows(arrowBig, arrowSmall);
   };
-
 
   $document.on('contextmenu', '.non_modal_title', function(event) {
     event.preventDefault();
@@ -252,7 +252,7 @@ $document.ready(() => {
           $('#modal_popup_mkdir').hide();
           modal_on = 0;
         } else {
-          $('#mkdir_input').attr('data-content', 'Directory already exists!');
+          $('#mkdir_input').attr('data-html', 'Directory already exists!');
           $('#mkdir_input').popup('show', function(){
             setTimeout(function(){
               console.log('callback');
@@ -264,7 +264,7 @@ $document.ready(() => {
         }
       }
     } else {
-      $('#mkdir_input').attr('data-content', 'Whitespace on name is not supported yet.. sorry');
+      $('#mkdir_input').attr('data-html', 'Whitespace on name is not supported yet.. sorry');
       $('#mkdir_input').popup('show', function(){
         setTimeout(function(){
           console.log('callback');
@@ -302,7 +302,7 @@ $document.ready(() => {
           modal_on = 0;
         }
         else {
-          $('#rename_input').attr('data-content', 'There is a file using same name!');
+          $('#rename_input').attr('data-html', 'There is a file using same name!');
           $('#rename_input').popup('show', function(){
             setTimeout(function(){
               console.log('callback');
@@ -314,7 +314,7 @@ $document.ready(() => {
         }
       }
       else{
-        $('#rename_input').attr('data-content', 'Whitespace on name is not supported yet.. sorry');
+        $('#rename_input').attr('data-html', 'Whitespace on name is not supported yet.. sorry');
         $('#rename_input').popup('show', function(){
           setTimeout(function(){
             console.log('callback');
@@ -782,12 +782,12 @@ function handleCommand(command) {
     }
   } else if (op === 'rm') {
     if(rest.length == 0){
-      showErrorMsg('rm usage : rm [flag (optional)][folder/file name] ex) rm -r aaa or rm README.md');
+      showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
     }
     else if(rest.length == 1){
       const path = rest[0];
       if (path.includes('-')) {
-        showErrorMsg('rm usage : rm [flag (optional)][folder/file name] ex) rm -r aaa or rm README.md');
+        showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
       }
       else{
         let remove_obj = findByPath(path);
@@ -806,7 +806,7 @@ function handleCommand(command) {
             addCommand(command);
           }
           else{
-            showErrorMsg('rm : ' + path + ' is a directory. Try rm -r ' + path);
+            showErrorMsg('rm : ' + path + ' is a directory. <br /> Try rm -r ' + path);
           }
         }
       }
@@ -815,7 +815,7 @@ function handleCommand(command) {
       const flag = rest[0];
       const path = rest[1];
       if (!flag.includes('-')){
-        showErrorMsg('rm usage : rm [flag (optional)][folder/file name] ex) rm -r aaa or rm README.md');
+        showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
       }
       else if(flag === '-r'){
         let remove_obj = findByPath(path);
@@ -855,7 +855,7 @@ function handleCommand(command) {
             addCommand(command);
           }
           else{
-            showErrorMsg('rm : ' + path + ' is a directory. Try rm -r ' + path);
+            showErrorMsg('rm : ' + path + ' is a directory. <br /> Try rm -r ' + path);
           }
         }
       }
@@ -864,14 +864,14 @@ function handleCommand(command) {
       }
     }
     else{
-      showErrorMsg('rm usage : rm [flag (optional)][folder/file name] ex) rm -r aaa or rm README.md');
+      showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
     }
   } else if(op === 'cp'){
     if(rest.length == 2){
       const src = rest[0];
       const dst = rest[1];
       if(src.includes('-')){
-        showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] ex) cp README.md bbb');
+        showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] <br /> ex) cp README.md bbb');
         return;
       }
       let src_obj = findByPath(src);
@@ -968,7 +968,7 @@ function handleCommand(command) {
       const src = rest[1];
       const dst = rest[2];
       if(!flag.includes('-')){
-        showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] ex) cp README.md bbb');
+        showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] <br /> ex) cp README.md bbb');
         return;
       }
       else if(flag === '-r'){
@@ -1116,7 +1116,7 @@ function handleCommand(command) {
     }
   } else if (op === 'mv') {
     if(rest.length == 0 || rest.length == 1){
-      showErrorMsg('mv usage : mv [source] [destination] ex) mv file1 folder1');
+      showErrorMsg('mv usage : mv [source] [destination] <br /> ex) mv file1 folder1');
       return;
     }
     const srcPath = getAbsolutePath(rest[0]);
@@ -1254,10 +1254,10 @@ function handleCommand(command) {
 
 function showErrorMsg(msg){
   if(msg === ''){
-    $('#command_line').attr('data-content', 'Sorry, we do not support your command yet.');
+    $('#command_line').attr('data-html', 'Sorry, we do not support your command yet.');
   }
   else{
-    $('#command_line').attr('data-content', msg);
+    $('#command_line').attr('data-html', msg);
   }
   $('#command_line').popup('destroy');
   $('#command_line').popup('show');
