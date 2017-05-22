@@ -94,6 +94,16 @@ $document.ready(() => {
     ctxMenu.style.display = 'inline-block';
     ctxMenu.style.left = `${event.pageX}px`;
     ctxMenu.style.top = `${event.pageY}px`;
+    const guiWindow = document.getElementById('gui_window');
+    const commandLine = document.getElementById('command_line');
+
+
+    commandLine.value = '';
+    commandLine.placeholder='Type your command here';
+    emphasize(guiWindow);
+    deemphasize(commandLine);
+    resizeArrows(arrowSmall, arrowBig);
+    currentMode = 'GUI';
     return false;
   });
 
@@ -121,12 +131,21 @@ $document.ready(() => {
     ctxMenu2.style.display = 'none';
     $('.unit').css("background-color", "rgba(0,0,0,0)");
     $(this).css("background-color", "#AAAAAA");
+    const guiWindow = document.getElementById('gui_window');
+    const commandLine = document.getElementById('command_line');
+
+
+    commandLine.value = '';
+    commandLine.placeholder='Type your command here';
+    emphasize(guiWindow);
+    deemphasize(commandLine);
+    resizeArrows(arrowSmall, arrowBig);
+    currentMode = 'GUI';
     event.stopPropagation();
   });
 
 
   $document.on('click', function(event) {
-    console.log('fuck1');
     ctxMenu2.style.display = 'none';
     ctxMenu.style.display = 'none';
     ctxMenu.style.left = '';
@@ -139,7 +158,6 @@ $document.ready(() => {
   });
 
   $document.on('click', '.copy', function(event) {
-    console.log('fuck2');
     //event.preventDefault();
     copyorcut = "copy";
     ctxMenu.style.display = '';
@@ -153,7 +171,6 @@ $document.ready(() => {
   });
 
   $document.on('click', '.rename', function(event) {
-    console.log('fuck3');
     //event.preventDefault();
     ctxMenu.style.display = '';
     if(modal_on == 0) {
@@ -174,7 +191,6 @@ $document.ready(() => {
 
 
   $document.on('click', '.mkdir1', function(event) {
-    console.log('fuck4');
     ctxMenu2.style.display = '';
     if(modal_on == 0) {
       $('#modal_popup_mkdir').show();
@@ -187,7 +203,6 @@ $document.ready(() => {
   });
 
   $document.on('click', '.modal_title', function(event) {
-    console.log('fuck5');
     event.preventDefault();
     event.target.backgroundColor = 'blue';
     return false;
@@ -195,7 +210,6 @@ $document.ready(() => {
 
 
   $document.on('click', '.cut', function(event) {
-    console.log('fuck6');
     //event.preventDefault();
     copyorcut = "cut";
     ctxMenu.style.display = '';
@@ -208,7 +222,6 @@ $document.ready(() => {
   });
 
   $document.on('click', '.delete', function(event) {
-    console.log('fuck8');
     event.preventDefault();
     handleDelete(selectedObj);
     if (selectedObj.fileType === 'folder') addCommand(`rm -rf ${ selectedObj.name }`);
@@ -237,7 +250,6 @@ $document.ready(() => {
   });
 
   $('#mkdir_submit').click(function(event){
-    console.log('fuck9');
     let new_name = $('#mkdir_input').val();
     if(new_name !== '') {
       if(new_name.indexOf(' ') == -1) {
@@ -270,7 +282,6 @@ $document.ready(() => {
   });
 
   $('#rename_submit').click(function(event){
-    console.log('fuck10');
     let new_name = $('#rename_input').val();
     if(new_name !== ''){
       let parentObj = getParentObject(selectedObj);
@@ -321,10 +332,10 @@ $document.ready(() => {
   });
 
   $document.on('click', '.unit', function(event) {
-    console.log('fuck11');
     event.preventDefault();
     $('.unit').css("background-color", "rgba(0,0,0,0)");
-    $(this).css("background-color", "#AAAAAA");
+    if (!this.classList.contains('sidebar_item'))
+      $(this).css("background-color", "#AAAAAA");
     ctxMenu.style.display = 'none';
     ctxMenu2.style.display = 'none';
     return false;
@@ -338,7 +349,6 @@ $document.ready(() => {
   // });
 
   $('#modal_popup').click(function(event) {
-    console.log('fuck12');
     if(modal_on != 0) {
       if(prev_target != 0) prev_target.style.color = '#000000';
       $('#submit_copy').addClass('disabled');
@@ -348,12 +358,10 @@ $document.ready(() => {
   });
 
   $('#modal_popup').bind('keydown', function(event) {
-    console.log('fuck13');
     commandInput(event);
   })
 
   $('#modal_popup_rename').click(function(event) {
-    console.log('fuck14');
     if(modal_on == 2) {
       $('#rename_input').popup('destroy');
       $('#rename_submit').addClass('disabled');
@@ -364,7 +372,6 @@ $document.ready(() => {
   });
 
   $('#modal_popup_mkdir').click(function(event) {
-    console.log('fuck15');
     if(modal_on == 3) {
       $('#mkdir_input').popup('destroy');
       $('#mkdir_submit').addClass('disabled');
@@ -378,7 +385,6 @@ $document.ready(() => {
   let target = 0;
 
   $('.modal_content').click(function(event) {
-    console.log('fuck16');
     if($(event.target).closest('.title').length == 1){
       if(prev_target != 0) prev_target.style.color = '#000000';
       target = $(event.target).closest('.title')[0];
@@ -390,7 +396,6 @@ $document.ready(() => {
   });
 
   $('#submit_copy').click(function(event) {
-    console.log('fuck18');
     let targetObj = findByAbsolutePath(target.id);
     if (targetObj.path.indexOf(selectedObj.path) == -1) {
       if(copyorcut == "copy") {
@@ -481,6 +486,22 @@ function changeModeListener(clicked) {
     currentMode = 'GUI';
   }
 }
+function emphasize(target) { target.classList.add('emphasized'); }
+function deemphasize(target) { target.classList.remove('emphasized') }
+$(document).on('contextmenu', '#gui_window', function(e) {
+  e.preventDefault();
+
+  const guiWindow = document.getElementById('gui_window');
+  const commandLine = document.getElementById('command_line');
+
+
+  commandLine.value = '';
+  commandLine.placeholder='Type your command here';
+  emphasize(guiWindow);
+  deemphasize(commandLine);
+  resizeArrows(arrowSmall, arrowBig);
+  currentMode = 'GUI';
+});
 
 function goto(here) {
   current = here;
@@ -502,11 +523,13 @@ function renderHierarchy() {
       if (type == 'folder') {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
+        const item = document.createElement('span');
         const icon = document.createElement('i');
         const nameText = document.createElement('span');
 
         nameText.innerHTML = name;
-        title.classList.add('title', 'non_modal_title');
+        item.classList.add('unit', 'sidebar_item', 'non_modal_title');
+        title.classList.add('title');
         title.id = child.path;
         dropdown.classList.add('dropdown', 'icon');
         icon.classList.add('folder', 'icon');
@@ -518,9 +541,11 @@ function renderHierarchy() {
           goto(child);
           addCommand(`cd ${child.path}`);
         }
+
         title.appendChild(dropdown);
-        title.appendChild(icon);
-        title.appendChild(nameText);
+        item.appendChild(icon);
+        item.appendChild(nameText);
+        title.appendChild(item);
         currentDir.appendChild(title);
 
         const content = document.createElement('div');
@@ -1245,8 +1270,7 @@ function handleCommand(command) {
       else dstPrevObj = findByAbsolutePath(dstPathFrags.join('/'));
 
       if (dstPrevObj == 0 || dstPrevObj.type != 'folder') { /* dstPrevObj does not exist or it is not a folder */
-        showErrorMsg(`no such directory: ${ rest[0] }`)
-        // reject(no such directory: rest[0])
+        showErrorMsg(`no such directory: ${ rest[1] }`)
         return;
       } else { /* dstPrevObj is a folder */
         /* rename */
