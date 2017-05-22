@@ -399,7 +399,12 @@ $document.ready(() => {
       if(copyorcut == "copy") {
         if(!$('#submit_copy').hasClass('disabled')){
           handleCopy(selectedObj, targetObj);
-          addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+          if(selectedObj.type === 'folder'){
+            addCommand(`cp -r ${selectedObj.name} ${targetObj.path}`);
+          }
+          else{
+            addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+          }
           if (current === targetObj) {
             renderFinder(current);
           }
@@ -865,6 +870,10 @@ function handleCommand(command) {
     if(rest.length == 2){
       const src = rest[0];
       const dst = rest[1];
+      if(src.includes('-')){
+        showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] ex) cp README.md bbb');
+        return;
+      }
       let src_obj = findByPath(src);
       if(src_obj == 0){
         showErrorMsg('No such file named ' + src);
@@ -882,17 +891,14 @@ function handleCommand(command) {
             else{
               let child = hasChildNamed(dst_obj, src_obj.name);
               if(child == 0){
-                let newChild = {
-                  type: 'file',
-                  name: src_obj.name,
-                  path: dst + src_obj.name,
-                  content: src_obj.content,
-                };
+                let newChild = deepcopy(src_obj);
+                replacePath(newChild, src_obj.path, dst + src_obj.name);
                 dst_obj.children.push(newChild);
                 addCommand(command);
               }
               else if(child.type === 'file'){
-                child.content = src_obj.content;
+                let newChild = deepcopy(src_obj);
+                child.content = newChild.content;
                 addCommand(command);
               }
               else{
@@ -907,7 +913,8 @@ function handleCommand(command) {
             let dir_string = '';
             let dst_dir_obj = current;
             if(dst_len - 1 > 0){
-              dir_string = dst_arr.splice(dst_len - 1, 1).join('/') + '/';
+              dst_arr.splice(dst_len - 1, 1);
+              dir_string = dst_arr.join('/') + '/';
               dst_dir_obj = findByPath(dir_string);
             }
             else if(dst[0] == '~'){
@@ -919,24 +926,18 @@ function handleCommand(command) {
             else if(dst_dir_obj.type === 'folder'){
               let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
               if(dst_folder_child == 0){
-                let newChild = {
-                  type: 'file',
-                  name: dst_filename,
-                  path: dst_dir_obj.path + src_obj.name,
-                  content: src_obj.content,
-                };
+                let newChild = deepcopy(src_obj);
+                newChild.name = dst_filename;
+                replacePath(newChild, src_obj.path, dst_dir_obj.path + dst_filename);
                 dst_dir_obj.children.push(newChild);
                 addCommand(command);
               }
               else if(dst_folder_child.type === 'folder'){
+                console.log('yoyo');
                 let last_child = hasChildNamed(dst_folder_child, src_obj.name);
                 if(last_child == 0){
-                  let newChild = {
-                    type: 'file',
-                    name: src_obj.name,
-                    path: dst_folder_child.path + src_obj.name,
-                    content: src_obj.content,
-                  };
+                  let newChild = deepcopy(src_obj);
+                  replacePath(newChild, src_obj.path, dst_folder_child.path + src_obj.name);
                   dst_folder_child.children.push(newChild);
                   addCommand(command);
                 }
@@ -944,79 +945,174 @@ function handleCommand(command) {
                   showErrorMsg('cp: cannot overwrite directory ' + last_child.name + ' with non-directory ' + src_obj.name);
                 }
                 else{
-                  last_child.content = src_obj.content;
+                  let newChild = deepcopy(src_obj);
+                  last_child.content = newChild.content;
                   addCommand(command);
                 }
               }
               else{
-                dst_folder_child.content = src_obj.content;
+                let newChild = deepcopy(src_obj);
+                dst_folder_child.content = newChild.content;
                 addCommand(command);
               }
             }
           }
         }
         else {
-          let dst_arr = dst.split('/');
-          if (dst[dst.length-1] === '/'){
-            dst_arr.splice(dst_arr.length - 1, 1);
-          }
-          let dst_len = dst_arr.length;
-          let dst_filename = dst_arr[dst_len - 1];
-          let dir_string = '';
-          let dst_dir_obj = current;
-          if(dst_len - 1 > 0){
-            dst_arr.splice(dst_len - 1, 1);
-            dir_string = dst_arr.join('/') + '/';
-            dst_dir_obj = findByPath(dir_string);
-          }
-          else if(dst[0] == '~'){
-            dst_dir_obj = root;
-          }
-          if(dst_dir_obj == 0 || dst_dir_obj == -1){
-            showErrorMsg('cp: directory ' + dst + ' does not exist');
-          }
-          else if(dst_dir_obj.type === 'folder'){
-            let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
-            if(dst_folder_child == 0){
-              let newChild = {
-                type: 'folder',
-                name: dst_filename,
-                path: dst_dir_obj.path + dst_filename + '/',
-                children: src_obj.children,
-              };
-              replacePath(newChild, src_obj.path, dst_dir_obj.path + dst_filename + '/');
-              dst_dir_obj.children.push(newChild);
-              addCommand(command);
-            }
-            else if(dst_folder_child.type === 'folder'){
-              let last_child = hasChildNamed(dst_folder_child, src_obj.name);
-              if(last_child == 0){
-                let newChild = {
-                  type: 'folder',
-                  name: src_obj.name,
-                  path: dst_folder_child.path + src_obj.name + '/',
-                  children: src_obj.children,
-                };
-                replacePath(newChild, src_obj.path, dst_folder_child.path + src_obj.name + '/');
-                dst_folder_child.children.push(newChild);
-                addCommand(command);
+          showErrorMsg('cp : ' + src + ' is a directory. Try cp -r ' + src + ' ' + dst);
+        }
+      }
+    }
+    else if (rest.length === 3){
+      const flag = rest[0];
+      const src = rest[1];
+      const dst = rest[2];
+      if(!flag.includes('-')){
+        showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] ex) cp README.md bbb');
+        return;
+      }
+      else if(flag === '-r'){
+        let src_obj = findByPath(src);
+        if(src_obj == 0){
+          showErrorMsg('No such file named ' + src);
+        }
+        else{
+          if(src_obj.type === 'file'){
+            if (dst[dst.length-1] === '/'){
+              let dst_obj = findByPath(dst);
+              if(dst_obj == 0){
+                showErrorMsg('cp: directory ' + dst + ' does not exist');
               }
-              else if (last_child.type === 'folder'){
-                last_child.children = src_obj.children;
-                replacePath(last_child, src_obj.path, dst_folder_child.path + src_obj.name + '/');
-                addCommand(command);
+              else if(dst_obj.type === 'file'){
+                showErrorMsg('cp: directory ' + dst + ' does not exist');
               }
               else{
-                showErrorMsg('cp: cannot overwrite non-directory ' + last_child.name + ' with directory ' + src_obj.name);
-
+                let child = hasChildNamed(dst_obj, src_obj.name);
+                if(child == 0){
+                  let newChild = deepcopy(src_obj);
+                  replacePath(newChild, src_obj.path, dst + src_obj.name);
+                  dst_obj.children.push(newChild);
+                  addCommand(command);
+                }
+                else if(child.type === 'file'){
+                  let newChild = deepcopy(src_obj);
+                  child.content = newChild.content;
+                  addCommand(command);
+                }
+                else{
+                  showErrorMsg('cp: cannot overwrite directory ' + child.name + ' with non-directory ' + src_obj.name);
+                }
               }
             }
             else{
-              showErrorMsg('cp: cannot overwrite non-directory ' + dst_folder_child.name + ' with directory ' + src_obj.name);
+              let dst_arr = dst.split('/');
+              let dst_len = dst_arr.length;
+              let dst_filename = dst_arr[dst_len - 1];
+              let dir_string = '';
+              let dst_dir_obj = current;
+              if(dst_len - 1 > 0){
+                dst_arr.splice(dst_len - 1, 1);
+                dir_string = dst_arr.join('/') + '/';
+                dst_dir_obj = findByPath(dir_string);
+              }
+              else if(dst[0] == '~'){
+                dst_dir_obj = root;
+              }
+              if(dst_dir_obj == 0 || dst_dir_obj == -1){
+                showErrorMsg('cp: directory ' + dst + ' does not exist');
+              }
+              else if(dst_dir_obj.type === 'folder'){
+                let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
+                if(dst_folder_child == 0){
+                  let newChild = deepcopy(src_obj);
+                  newChild.name = dst_filename;
+                  replacePath(newChild, src_obj.path, dst_dir_obj.path + dst_filename);
+                  dst_dir_obj.children.push(newChild);
+                  addCommand(command);
+                }
+                else if(dst_folder_child.type === 'folder'){
+                  let last_child = hasChildNamed(dst_folder_child, src_obj.name);
+                  if(last_child == 0){
+                    let newChild = deepcopy(src_obj);
+                    replacePath(newChild, src_obj.path, dst_folder_child.path + src_obj.name);
+                    dst_folder_child.children.push(newChild);
+                    addCommand(command);
+                  }
+                  else if (last_child.type === 'folder'){
+                    showErrorMsg('cp: cannot overwrite directory ' + last_child.name + ' with non-directory ' + src_obj.name);
+                  }
+                  else{
+                    let newChild = deepcopy(src_obj);
+                    last_child.content = newChild.content;
+                    addCommand(command);
+                  }
+                }
+                else{
+                  let newChild = deepcopy(src_obj);
+                  dst_folder_child.content = newChild.content;
+                  addCommand(command);
+                }
+              }
+            }
+          }
+          else{
+            let dst_arr = dst.split('/');
+            if (dst[dst.length-1] === '/'){
+              dst_arr.splice(dst_arr.length - 1, 1);
+            }
+            let dst_len = dst_arr.length;
+            let dst_filename = dst_arr[dst_len - 1];
+            let dir_string = '';
+            let dst_dir_obj = current;
+            if(dst_len - 1 > 0){
+              dst_arr.splice(dst_len - 1, 1);
+              dir_string = dst_arr.join('/') + '/';
+              dst_dir_obj = findByPath(dir_string);
+            }
+            else if(dst[0] == '~'){
+              dst_dir_obj = root;
+            }
+            if(dst_dir_obj == 0 || dst_dir_obj == -1){
+              showErrorMsg('cp: directory ' + dst + ' does not exist');
+            }
+            else if(dst_dir_obj.type === 'folder'){
+              let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
+              if(dst_folder_child == 0){
+                let newChild = deepcopy(src_obj);
+                replacePath(newChild, src_obj.path, dst_dir_obj.path + dst_filename + '/');
+                dst_dir_obj.children.push(newChild);
+                addCommand(command);
+              }
+              else if(dst_folder_child.type === 'folder'){
+                let last_child = hasChildNamed(dst_folder_child, src_obj.name);
+                if(last_child == 0){
+                  let newChild = deepcopy(src_obj);
+                  replacePath(newChild, src_obj.path, dst_folder_child.path + src_obj.name + '/');
+                  dst_folder_child.children.push(newChild);
+                  addCommand(command);
+                }
+                else if (last_child.type === 'folder'){
+                  let newChild = deepcopy(src_obj);
+                  last_child.children = newChild.children;
+                  replacePath(last_child, src_obj.path, dst_folder_child.path + src_obj.name + '/');
+                  addCommand(command);
+                }
+                else{
+                  showErrorMsg('cp: cannot overwrite non-directory ' + last_child.name + ' with directory ' + src_obj.name);
+
+                }
+              }
+              else{
+                showErrorMsg('cp: cannot overwrite non-directory ' + dst_folder_child.name + ' with directory ' + src_obj.name);
+              }
             }
           }
         }
       }
+      else{
+        showErrorMsg('');
+      }
+
     }
   } else if (op === 'mv') {
     if(rest.length == 0 || rest.length == 1){
@@ -1206,6 +1302,7 @@ function replacePath(target, orgPath, newPath) {
     target.children.forEach((child) => replacePath(child, orgPath, newPath))
   }
 }
+
 
 function findByPath(path){
   if(path === ''){
