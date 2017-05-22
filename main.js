@@ -531,8 +531,8 @@ function renderHierarchy() {
         const nameText = document.createElement('span');
 
         nameText.innerHTML = name;
-        item.classList.add('unit', 'sidebar_item');
-        title.classList.add('title', 'non_modal_title');
+        item.classList.add('unit', 'sidebar_item', 'non_modal_title');
+        title.classList.add('title');
         title.id = child.path;
         dropdown.classList.add('dropdown', 'icon');
         icon.classList.add('folder', 'icon');
