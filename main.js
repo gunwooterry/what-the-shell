@@ -1275,10 +1275,20 @@ function handleCommand(command) {
       renderHierarchy();
       addCommand(command);
       renderFinder(current);
-    } else { /* dstPathObj does not exist */
+    } else { /* dstObj does not exist */
       const dstPathFrags = dstPath.split('/');
-      const newName = dstPathFrags[dstPathFrags.length - 1];
-      dstPathFrags.splice(dstPathFrags.length - 1, 1);
+      let newName;
+      if (dstPathFrags[dstPathFrags.length - 1] === '') {
+        if (srcObj.type !== 'folder'){
+          showErrorMsg(`not a directory: ${ srcObj.name }`);
+          return;
+        }
+        newName = dstPathFrags[dstPathFrags.length - 2];
+        dstPathFrags.splice(dstPathFrags.length - 2, 2);
+      } else {
+        newName = dstPathFrags[dstPathFrags.length - 1];
+        dstPathFrags.splice(dstPathFrags.length - 1, 1);
+      }
 
       let dstPrevObj;
       if (dstPathFrags.length == 0) dstPrevObj = deepcopy(current);
