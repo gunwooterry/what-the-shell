@@ -398,38 +398,64 @@ $document.ready(() => {
     if (targetObj.path.indexOf(selectedObj.path) === -1) {
       if (copyorcut === "copy") {
         if (!$('#submit_copy').hasClass('disabled')) {
-          handleCopy(selectedObj, targetObj);
-          if (selectedObj.type === 'folder') {
-            addCommand(`cp -r ${selectedObj.name} ${targetObj.path}`);
+          let dup = 0
+          let dup_name = ''
+          for (let i = 0; i < targetObj.children.length; i++) {
+            if (targetObj.children[i].name === selectedObj.name) {
+              dup = 1
+              dup_name = targetObj.children[i].name
+              break
+            }
           }
-          else {
-            addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
-          }
-          if (current === targetObj) {
-            renderFinder(current);
-          }
-          renderHierarchy();
-          if (modal_on === 1) {
-            if (prev_target !== 0) prev_target.style.color = '#000000';
-            $('#submit_copy').addClass('disabled');
-            $('#modal_popup').hide();
-            modal_on = 0;
+          if(dup == 0) {
+            handleCopy(selectedObj, targetObj);
+            if (selectedObj.type === 'folder') {
+              addCommand(`cp -r ${selectedObj.name} ${targetObj.path}`);
+            }
+            else {
+              addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+            }
+            if (current === targetObj) {
+              renderFinder(current);
+            }
+            renderHierarchy();
+            if (modal_on === 1) {
+              if (prev_target !== 0) prev_target.style.color = '#000000';
+              $('#submit_copy').addClass('disabled');
+              $('#modal_popup').hide();
+              modal_on = 0;
+            }
+          } else {
+            alert(`${dup_name} already exists`);
           }
         }
       } else if (copyorcut === "cut") {
         if (!$('#submit_copy').hasClass('disabled')) {
-          handleCopy(selectedObj, targetObj);
-          handleDelete(selectedObj);
-          if (current === targetObj) {
-            renderFinder(current);
+          let dup = 0
+          let dup_name = ''
+          for (let i = 0; i < targetObj.children.length; i++) {
+            if (targetObj.children[i].name === selectedObj.name) {
+              dup = 1
+              dup_name = targetObj.children[i].name
+              break
+            }
           }
-          renderHierarchy();
-          addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
-          if (modal_on === 1) {
-            if (prev_target !== 0) prev_target.style.color = '#000000';
-            $('#submit_copy').addClass('disabled');
-            $('#modal_popup').hide();
-            modal_on = 0;
+          if(dup == 0) {
+            handleCopy(selectedObj, targetObj);
+            handleDelete(selectedObj);
+            if (current === targetObj) {
+              renderFinder(current);
+            }
+            renderHierarchy();
+            addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
+            if (modal_on === 1) {
+              if (prev_target !== 0) prev_target.style.color = '#000000';
+              $('#submit_copy').addClass('disabled');
+              $('#modal_popup').hide();
+              modal_on = 0;
+            }
+          } else {
+            alert(`${dup_name} already exists`);
           }
         }
       }
@@ -1179,8 +1205,11 @@ function handleCommand(command) {
       showErrorMsg('mv usage : mv [source] [destination] <br /> ex) mv file1 folder1');
       return;
     }
-    const srcPath = getAbsolutePath(rest[0]);
-    const dstPath = getAbsolutePath(rest[1]);
+    let srcPath, dstPath;
+    if (rest[0].indexOf('~/') !== 0) srcPath = getAbsolutePath(rest[0]);
+    else srcPath = rest[0];
+    if (rest[1].indexOf('~/') !== 0) dstPath = getAbsolutePath(rest[1]);
+    else dstPath = rest[1];
     if (srcPath == 0 || dstPath == 0) return;
     const srcObj = findByAbsolutePath(srcPath);
     const dstObj = findByAbsolutePath(dstPath);
@@ -1275,10 +1304,20 @@ function handleCommand(command) {
       renderHierarchy();
       addCommand(command);
       renderFinder(current);
-    } else { /* dstPathObj does not exist */
+    } else { /* dstObj does not exist */
       const dstPathFrags = dstPath.split('/');
-      const newName = dstPathFrags[dstPathFrags.length - 1];
-      dstPathFrags.splice(dstPathFrags.length - 1, 1);
+      let newName;
+      if (dstPathFrags[dstPathFrags.length - 1] === '') {
+        if (srcObj.type !== 'folder'){
+          showErrorMsg(`not a directory: ${ srcObj.name }`);
+          return;
+        }
+        newName = dstPathFrags[dstPathFrags.length - 2];
+        dstPathFrags.splice(dstPathFrags.length - 2, 2);
+      } else {
+        newName = dstPathFrags[dstPathFrags.length - 1];
+        dstPathFrags.splice(dstPathFrags.length - 1, 1);
+      }
 
       let dstPrevObj;
       if (dstPathFrags.length == 0) dstPrevObj = deepcopy(current);
@@ -1292,9 +1331,13 @@ function handleCommand(command) {
         if (dstPrevObj.path == current.path) { /* dstPrevObj is the current directory */
           /* just rename srcObj */
           srcObj.name = newName;
+          srcObj.path = parentPath(srcObj.path) + '/' + newName;
+          if (srcObj.type === 'folder') srcObj.path = srcObj.path + '/';
         } else {
           /* move srcObj to dstPrevObj and rename it */
           srcObj.name = newName;
+          srcObj.path = parentPath(srcObj.path) + '/' + newName;
+          if (srcObj.type === 'folder') srcObj.path = srcObj.path + '/';
           handleCopy(srcObj, dstPrevObj);
           handleDelete(srcObj);
 
@@ -1327,7 +1370,6 @@ function showErrorMsg(msg) {
 function handleCopy(obj, dirObj) {
   const newObj = deepcopy(obj);
   const orgPath = parentPath(newObj.path);
-
   replacePath(newObj, `${orgPath}/`, dirObj.path);
   dirObj.children.push(newObj);
   renderHierarchy();
