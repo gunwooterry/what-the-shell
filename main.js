@@ -107,6 +107,8 @@ $document.ready(() => {
     return false;
   });
 
+  document.getElementById('clear').onclick = clear;
+
   $document.on('contextmenu', '#modal_popup', function (event) {
     event.preventDefault();
   });
@@ -345,8 +347,8 @@ $document.ready(() => {
 // });
 
   $('#modal_popup').click(function (event) {
-    if (modal_on != 0) {
-      if (prev_target != 0) prev_target.style.color = '#000000';
+    if (modal_on !== 0) {
+      if (prev_target !== 0) prev_target.style.color = '#000000';
       $('#submit_copy').addClass('disabled');
       $('#modal_popup').hide();
       modal_on = 0;
@@ -452,6 +454,11 @@ function resizeArrows(left, right) {
   arrowRight.style.fontSize = `${right}em`;
 }
 
+function clear() {
+  const history = document.getElementById('history');
+  while (history.firstChild) history.removeChild(history.firstChild);
+}
+
 function changeModeListener(clicked) {
   function emphasize(target) {
     target.classList.add('emphasized');
@@ -464,10 +471,10 @@ function changeModeListener(clicked) {
   const guiWindow = document.getElementById('gui_window');
   const commandLine = document.getElementById('command_line');
 
-  const btnToCUI = clicked == 'arrow_btn' && currentMode == 'GUI';
-  const btnToGUI = clicked == 'arrow_btn' && currentMode == 'CUI';
-  const clickedCUI = clicked == 'command_line';
-  const clickedGUI = clicked == 'gui_window'
+  const btnToCUI = clicked === 'arrow_btn' && currentMode === 'GUI';
+  const btnToGUI = clicked === 'arrow_btn' && currentMode === 'CUI';
+  const clickedCUI = clicked === 'command_line';
+  const clickedGUI = clicked === 'gui_window'
 
   if (btnToCUI || clickedCUI) {
     commandLine.placeholder = '';
@@ -525,8 +532,7 @@ function renderHierarchy() {
     currentDir.classList.add('ui', 'accordion');
     current.children.forEach(child => {
       const {type, name, path} = child
-      if (type == 'folder'
-      ) {
+      if (type === 'folder') {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
         const item = document.createElement('span');
@@ -786,7 +792,7 @@ function handleCommand(command) {
         name: outputName,
         path: current.path + outputName,
         content: message,
-      }
+      };
       current.children.push(newFile);
     }
     addCommand(command);
@@ -796,28 +802,29 @@ function handleCommand(command) {
     if (rest.length === 0) {
       current = root;
       addCommand(command);
-    }
-    else if (rest.length === 1) {
+    } else if (rest.length === 1) {
       const path = rest[0];
-      current = findByPath(path);
-      addCommand(command);
-    }
-    else {
+      const found = findByPath(path);
+      console.log(found);
+      if (found <= 0) showErrorMsg('cd usage: no such directory');
+      else {
+        current = found;
+        addCommand(command);
+      }
+    } else {
       showErrorMsg('cd usage : cd [folder name] ex) cd aaa');
     }
   } else if (op === 'mkdir') {
     if (rest.length === 0) {
       showErrorMsg(`mkdir usage : mkdir [new folder name] ex) mkdir folder1`);
       return;
-    }
-    else if (rest.length === 1) {
+    } else if (rest.length === 1) {
       let new_name = rest[0];
       if (new_name !== '') {
         if (new_name === ' ') {
           showErrorMsg(`mkdir usage : mkdir [new folder name] ex) mkdir folder1`);
           return;
-        }
-        else if (!new_name.includes(' ')) {
+        } else if (!new_name.includes(' ')) {
           if (hasChildNamed(current, new_name) === 0) {
             addCommand(`mkdir ${new_name}`);
             makeDirectory(new_name);
@@ -825,32 +832,27 @@ function handleCommand(command) {
             showErrorMsg(`${new_name} already exists!`);
             return;
           }
-        }
-        else {
+        } else {
           showErrorMsg('Whitespace on name is not supported yet.. sorry');
           return;
         }
       }
-    }
-    else {
+    } else {
       showErrorMsg('');
       return;
     }
   } else if (op === 'rm') {
     if (rest.length === 0) {
       showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
-    }
-    else if (rest.length === 1) {
+    } else if (rest.length === 1) {
       const path = rest[0];
       if (path.includes('-')) {
         showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
-      }
-      else {
+      } else {
         let remove_obj = findByPath(path);
         if (remove_obj === 0) {
           showErrorMsg('rm : no such file or directory ' + path);
-        }
-        else {
+        } else {
           if (remove_obj.type === 'file') {
             let parent_obj = getParentObject(remove_obj);
             for (let i = 0; i < parent_obj.children.length; i++) {
@@ -860,14 +862,12 @@ function handleCommand(command) {
               }
             }
             addCommand(command);
-          }
-          else {
+          } else {
             showErrorMsg('rm : ' + path + ' is a directory. <br /> Try rm -r ' + path);
           }
         }
       }
-    }
-    else if (rest.length === 2) {
+    } else if (rest.length === 2) {
       const flag = rest[0];
       const path = rest[1];
       if (!flag.includes('-')) {
@@ -1227,7 +1227,7 @@ function handleCommand(command) {
             break;
           }
         }
-        if (dup == 1) {
+        if (dup === 1) {
           const srcParentObj = getParentObject(srcObj);
           const newObj = deepcopy(srcObj);
           const orgPath = parentPath(newObj.path);
