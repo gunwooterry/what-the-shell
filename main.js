@@ -60,11 +60,11 @@ let command_buffer = '';
 
 $document.ready(() => {
   const $welcome = $('#welcome');
-  $welcome.modal({ blurring: true }).modal('show', function(){
+  $welcome.modal({blurring: true}).modal('show', function () {
     $welcome.focus();
-    $welcome.bind('keydown', function(e) {
+    $welcome.bind('keydown', function (e) {
       console.log('hi');
-      if(e.keyCode == 13 || e.keyCode == 27)
+      if (e.keyCode === 13 || e.keyCode === 27)
         $welcome.modal('hide');
     });
   });
@@ -80,17 +80,17 @@ $document.ready(() => {
   renderFinder(current);
   renderBreadcrumb(current);
 
-  arrowBtn.onmouseover = function() {
-    if (currentMode == 'GUI') resizeArrows(arrowSmallHover, arrowBigHover);
+  arrowBtn.onmouseover = function () {
+    if (currentMode === 'GUI') resizeArrows(arrowSmallHover, arrowBigHover);
     else resizeArrows(arrowBigHover, arrowSmallHover);
   };
 
-  arrowBtn.onmouseout = function() {
-    if (currentMode == 'GUI') resizeArrows(arrowSmall, arrowBig);
+  arrowBtn.onmouseout = function () {
+    if (currentMode === 'GUI') resizeArrows(arrowSmall, arrowBig);
     else resizeArrows(arrowBig, arrowSmall);
   };
 
-  $document.on('contextmenu', '.non_modal_title', function(event) {
+  $document.on('contextmenu', '.non_modal_title', function (event) {
     event.preventDefault();
     let targetPath = event.currentTarget.id;
     selectedObj = findByAbsolutePath(targetPath);
@@ -102,7 +102,7 @@ $document.ready(() => {
 
 
     commandLine.value = '';
-    commandLine.placeholder='Type your command here';
+    commandLine.placeholder = 'Type your command here';
     emphasize(guiWindow);
     deemphasize(commandLine);
     resizeArrows(arrowSmall, arrowBig);
@@ -110,11 +110,13 @@ $document.ready(() => {
     return false;
   });
 
-  $document.on('contextmenu', '#modal_popup', function(event) {
+  document.getElementById('clear').onclick = clear;
+
+  $document.on('contextmenu', '#modal_popup', function (event) {
     event.preventDefault();
   });
 
-  $document.on('contextmenu', '#finder', function(event) {
+  $document.on('contextmenu', '#finder', function (event) {
     event.preventDefault();
     ctxMenu.style.display = 'none';
     ctxMenu2.style.display = 'inline-block';
@@ -124,7 +126,7 @@ $document.ready(() => {
   });
 
 
-  $document.on('contextmenu', '.unit', function(event) {
+  $document.on('contextmenu', '.unit', function (event) {
     event.preventDefault();
     let targetName = event.currentTarget.id;
     selectedObj = findByChildName(current, targetName);
@@ -139,7 +141,7 @@ $document.ready(() => {
 
 
     commandLine.value = '';
-    commandLine.placeholder='Type your command here';
+    commandLine.placeholder = 'Type your command here';
     emphasize(guiWindow);
     deemphasize(commandLine);
     resizeArrows(arrowSmall, arrowBig);
@@ -148,75 +150,73 @@ $document.ready(() => {
   });
 
 
-  $document.on('click', function(event) {
+  $document.on('click', function (event) {
     ctxMenu2.style.display = 'none';
     ctxMenu.style.display = 'none';
     ctxMenu.style.left = '';
     ctxMenu.style.top = '';
-    // if(modal_on == 1) {
-    //   $('#modal_popup').hide();
-    //   modal_on =0;
-    // }
     $('.unit').css("background-color", "rgba(0,0,0,0)");
   });
 
-  $document.on('click', '.copy', function(event) {
+  $document.on('click', '.copy', function (event) {
     //event.preventDefault();
+    const $modalPopup = $('#modal_popup');
     copyorcut = "copy";
     ctxMenu.style.display = '';
-    if(modal_on == 0) {
+    if (modal_on === 0) {
       renderModalHierarchy();
-      $('#modal_popup').show();
-      $('#modal_popup').focus();
+      $modalPopup.show();
+      $modalPopup.focus();
       modal_on = 1;
-     }
-     return false;
+    }
+    return false;
   });
 
-  $document.on('click', '.rename', function(event) {
+  $document.on('click', '.rename', function (event) {
     //event.preventDefault();
     ctxMenu.style.display = '';
-    if(modal_on == 0) {
-      $('#modal_popup_rename').show();
-      if(selectedObj.type === 'folder'){
-        $("#rename_header").html("TYPE NEW FOLDER NAME");
-      }
-      else{
-        $("#rename_header").html("TYPE NEW FILE NAME");
-      }
-      $('#rename_input').popup('destroy');
-      $('#rename_input').attr("placeholder", selectedObj.name);
-      $('#rename_input').focus();
+    if (modal_on === 0) {
+      const $modalPopupRename = $('#modal_popup_rename');
+      const $renameHeader = $('#rename_header');
+      const $renameInput = $('#rename_input');
+      $modalPopupRename.show();
+      if (selectedObj.type === 'folder') $renameHeader.html("TYPE NEW FOLDER NAME");
+      else $renameHeader.html("TYPE NEW FILE NAME");
+      $renameInput.popup('destroy');
+      $renameInput.attr("placeholder", selectedObj.name);
+      $renameInput.focus();
       modal_on = 2;
-     }
-     return false;
+    }
+    return false;
   });
 
 
-  $document.on('click', '.mkdir1', function(event) {
+  $document.on('click', '.mkdir1', function (event) {
     ctxMenu2.style.display = '';
-    if(modal_on == 0) {
-      $('#modal_popup_mkdir').show();
-      $('#mkdir_input').popup('destroy');
-      $('#mkdir_input').attr("placeholder", "");
-      $('#mkdir_input').focus();
+    if (modal_on === 0) {
+      const $modalPopupMkdir = $('#modal_popup_mkdir');
+      const $mkdirInput = $('#mkdir_input');
+      $modalPopupMkdir.show();
+      $mkdirInput.popup('destroy');
+      $mkdirInput.attr("placeholder", "");
+      $mkdirInput.focus();
       modal_on = 3;
     }
     return false;
   });
 
-  $document.on('click', '.modal_title', function(event) {
+  $document.on('click', '.modal_title', function (event) {
     event.preventDefault();
     event.target.backgroundColor = 'blue';
     return false;
   });
 
 
-  $document.on('click', '.cut', function(event) {
+  $document.on('click', '.cut', function (event) {
     //event.preventDefault();
     copyorcut = "cut";
     ctxMenu.style.display = '';
-    if(modal_on == 0) {
+    if (modal_on === 0) {
       renderModalHierarchy();
       $('#modal_popup').show();
       modal_on = 1;
@@ -224,39 +224,37 @@ $document.ready(() => {
     return false;
   });
 
-  $document.on('click', '.delete', function(event) {
+  $document.on('click', '.delete', function (event) {
     event.preventDefault();
     handleDelete(selectedObj);
     if (selectedObj.fileType === 'folder') addCommand(`rm -rf ${ selectedObj.name }`);
     else addCommand(`rm -f ${ selectedObj.name }`);
   });
 
-  $('#rename_input').on('input', function(){
-    let input_value = this.value;
-    if(input_value === ''){
-      $('#rename_submit').addClass('disabled');
-    }
-    else{
-      $('#rename_submit').removeClass('disabled');
-    }
+  $('#rename_input').on('input', function () {
+    const inputValue = this.value;
+    const $renameSubmit = $('#rename_submit');
+    if (inputValue === '') $renameSubmit.addClass('disabled');
+    else $renameSubmit.removeClass('disabled');
   });
 
 
-  $('#mkdir_input').on('input', function(){
+  $('#mkdir_input').on('input', function () {
     let input_value = this.value;
-    if(input_value === ''){
+    if (input_value === '') {
       $('#mkdir_submit').addClass('disabled');
     }
-    else{
+    else {
       $('#mkdir_submit').removeClass('disabled');
     }
   });
 
-  $('#mkdir_submit').click(function(event){
+  $('#mkdir_submit').click(function (event) {
+    const $mkdirInput = $('#mkdir_input');
     let new_name = $('#mkdir_input').val();
-    if(new_name !== '') {
-      if(new_name.indexOf(' ') == -1) {
-        if(hasChildNamed(current, new_name) == 0) {
+    if (new_name !== '') {
+      if (new_name.indexOf(' ') === -1) {
+        if (hasChildNamed(current, new_name) === 0) {
           addCommand(`mkdir ${new_name}`);
           makeDirectory(new_name);
           $('#mkdir_input').val('');
@@ -265,8 +263,8 @@ $document.ready(() => {
           modal_on = 0;
         } else {
           $('#mkdir_input').attr('data-html', 'Directory already exists!');
-          $('#mkdir_input').popup('show', function(){
-            setTimeout(function(){
+          $('#mkdir_input').popup('show', function () {
+            setTimeout(function () {
               console.log('callback');
               $('#mkdir_input').popup('destroy');
             }, 2000);
@@ -275,8 +273,8 @@ $document.ready(() => {
       }
     } else {
       $('#mkdir_input').attr('data-html', 'Whitespace on name is not supported yet.. sorry');
-      $('#mkdir_input').popup('show', function(){
-        setTimeout(function(){
+      $('#mkdir_input').popup('show', function () {
+        setTimeout(function () {
           console.log('callback');
           $('#mkdir_input').popup('destroy');
         }, 2000);
@@ -284,17 +282,17 @@ $document.ready(() => {
     }
   });
 
-  $('#rename_submit').click(function(event){
+  $('#rename_submit').click(function (event) {
     let new_name = $('#rename_input').val();
-    if(new_name !== ''){
+    if (new_name !== '') {
       let parentObj = getParentObject(selectedObj);
       let prev_name = selectedObj.name;
-      if(!new_name.includes(' ')){
-        if(prev_name === new_name || hasChildNamed(parentObj, new_name) == 0){
+      if (!new_name.includes(' ')) {
+        if (prev_name === new_name || hasChildNamed(parentObj, new_name) == 0) {
           addCommand(`mv ${prev_name} ${new_name}`);
           selectedObj.name = new_name;
           let new_path = parentObj.path;
-          if(selectedObj.type === 'folder'){
+          if (selectedObj.type === 'folder') {
             new_path += (new_name + '/');
           }
           else {
@@ -310,22 +308,22 @@ $document.ready(() => {
         }
         else {
           $('#rename_input').attr('data-html', 'There is a file using same name!');
-          $('#rename_input').popup('show', function(){
-            setTimeout(function(){
+          $('#rename_input').popup('show', function () {
+            setTimeout(function () {
               console.log('callback');
-              $('#rename_input').popup('hide', function(){
+              $('#rename_input').popup('hide', function () {
                 $('#rename_input').popup('destroy');
               });
             }, 2000);
           });
         }
       }
-      else{
+      else {
         $('#rename_input').attr('data-html', 'Whitespace on name is not supported yet.. sorry');
-        $('#rename_input').popup('show', function(){
-          setTimeout(function(){
+        $('#rename_input').popup('show', function () {
+          setTimeout(function () {
             console.log('callback');
-            $('#rename_input').popup('hide', function(){
+            $('#rename_input').popup('hide', function () {
               $('#rename_input').popup('destroy');
             });
           }, 2000);
@@ -334,7 +332,7 @@ $document.ready(() => {
     }
   });
 
-  $document.on('click', '.unit', function(event) {
+  $document.on('click', '.unit', function (event) {
     event.preventDefault();
     $('.unit').css("background-color", "rgba(0,0,0,0)");
     if (!this.classList.contains('sidebar_item'))
@@ -345,27 +343,27 @@ $document.ready(() => {
   });
 
 
-  // $document.on('click', '.title', function(event) {
-  //   //event.preventDefault();
-  //   let selectedFolderName = event.currentTarget.id;
-  //   console.log(selectedFolderName);
-  // });
+// $document.on('click', '.title', function(event) {
+//   //event.preventDefault();
+//   let selectedFolderName = event.currentTarget.id;
+//   console.log(selectedFolderName);
+// });
 
-  $('#modal_popup').click(function(event) {
-    if(modal_on != 0) {
-      if(prev_target != 0) prev_target.style.color = '#000000';
+  $('#modal_popup').click(function (event) {
+    if (modal_on !== 0) {
+      if (prev_target !== 0) prev_target.style.color = '#000000';
       $('#submit_copy').addClass('disabled');
       $('#modal_popup').hide();
       modal_on = 0;
     }
   });
 
-  $('#modal_popup').bind('keydown', function(event) {
+  $('#modal_popup').bind('keydown', function (event) {
     commandInput(event);
   })
 
-  $('#modal_popup_rename').click(function(event) {
-    if(modal_on == 2) {
+  $('#modal_popup_rename').click(function (event) {
+    if (modal_on == 2) {
       $('#rename_input').popup('destroy');
       $('#rename_submit').addClass('disabled');
       $('#modal_popup_rename').hide();
@@ -374,8 +372,8 @@ $document.ready(() => {
     }
   });
 
-  $('#modal_popup_mkdir').click(function(event) {
-    if(modal_on == 3) {
+  $('#modal_popup_mkdir').click(function (event) {
+    if (modal_on === 3) {
       $('#mkdir_input').popup('destroy');
       $('#mkdir_submit').addClass('disabled');
       $('#modal_popup_mkdir').hide();
@@ -387,9 +385,9 @@ $document.ready(() => {
   let prev_target = 0;
   let target = 0;
 
-  $('.modal_content').click(function(event) {
-    if($(event.target).closest('.title').length == 1){
-      if(prev_target != 0) prev_target.style.color = '#000000';
+  $('.modal_content').click(function (event) {
+    if ($(event.target).closest('.title').length === 1) {
+      if (prev_target != 0) prev_target.style.color = '#000000';
       target = $(event.target).closest('.title')[0];
       prev_target = target;
       target.style.color = '#21ae21';
@@ -398,7 +396,7 @@ $document.ready(() => {
     return false;
   });
 
-  $('#submit_copy').click(function(event) {
+  $('#submit_copy').click(function (event) {
     let targetObj = findByAbsolutePath(target.id);
     if (targetObj.path === selectedObj.path) {
       alert('you cannot do recursive copy or move');
@@ -432,6 +430,8 @@ $document.ready(() => {
               $('#modal_popup').hide();
               modal_on =0;
             }
+          } else {
+            alert(`${dup_name} already exists`);
           }
         }
       }
@@ -454,17 +454,27 @@ function resizeArrows(left, right) {
   arrowRight.style.fontSize = `${right}em`;
 }
 
+function clear() {
+  const history = document.getElementById('history');
+  while (history.firstChild) history.removeChild(history.firstChild);
+}
+
 function changeModeListener(clicked) {
-  function emphasize(target) { target.classList.add('emphasized'); }
-  function deemphasize(target) { target.classList.remove('emphasized') }
+  function emphasize(target) {
+    target.classList.add('emphasized');
+  }
+
+  function deemphasize(target) {
+    target.classList.remove('emphasized')
+  }
 
   const guiWindow = document.getElementById('gui_window');
   const commandLine = document.getElementById('command_line');
 
-  const btnToCUI = clicked == 'arrow_btn' && currentMode == 'GUI';
-  const btnToGUI = clicked == 'arrow_btn' && currentMode == 'CUI';
-  const clickedCUI = clicked == 'command_line';
-  const clickedGUI = clicked == 'gui_window'
+  const btnToCUI = clicked === 'arrow_btn' && currentMode === 'GUI';
+  const btnToGUI = clicked === 'arrow_btn' && currentMode === 'CUI';
+  const clickedCUI = clicked === 'command_line';
+  const clickedGUI = clicked === 'gui_window'
 
   if (btnToCUI || clickedCUI) {
     commandLine.placeholder = '';
@@ -476,7 +486,7 @@ function changeModeListener(clicked) {
     currentMode = 'CUI';
   } else if (btnToGUI || clickedGUI) {
     commandLine.value = '';
-    commandLine.placeholder='Type your command here';
+    commandLine.placeholder = 'Type your command here';
     emphasize(guiWindow);
     deemphasize(commandLine);
     if (btnToGUI) resizeArrows(arrowSmallHover, arrowBigHover);
@@ -484,9 +494,13 @@ function changeModeListener(clicked) {
     currentMode = 'GUI';
   }
 }
-function emphasize(target) { target.classList.add('emphasized'); }
-function deemphasize(target) { target.classList.remove('emphasized') }
-$(document).on('contextmenu', '#gui_window', function(e) {
+function emphasize(target) {
+  target.classList.add('emphasized');
+}
+function deemphasize(target) {
+  target.classList.remove('emphasized')
+}
+$(document).on('contextmenu', '#gui_window', function (e) {
   e.preventDefault();
 
   const guiWindow = document.getElementById('gui_window');
@@ -494,7 +508,7 @@ $(document).on('contextmenu', '#gui_window', function(e) {
 
 
   commandLine.value = '';
-  commandLine.placeholder='Type your command here';
+  commandLine.placeholder = 'Type your command here';
   emphasize(guiWindow);
   deemphasize(commandLine);
   resizeArrows(arrowSmall, arrowBig);
@@ -517,8 +531,8 @@ function renderHierarchy() {
     const currentDir = document.createElement('div');
     currentDir.classList.add('ui', 'accordion');
     current.children.forEach(child => {
-      const { type, name, path } = child
-      if (type == 'folder') {
+      const {type, name, path} = child
+      if (type === 'folder') {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
         const item = document.createElement('span');
@@ -534,11 +548,11 @@ function renderHierarchy() {
         icon.onclick = () => {
           goto(child);
           addCommand(`cd ${child.path}`);
-        }
+        };
         nameText.onclick = () => {
           goto(child);
           addCommand(`cd ${child.path}`);
-        }
+        };
 
         title.appendChild(dropdown);
         item.appendChild(icon);
@@ -553,14 +567,16 @@ function renderHierarchy() {
         content.appendChild(renderHierarchyRec(child));
         currentDir.appendChild(content);
 
-        dropdown.onclick = function() {
+        dropdown.onclick = function () {
           title.classList.toggle('active');
           content.classList.toggle('active');
         }
       }
-    });
+    })
+    ;
     return currentDir;
   }
+
   const sidebar = document.getElementById('sidebar');
   while (sidebar.firstChild) sidebar.removeChild(sidebar.firstChild);
   sidebar.appendChild(renderHierarchyRec(root));
@@ -571,8 +587,8 @@ function renderModalHierarchy() {
     const currentDir = document.createElement('div');
     currentDir.classList.add('ui', 'accordion');
     current.children.forEach(child => {
-      const { type, name, path } = child
-      if (type == 'folder') {
+      const {type, name, path} = child
+      if (type === 'folder') {
         const title = document.createElement('div');
         const dropdown = document.createElement('i');
         const icon = document.createElement('i');
@@ -594,14 +610,16 @@ function renderModalHierarchy() {
         content.appendChild(renderModalHierarchyRec(child));
         currentDir.appendChild(content);
 
-        dropdown.onclick = function() {
+        dropdown.onclick = function () {
           title.classList.toggle('active');
           content.classList.toggle('active');
         }
       }
-    });
+    })
+    ;
     return currentDir;
   }
+
   const hierarchy = document.getElementById('hierarchy');
   while (hierarchy.firstChild) hierarchy.removeChild(hierarchy.firstChild);
   hierarchy.appendChild(renderModalHierarchyRec(root));
@@ -612,7 +630,7 @@ function renderFinder(current) {
   const grid = document.createElement('div');
   grid.classList.add('ui', 'four', 'column', 'grid');
   current.children.forEach(child => {
-    const { type, name } = child
+    const {type, name} = child
     const column = document.createElement('div');
     const unit = document.createElement('div');
     const icon = document.createElement('i');
@@ -625,14 +643,14 @@ function renderFinder(current) {
     icon.style.margin = 'auto';
     icon.style.display = 'block';
     nameText.display = 'block';
-    if (type == 'folder') {
+    if (type === 'folder') {
       icon.classList.add('huge', 'blue', 'folder', 'icon');
       unit.ondblclick = function () {
         goto(child);
         addCommand(`cd ${name}/`);
       }
     }
-    else if (type == 'file') {
+    else if (type === 'file') {
       icon.classList.add('huge', 'file', 'icon');
       unit.ondblclick = function () {
         openFile(child);
@@ -653,13 +671,13 @@ function renderBreadcrumb(current) {
   const breadcrumb = document.getElementById('breadcrumb');
   while (breadcrumb.firstChild) breadcrumb.removeChild(breadcrumb.firstChild);
 
-  const { path } = current;
+  const {path} = current;
   const pathArray = path.split('/');
   pathArray.slice(0, pathArray.length - 1).forEach((folderName, idx, arr) => {
     const folderNameText = document.createTextNode(folderName);
     const divider = document.createElement('span');
     const dividerText = document.createTextNode('/');
-    if (idx == arr.length - 1) {
+    if (idx === arr.length - 1) {
       const folder = document.createElement('div');
       folder.classList.add('active', 'section');
       folder.appendChild(folderNameText);
@@ -677,7 +695,8 @@ function renderBreadcrumb(current) {
     divider.className = 'divider';
     divider.appendChild(dividerText);
     breadcrumb.appendChild(divider);
-  });
+  })
+  ;
 }
 
 function addCommand(command) {
@@ -712,7 +731,9 @@ function addCommand(command) {
   manualButton.classList.add('one', 'wide', 'column', 'help', 'icon');
   manualButton.style.cssFloat = 'right';
   manualButton.style.margin = 0;
-  manualButton.onclick = function () { showManual(command) };
+  manualButton.onclick = function () {
+    showManual(command)
+  };
 
   history.scrollTop = history.scrollHeight;
   historyCount += 1;
@@ -721,47 +742,46 @@ function addCommand(command) {
 }
 
 function commandInput(e) {
-  console.log('hi');
-    if (currentMode == 'CUI' && e.keyCode == 13) {
-      const commandLine = document.getElementById('command_line');
-      const command = commandLine.value;
-      if (command){
-        handleCommand(command);
-      }
+  if (currentMode == 'CUI' && e.keyCode == 13) {
+    const commandLine = document.getElementById('command_line');
+    const command = commandLine.value;
+    if (command){
+      handleCommand(command);
     }
-    else if (currentMode == 'CUI' && e.keyCode == 38) {
-      const commandLine = document.getElementById('command_line');
+  }
+  else if (currentMode == 'CUI' && e.keyCode == 38) {
+    const commandLine = document.getElementById('command_line');
+    if(history_index == history_stack.length){
+      command_buffer = commandLine.value;
+    }
+    if(history_index > 0){
+      history_index -= 1;
+      commandLine.value = history_stack[history_index];
+    }
+  }
+  else if (currentMode == 'CUI' && e.keyCode == 40) {
+    const commandLine = document.getElementById('command_line');
+    if(history_index < history_stack.length){
+      history_index += 1;
       if(history_index == history_stack.length){
-        command_buffer = commandLine.value;
+        commandLine.value = command_buffer;
       }
-      if(history_index > 0){
-        history_index -= 1;
+      else{
         commandLine.value = history_stack[history_index];
       }
     }
-    else if (currentMode == 'CUI' && e.keyCode == 40) {
-      const commandLine = document.getElementById('command_line');
-      if(history_index < history_stack.length){
-        history_index += 1;
-        if(history_index == history_stack.length){
-          commandLine.value = command_buffer;
-        }
-        else{
-          commandLine.value = history_stack[history_index];
-        }
-      }
-    }
-    else if (currentMode == 'GUI' && modal_on >= 2 && e.keyCode == 13) {
-      if(modal_on == 2) $('#rename_submit').trigger('click');
-      if(modal_on == 3) $('#mkdir_submit').trigger('click');
-    }
-    else if (currentMode == 'GUI' && modal_on >= 2 && e.keyCode == 27) {
-      if(modal_on == 2) $('#modal_popup_rename').trigger('click');
-      if(modal_on == 3) $('#modal_popup_mkdir').trigger('click');
-    }
-    else if (currentMode == 'GUI' && modal_on == 1 && e.keyCode == 27) {
-      $('#modal_popup').trigger('click');
-    }
+  }
+  else if (currentMode == 'GUI' && modal_on >= 2 && e.keyCode == 13) {
+    if(modal_on == 2) $('#rename_submit').trigger('click');
+    if(modal_on == 3) $('#mkdir_submit').trigger('click');
+  }
+  else if (currentMode == 'GUI' && modal_on >= 2 && e.keyCode == 27) {
+    if(modal_on == 2) $('#modal_popup_rename').trigger('click');
+    if(modal_on == 3) $('#modal_popup_mkdir').trigger('click');
+  }
+  else if (currentMode == 'GUI' && modal_on == 1 && e.keyCode == 27) {
+    $('#modal_popup').trigger('click');
+  }
 }
 
 function handleDelete(fileObj) {
@@ -785,7 +805,7 @@ function handleCommand(command) {
   const rest = args.slice(1);
 
   if (op === 'echo') {
-    if(rest.length == 0){
+    if (rest.length === 0) {
       showErrorMsg(`echo usage : echo [string] > [output name] ex) echo "hello,world" > hello.txt`);
       return;
     }
@@ -797,106 +817,100 @@ function handleCommand(command) {
         name: outputName,
         path: current.path + outputName,
         content: message,
-      }
+      };
       current.children.push(newFile);
     }
     addCommand(command);
   } else if (op === 'ls') {
     addCommand(command);
   } else if (op === 'cd') {
-    if(rest.length == 0){
+    if (rest.length === 0) {
       current = root;
       addCommand(command);
-    }
-    else if(rest.length == 1){
+    } else if (rest.length === 1) {
       const path = rest[0];
-      current = findByPath(path);
-      addCommand(command);
-    }
-    else{
+      const found = findByPath(path);
+      console.log(found);
+      if (found <= 0) showErrorMsg('cd usage: no such directory');
+      else {
+        current = found;
+        addCommand(command);
+      }
+    } else {
       showErrorMsg('cd usage : cd [folder name] ex) cd aaa');
     }
-  } else if (op === 'mkdir'){
-    if(rest.length == 0){
+  } else if (op === 'mkdir') {
+    if (rest.length === 0) {
       showErrorMsg(`mkdir usage : mkdir [new folder name] ex) mkdir folder1`);
       return;
-    }
-    else if(rest.length == 1){
+    } else if (rest.length === 1) {
       let new_name = rest[0];
-      if(new_name !== '') {
-        if(new_name === ' '){
+      if (new_name !== '') {
+        if (new_name === ' ') {
           showErrorMsg(`mkdir usage : mkdir [new folder name] ex) mkdir folder1`);
           return;
-        }
-        else if(!new_name.includes(' ')) {
-          if(hasChildNamed(current, new_name) == 0) {
+        } else if (!new_name.includes(' ')) {
+          if (hasChildNamed(current, new_name) === 0) {
             addCommand(`mkdir ${new_name}`);
             makeDirectory(new_name);
           } else {
             showErrorMsg(`${new_name} already exists!`);
             return;
           }
-        }
-        else {
+        } else {
           showErrorMsg('Whitespace on name is not supported yet.. sorry');
           return;
         }
       }
-    }
-    else{
+    } else {
       showErrorMsg('');
       return;
     }
   } else if (op === 'rm') {
-    if(rest.length == 0){
+    if (rest.length === 0) {
       showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
-    }
-    else if(rest.length == 1){
+    } else if (rest.length === 1) {
       const path = rest[0];
       if (path.includes('-')) {
         showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
-      }
-      else{
+      } else {
         let remove_obj = findByPath(path);
-        if(remove_obj == 0){
+        if (remove_obj === 0) {
           showErrorMsg('rm : no such file or directory ' + path);
-        }
-        else{
-          if(remove_obj.type === 'file'){
+        } else {
+          if (remove_obj.type === 'file') {
             let parent_obj = getParentObject(remove_obj);
-            for(let i = 0 ; i < parent_obj.children.length ; i++){
-              if(parent_obj.children[i].name === remove_obj.name){
+            for (let i = 0; i < parent_obj.children.length; i++) {
+              if (parent_obj.children[i].name === remove_obj.name) {
                 parent_obj.children.splice(i, 1);
                 break;
               }
             }
             addCommand(command);
-          }
-          else{
+          } else {
             showErrorMsg('rm : ' + path + ' is a directory. <br /> Try rm -r ' + path);
           }
         }
       }
-    }
-    else if(rest.length == 2){
+    } else if (rest.length === 2) {
       const flag = rest[0];
       const path = rest[1];
-      if (!flag.includes('-')){
+      if (!flag.includes('-')) {
         showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
       }
-      else if(flag === '-r'){
+      else if (flag === '-r') {
         let remove_obj = findByPath(path);
-        if(remove_obj == 0){
+        if (remove_obj === 0) {
           showErrorMsg('rm : no such file or directory ' + path);
         }
-        else{
-          if(remove_obj.name === '~'){
+        else {
+          if (remove_obj.name === '~') {
             showErrorMsg('rm : cannot remove the root folder');
           }
-          else{
+          else {
             let parent_obj = getParentObject(remove_obj);
-            for(let i = 0 ; i < parent_obj.children.length ; i++){
-              if(parent_obj.children[i].name === remove_obj.name){
+            for (let i = 0; i < parent_obj.children.length; i++) {
+              if (parent_obj.children[i].name === remove_obj.name) {
                 parent_obj.children.splice(i, 1);
                 break;
               }
@@ -905,85 +919,85 @@ function handleCommand(command) {
           }
         }
       }
-      else if(flag === '-f'){
+      else if (flag === '-f') {
         let remove_obj = findByPath(path);
-        if(remove_obj == 0){
+        if (remove_obj === 0) {
           showErrorMsg('rm : no such file or directory ' + path);
         }
-        else{
-          if(remove_obj.type === 'file'){
+        else {
+          if (remove_obj.type === 'file') {
             let parent_obj = getParentObject(remove_obj);
-            for(let i = 0 ; i < parent_obj.children.length ; i++){
-              if(parent_obj.children[i].name === remove_obj.name){
+            for (let i = 0; i < parent_obj.children.length; i++) {
+              if (parent_obj.children[i].name === remove_obj.name) {
                 parent_obj.children.splice(i, 1);
                 break;
               }
             }
             addCommand(command);
           }
-          else{
+          else {
             showErrorMsg('rm : ' + path + ' is a directory. <br /> Try rm -r ' + path);
           }
         }
       }
-      else{
+      else {
         showErrorMsg('');
       }
     }
-    else{
+    else {
       showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
     }
-  } else if(op === 'cp'){
-    if(rest.length == 0 || rest.length == 1){
+  } else if (op === 'cp') {
+    if (rest.length === 0 || rest.length === 1) {
       showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] ex) cp README.md bbb');
       return;
     }
-    else if(rest.length == 2){
+    else if (rest.length === 2) {
       const src = rest[0];
       const dst = rest[1];
-      if(src.includes('-')){
+      if (src.includes('-')) {
         showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] <br /> ex) cp README.md bbb');
         return;
       }
       let src_obj = findByPath(src);
-      if(src_obj == 0){
+      if (src_obj === 0) {
         showErrorMsg('No such file named ' + src);
       }
       else {
-        if(src_obj.type === 'file'){
-          if (dst[dst.length-1] === '/'){
+        if (src_obj.type === 'file') {
+          if (dst[dst.length - 1] === '/') {
             let dst_obj = findByPath(dst);
-            if(dst_obj == 0){
+            if (dst_obj === 0) {
               showErrorMsg('cp: directory ' + dst + ' does not exist');
             }
-            else if(dst_obj.type === 'file'){
+            else if (dst_obj.type === 'file') {
               showErrorMsg('cp: directory ' + dst + ' does not exist');
             }
-            else{
+            else {
               let child = hasChildNamed(dst_obj, src_obj.name);
-              if(child == 0){
+              if (child === 0) {
                 let newChild = deepcopy(src_obj);
                 replacePath(newChild, src_obj.path, dst + src_obj.name);
                 dst_obj.children.push(newChild);
                 addCommand(command);
               }
-              else if(child.type === 'file'){
+              else if (child.type === 'file') {
                 let newChild = deepcopy(src_obj);
                 child.content = newChild.content;
                 addCommand(command);
               }
-              else{
+              else {
                 showErrorMsg('cp: cannot overwrite directory ' + child.name + ' with non-directory ' + src_obj.name);
               }
             }
           }
-          else{
+          else {
             let dst_arr = dst.split('/');
             let dst_len = dst_arr.length;
             let dst_filename = dst_arr[dst_len - 1];
             let dir_string = '';
             let dst_dir_obj = current;
-            if(dst_len - 1 > 0){
+            if (dst_len - 1 > 0) {
               dst_arr.splice(dst_len - 1, 1);
               dir_string = dst_arr.join('/') + '/';
               dst_dir_obj = findByPath(dir_string);
@@ -991,12 +1005,12 @@ function handleCommand(command) {
             else if(dst[0] == '~' || dst === '/'){
               dst_dir_obj = root;
             }
-            if(dst_dir_obj == 0 || dst_dir_obj == -1){
+            if (dst_dir_obj === 0 || dst_dir_obj === -1) {
               showErrorMsg('cp: directory ' + dst + ' does not exist');
             }
-            else if(dst_dir_obj.type === 'folder'){
+            else if (dst_dir_obj.type === 'folder') {
               let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
-              if(dst_folder_child == 0){
+              if (dst_folder_child === 0) {
                 let newChild = deepcopy(src_obj);
                 newChild.name = dst_filename;
                 replacePath(newChild, src_obj.path, dst_dir_obj.path + dst_filename);
@@ -1005,22 +1019,22 @@ function handleCommand(command) {
               }
               else if(dst_folder_child.type === 'folder'){
                 let last_child = hasChildNamed(dst_folder_child, src_obj.name);
-                if(last_child == 0){
+                if (last_child === 0) {
                   let newChild = deepcopy(src_obj);
                   replacePath(newChild, src_obj.path, dst_folder_child.path + src_obj.name);
                   dst_folder_child.children.push(newChild);
                   addCommand(command);
                 }
-                else if (last_child.type === 'folder'){
+                else if (last_child.type === 'folder') {
                   showErrorMsg('cp: cannot overwrite directory ' + last_child.name + ' with non-directory ' + src_obj.name);
                 }
-                else{
+                else {
                   let newChild = deepcopy(src_obj);
                   last_child.content = newChild.content;
                   addCommand(command);
                 }
               }
-              else{
+              else {
                 let newChild = deepcopy(src_obj);
                 dst_folder_child.content = newChild.content;
                 addCommand(command);
@@ -1033,54 +1047,54 @@ function handleCommand(command) {
         }
       }
     }
-    else if (rest.length === 3){
+    else if (rest.length === 3) {
       const flag = rest[0];
       const src = rest[1];
       const dst = rest[2];
-      if(!flag.includes('-')){
+      if (!flag.includes('-')) {
         showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] <br /> ex) cp README.md bbb');
         return;
       }
-      else if(flag === '-r'){
+      else if (flag === '-r') {
         let src_obj = findByPath(src);
-        if(src_obj == 0){
+        if (src_obj === 0) {
           showErrorMsg('No such file named ' + src);
         }
-        else{
-          if(src_obj.type === 'file'){
-            if (dst[dst.length-1] === '/'){
+        else {
+          if (src_obj.type === 'file') {
+            if (dst[dst.length - 1] === '/') {
               let dst_obj = findByPath(dst);
-              if(dst_obj == 0){
+              if (dst_obj === 0) {
                 showErrorMsg('cp: directory ' + dst + ' does not exist');
               }
-              else if(dst_obj.type === 'file'){
+              else if (dst_obj.type === 'file') {
                 showErrorMsg('cp: directory ' + dst + ' does not exist');
               }
-              else{
+              else {
                 let child = hasChildNamed(dst_obj, src_obj.name);
-                if(child == 0){
+                if (child === 0) {
                   let newChild = deepcopy(src_obj);
                   replacePath(newChild, src_obj.path, dst + src_obj.name);
                   dst_obj.children.push(newChild);
                   addCommand(command);
                 }
-                else if(child.type === 'file'){
+                else if (child.type === 'file') {
                   let newChild = deepcopy(src_obj);
                   child.content = newChild.content;
                   addCommand(command);
                 }
-                else{
+                else {
                   showErrorMsg('cp: cannot overwrite directory ' + child.name + ' with non-directory ' + src_obj.name);
                 }
               }
             }
-            else{
+            else {
               let dst_arr = dst.split('/');
               let dst_len = dst_arr.length;
               let dst_filename = dst_arr[dst_len - 1];
               let dir_string = '';
               let dst_dir_obj = current;
-              if(dst_len - 1 > 0){
+              if (dst_len - 1 > 0) {
                 dst_arr.splice(dst_len - 1, 1);
                 dir_string = dst_arr.join('/') + '/';
                 dst_dir_obj = findByPath(dir_string);
@@ -1088,36 +1102,36 @@ function handleCommand(command) {
               else if(dst[0] == '~' || dst === '/'){
                 dst_dir_obj = root;
               }
-              if(dst_dir_obj == 0 || dst_dir_obj == -1){
+              if (dst_dir_obj === 0 || dst_dir_obj === -1) {
                 showErrorMsg('cp: directory ' + dst + ' does not exist');
               }
-              else if(dst_dir_obj.type === 'folder'){
+              else if (dst_dir_obj.type === 'folder') {
                 let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
-                if(dst_folder_child == 0){
+                if (dst_folder_child === 0) {
                   let newChild = deepcopy(src_obj);
                   newChild.name = dst_filename;
                   replacePath(newChild, src_obj.path, dst_dir_obj.path + dst_filename);
                   dst_dir_obj.children.push(newChild);
                   addCommand(command);
                 }
-                else if(dst_folder_child.type === 'folder'){
+                else if (dst_folder_child.type === 'folder') {
                   let last_child = hasChildNamed(dst_folder_child, src_obj.name);
-                  if(last_child == 0){
+                  if (last_child == 0) {
                     let newChild = deepcopy(src_obj);
                     replacePath(newChild, src_obj.path, dst_folder_child.path + src_obj.name);
                     dst_folder_child.children.push(newChild);
                     addCommand(command);
                   }
-                  else if (last_child.type === 'folder'){
+                  else if (last_child.type === 'folder') {
                     showErrorMsg('cp: cannot overwrite directory ' + last_child.name + ' with non-directory ' + src_obj.name);
                   }
-                  else{
+                  else {
                     let newChild = deepcopy(src_obj);
                     last_child.content = newChild.content;
                     addCommand(command);
                   }
                 }
-                else{
+                else {
                   let newChild = deepcopy(src_obj);
                   dst_folder_child.content = newChild.content;
                   addCommand(command);
@@ -1125,16 +1139,16 @@ function handleCommand(command) {
               }
             }
           }
-          else{
+          else {
             let dst_arr = dst.split('/');
-            if (dst[dst.length-1] === '/'){
+            if (dst[dst.length - 1] === '/') {
               dst_arr.splice(dst_arr.length - 1, 1);
             }
             let dst_len = dst_arr.length;
             let dst_filename = dst_arr[dst_len - 1];
             let dir_string = '';
             let dst_dir_obj = current;
-            if(dst_len - 1 > 0){
+            if (dst_len - 1 > 0) {
               dst_arr.splice(dst_len - 1, 1);
               dir_string = dst_arr.join('/') + '/';
               dst_dir_obj = findByPath(dir_string);
@@ -1142,65 +1156,68 @@ function handleCommand(command) {
             else if(dst[0] == '~' || dst === '/'){
               dst_dir_obj = root;
             }
-            if(dst_dir_obj == 0 || dst_dir_obj == -1){
+            if (dst_dir_obj == 0 || dst_dir_obj == -1) {
               showErrorMsg('cp: directory ' + dst + ' does not exist');
             }
-            else if(dst_dir_obj.type === 'folder'){
+            else if (dst_dir_obj.type === 'folder') {
               let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
-              if(dst_folder_child == 0){
+              if (dst_folder_child == 0) {
                 let newChild = deepcopy(src_obj);
                 newChild.name = dst_filename;
                 replacePath(newChild, src_obj.path, dst_dir_obj.path + dst_filename + '/');
                 dst_dir_obj.children.push(newChild);
                 addCommand(command);
               }
-              else if(dst_folder_child.type === 'folder'){
+              else if (dst_folder_child.type === 'folder') {
                 let last_child = hasChildNamed(dst_folder_child, src_obj.name);
-                if(last_child == 0){
+                if (last_child == 0) {
                   let newChild = deepcopy(src_obj);
                   replacePath(newChild, src_obj.path, dst_folder_child.path + src_obj.name + '/');
                   dst_folder_child.children.push(newChild);
                   addCommand(command);
                 }
-                else if (last_child.type === 'folder'){
+                else if (last_child.type === 'folder') {
                   let newChild = deepcopy(src_obj);
                   last_child.children = newChild.children;
                   replacePath(last_child, src_obj.path, dst_folder_child.path + src_obj.name + '/');
                   addCommand(command);
                 }
-                else{
+                else {
                   showErrorMsg('cp: cannot overwrite non-directory ' + last_child.name + ' with directory ' + src_obj.name);
 
                 }
               }
-              else{
+              else {
                 showErrorMsg('cp: cannot overwrite non-directory ' + dst_folder_child.name + ' with directory ' + src_obj.name);
               }
             }
           }
         }
       }
-      else{
+      else {
         showErrorMsg('');
       }
 
     }
   } else if (op === 'mv') {
-    if(rest.length == 0 || rest.length == 1){
+    if (rest.length == 0 || rest.length == 1) {
       showErrorMsg('mv usage : mv [source] [destination] <br /> ex) mv file1 folder1');
       return;
     }
-    const srcPath = getAbsolutePath(rest[0]);
-    const dstPath = getAbsolutePath(rest[1]);
-    if(srcPath == 0 || dstPath == 0) return;
+    let srcPath, dstPath;
+    if (rest[0].indexOf('~/') !== 0) srcPath = getAbsolutePath(rest[0]);
+    else srcPath = rest[0];
+    if (rest[1].indexOf('~/') !== 0) dstPath = getAbsolutePath(rest[1]);
+    else dstPath = rest[1];
+    if (srcPath == 0 || dstPath == 0) return;
     const srcObj = findByAbsolutePath(srcPath);
     const dstObj = findByAbsolutePath(dstPath);
-    if(srcObj == 0) {
+    if (srcObj == 0) {
       return;
     }
-    if(dstObj != 0) {
-      if(dstObj.type == 'file') {
-        if(srcObj.type == 'folder') {
+    if (dstObj != 0) {
+      if (dstObj.type == 'file') {
+        if (srcObj.type == 'folder') {
           showErrorMsg(`${dstObj.name} already exists and is not a directory`);
           return;
         } else {
@@ -1211,14 +1228,14 @@ function handleCommand(command) {
 
           replacePath(newObj, `${orgPath}/`, parentPath(dstObj.path));
           newObj.name = dstObj.name;
-          for(let i = 0; i < srcParentObj.children.length; i++) {
-            if(srcParentObj.children[i].name === srcObj.name) {
+          for (let i = 0; i < srcParentObj.children.length; i++) {
+            if (srcParentObj.children[i].name === srcObj.name) {
               srcParentObj.children.splice(i, 1);
               break;
             }
           }
-          for(let i = 0; i < dstParentObj.children.length; i++) {
-            if(dstParentObj.children[i].name === dstObj.name) {
+          for (let i = 0; i < dstParentObj.children.length; i++) {
+            if (dstParentObj.children[i].name === dstObj.name) {
               dstParentObj.children.splice(i, 1);
               break;
             }
@@ -1231,23 +1248,23 @@ function handleCommand(command) {
         const newObj = deepcopy(srcObj);
         const orgPath = parentPath(newObj.path);
         replacePath(newObj, `${orgPath}/`, dstObj.path);
-        for(let i = 0; i < dstObj.children.length; i++) {
+        for (let i = 0; i < dstObj.children.length; i++) {
           if (dstObj.children[i].name === srcObj.name) {
             dup = 1;
             dup_index = i;
             break;
           }
         }
-        if(dup == 1) {
+        if (dup === 1) {
           const srcParentObj = getParentObject(srcObj);
           const newObj = deepcopy(srcObj);
           const orgPath = parentPath(newObj.path);
           replacePath(newObj, `${orgPath}/`, dstObj.path);
 
-          if(srcObj.type == 'folder' && dstObj.children[dup_index].type == 'folder') {
-            if(dstObj.children[dup_index].children.length == 0) {
-              for(let i = 0; i < srcParentObj.children.length; i++) {
-                if(srcParentObj.children[i].name === srcObj.name) {
+          if (srcObj.type == 'folder' && dstObj.children[dup_index].type == 'folder') {
+            if (dstObj.children[dup_index].children.length == 0) {
+              for (let i = 0; i < srcParentObj.children.length; i++) {
+                if (srcParentObj.children[i].name === srcObj.name) {
                   srcParentObj.children.splice(i, 1);
                   break;
                 }
@@ -1258,9 +1275,9 @@ function handleCommand(command) {
               showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not empty!`);
               return;
             }
-          } else if(srcObj.type == 'file' && dstObj.children[dup_index].type == 'file') {
-            for(let i = 0; i < srcParentObj.children.length; i++) {
-              if(srcParentObj.children[i].name === srcObj.name) {
+          } else if (srcObj.type == 'file' && dstObj.children[dup_index].type == 'file') {
+            for (let i = 0; i < srcParentObj.children.length; i++) {
+              if (srcParentObj.children[i].name === srcObj.name) {
                 srcParentObj.children.splice(i, 1);
                 break;
               }
@@ -1268,14 +1285,14 @@ function handleCommand(command) {
             dstObj.children.splice(dup_index, 1);
             dstObj.children.push(newObj);
           } else {
-            if(dstObj.children[dup_index].type == 'folder') showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not a file!`);
-            else if(dstObj.children[dup_index].type == 'file') showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not a folder!`);
+            if (dstObj.children[dup_index].type == 'folder') showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not a file!`);
+            else if (dstObj.children[dup_index].type == 'file') showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not a folder!`);
             return;
           }
         } else {
           const srcParentObj = getParentObject(srcObj);
-          for(let i = 0; i < srcParentObj.children.length; i++) {
-            if(srcParentObj.children[i].name === srcObj.name) {
+          for (let i = 0; i < srcParentObj.children.length; i++) {
+            if (srcParentObj.children[i].name === srcObj.name) {
               srcParentObj.children.splice(i, 1);
               break;
             }
@@ -1286,10 +1303,20 @@ function handleCommand(command) {
       renderHierarchy();
       addCommand(command);
       renderFinder(current);
-    } else { /* dstPathObj does not exist */
+    } else { /* dstObj does not exist */
       const dstPathFrags = dstPath.split('/');
-      const newName = dstPathFrags[dstPathFrags.length - 1];
-      dstPathFrags.splice(dstPathFrags.length - 1, 1);
+      let newName;
+      if (dstPathFrags[dstPathFrags.length - 1] === '') {
+        if (srcObj.type !== 'folder'){
+          showErrorMsg(`not a directory: ${ srcObj.name }`);
+          return;
+        }
+        newName = dstPathFrags[dstPathFrags.length - 2];
+        dstPathFrags.splice(dstPathFrags.length - 2, 2);
+      } else {
+        newName = dstPathFrags[dstPathFrags.length - 1];
+        dstPathFrags.splice(dstPathFrags.length - 1, 1);
+      }
 
       let dstPrevObj;
       if (dstPathFrags.length == 0) dstPrevObj = deepcopy(current);
@@ -1303,9 +1330,13 @@ function handleCommand(command) {
         if (dstPrevObj.path == current.path) { /* dstPrevObj is the current directory */
           /* just rename srcObj */
           srcObj.name = newName;
+          srcObj.path = parentPath(srcObj.path) + '/' + newName;
+          if (srcObj.type === 'folder') srcObj.path = srcObj.path + '/';
         } else {
           /* move srcObj to dstPrevObj and rename it */
           srcObj.name = newName;
+          srcObj.path = parentPath(srcObj.path) + '/' + newName;
+          if (srcObj.type === 'folder') srcObj.path = srcObj.path + '/';
           handleCopy(srcObj, dstPrevObj);
           handleDelete(srcObj);
 
@@ -1323,11 +1354,11 @@ function handleCommand(command) {
   renderBreadcrumb(current);
 }
 
-function showErrorMsg(msg){
-  if(msg === ''){
+function showErrorMsg(msg) {
+  if (msg === '') {
     $('#command_line').attr('data-html', 'Sorry, we do not support your command yet.');
   }
-  else{
+  else {
     $('#command_line').attr('data-html', msg);
   }
   $('#command_line').popup('destroy');
@@ -1378,11 +1409,14 @@ function getAbsolutePath(path) {
   currPathFrags.splice(currPathFrags.length - 1, 1);
   const pathFrags = path.split('/');
   for (let i = 0; i < pathFrags.length; i++) {
-    if (pathFrags[i] == '.') {}
+    if (pathFrags[i] == '.') {
+    }
     else if (pathFrags[i] == '..') {
       currPathFrags.splice(currPathFrags.length - 1, 1);
       if (currPathFrags.length == 0) return 0;
-    } else { currPathFrags.push(pathFrags[i]) }
+    } else {
+      currPathFrags.push(pathFrags[i])
+    }
   }
 
   return currPathFrags.join('/');
@@ -1400,31 +1434,22 @@ function replacePath(target, orgPath, newPath) {
   }
 }
 
-
-function findByPath(path){
-  if(path === ''){
-    return -10; //
-  }
-  if(path[0] === '~' || path[0] === '/'){
-    console.log(findByAbsolutePath(path));
-    return findByAbsolutePath(path);
-  }
-  else{
-    console.log(findByRelativePath(path));
-    return findByRelativePath(path);
-  }
+function findByPath(path) {
+  if (path === '') return -10;
+  if (path[0] === '~' || path[0] === '/') return findByAbsolutePath(path);
+  else return findByRelativePath(path);
 }
 
 function findByAbsolutePath(path) {
   let obj = root;
   const names = path.split('/');
   const currentName = obj.name;
-  if (names[0] != '~' && names[0] != '') return 0;
-  for (let i = 1; i < names.length; i++){
+  if (names[0] !== '~' && names[0] !== '') return 0;
+  for (let i = 1; i < names.length; i++) {
     console.log('gogo');
     if (!names[i]) return obj;
     obj = findByChildName(obj, names[i]);
-    if (obj == 0) return 0;
+    if (obj === 0) return 0;
   }
   return obj;
 }
@@ -1433,24 +1458,24 @@ function findByRelativePath(path) {
   let path_arr = path.split('/');
   let iter_obj = current;
   let path_name = path_arr[0];
-  for(let i = 0 ; i < path_arr.length ; i++){
+  for (let i = 0; i < path_arr.length; i++) {
     path_name = path_arr[i];
-    if(iter_obj == 0){
+    if (iter_obj === 0) {
       return 0;
     }
-    if(path_name === '.'){
+    if (path_name === '.') {
       continue;
     }
-    else if(path_name === ''){
-      if(iter_obj.type === 'folder')
+    else if (path_name === '') {
+      if (iter_obj.type === 'folder')
         return iter_obj;
       else
         return -1; // is not a directory
     }
-    else if(path_name === '..'){
+    else if (path_name === '..') {
       iter_obj = getParentObject(iter_obj);
     }
-    else{
+    else {
       iter_obj = findByChildName(iter_obj, path_name);
     }
   }
@@ -1459,7 +1484,7 @@ function findByRelativePath(path) {
 
 function findByChildName(obj, childName) {
   for (child of obj.children) {
-    const { type, name } = child;
+    const {type, name} = child;
     if (name === childName) return child;
   }
   return 0;
@@ -1476,14 +1501,11 @@ function getParentObject(fileObj) {
   return parentObj;
 }
 
-function hasChildNamed(parentObj, name){
-  if(parentObj.type === 'folder'){
+function hasChildNamed(parentObj, name) {
+  if (parentObj.type === 'folder') {
     let child_arr = parentObj.children;
-    for(let i = 0 ; i < child_arr.length ; i++){
-      if(child_arr[i].name === name){
-        return child_arr[i];
-        break;
-      }
+    for (let i = 0; i < child_arr.length; i++) {
+      if (child_arr[i].name === name) return child_arr[i];
     }
     return 0;
   }
