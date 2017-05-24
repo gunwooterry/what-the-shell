@@ -1292,9 +1292,13 @@ function handleCommand(command) {
         if (dstPrevObj.path == current.path) { /* dstPrevObj is the current directory */
           /* just rename srcObj */
           srcObj.name = newName;
+          srcObj.path = parentPath(srcObj.path) + '/' + newName;
+          if (srcObj.type === 'folder') srcObj.path = srcObj.path + '/';
         } else {
           /* move srcObj to dstPrevObj and rename it */
           srcObj.name = newName;
+          srcObj.path = parentPath(srcObj.path) + '/' + newName;
+          if (srcObj.type === 'folder') srcObj.path = srcObj.path + '/';
           handleCopy(srcObj, dstPrevObj);
           handleDelete(srcObj);
 
