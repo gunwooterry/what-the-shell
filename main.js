@@ -1206,12 +1206,10 @@ function handleCommand(command) {
       return;
     }
     let srcPath, dstPath;
-    if (rest[0].indexOf('~/') !== 0) const srcPath = getAbsolutePath(rest[0]);
+    if (rest[0].indexOf('~/') !== 0) srcPath = getAbsolutePath(rest[0]);
     else srcPath = rest[0];
-    if (rest[1].indexOf('~/') !== 0) const dstPath = getAbsolutePath(rest[1]);
+    if (rest[1].indexOf('~/') !== 0) dstPath = getAbsolutePath(rest[1]);
     else dstPath = rest[1];
-    console.log(srcPath);
-    console.log(dstPath);
     if (srcPath == 0 || dstPath == 0) return;
     const srcObj = findByAbsolutePath(srcPath);
     const dstObj = findByAbsolutePath(dstPath);
