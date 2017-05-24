@@ -123,10 +123,9 @@
         <div class="ui segment" style="padding: 0; margin: 0; height: 48px">
           <input id="command_line" ondblclick="changeModeListener(this.id)"
           onclick="changeModeListener(this.id)" type="text" name="command"
-          placeholder="Type your command here" onkeypress="commandInput(event)"
+          placeholder="Type your command here" onkeydown="commandInput(event)"
           data-inverted="" data-variation="very wide large" data-html="" />
         </div>
-
         <div class="ui active modal manual" id="manual">
           <div class="ui content">
             <div class="description">
