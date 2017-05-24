@@ -396,38 +396,64 @@ $document.ready(() => {
     if (targetObj.path.indexOf(selectedObj.path) === -1) {
       if (copyorcut === "copy") {
         if (!$('#submit_copy').hasClass('disabled')) {
-          handleCopy(selectedObj, targetObj);
-          if (selectedObj.type === 'folder') {
-            addCommand(`cp -r ${selectedObj.name} ${targetObj.path}`);
+          let dup = 0
+          let dup_name = ''
+          for (let i = 0; i < targetObj.children.length; i++) {
+            if (targetObj.children[i].name === selectedObj.name) {
+              dup = 1
+              dup_name = targetObj.children[i].name
+              break
+            }
           }
-          else {
-            addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
-          }
-          if (current === targetObj) {
-            renderFinder(current);
-          }
-          renderHierarchy();
-          if (modal_on === 1) {
-            if (prev_target !== 0) prev_target.style.color = '#000000';
-            $('#submit_copy').addClass('disabled');
-            $('#modal_popup').hide();
-            modal_on = 0;
+          if(dup == 0) {
+            handleCopy(selectedObj, targetObj);
+            if (selectedObj.type === 'folder') {
+              addCommand(`cp -r ${selectedObj.name} ${targetObj.path}`);
+            }
+            else {
+              addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
+            }
+            if (current === targetObj) {
+              renderFinder(current);
+            }
+            renderHierarchy();
+            if (modal_on === 1) {
+              if (prev_target !== 0) prev_target.style.color = '#000000';
+              $('#submit_copy').addClass('disabled');
+              $('#modal_popup').hide();
+              modal_on = 0;
+            }
+          } else {
+            alert(`${dup_name} already exists`);
           }
         }
       } else if (copyorcut === "cut") {
         if (!$('#submit_copy').hasClass('disabled')) {
-          handleCopy(selectedObj, targetObj);
-          handleDelete(selectedObj);
-          if (current === targetObj) {
-            renderFinder(current);
+          let dup = 0
+          let dup_name = ''
+          for (let i = 0; i < targetObj.children.length; i++) {
+            if (targetObj.children[i].name === selectedObj.name) {
+              dup = 1
+              dup_name = targetObj.children[i].name
+              break
+            }
           }
-          renderHierarchy();
-          addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
-          if (modal_on === 1) {
-            if (prev_target !== 0) prev_target.style.color = '#000000';
-            $('#submit_copy').addClass('disabled');
-            $('#modal_popup').hide();
-            modal_on = 0;
+          if(dup == 0) {
+            handleCopy(selectedObj, targetObj);
+            handleDelete(selectedObj);
+            if (current === targetObj) {
+              renderFinder(current);
+            }
+            renderHierarchy();
+            addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
+            if (modal_on === 1) {
+              if (prev_target !== 0) prev_target.style.color = '#000000';
+              $('#submit_copy').addClass('disabled');
+              $('#modal_popup').hide();
+              modal_on = 0;
+            }
+          } else {
+            alert(`${dup_name} already exists`);
           }
         }
       }
@@ -1327,7 +1353,6 @@ function showErrorMsg(msg) {
 function handleCopy(obj, dirObj) {
   const newObj = deepcopy(obj);
   const orgPath = parentPath(newObj.path);
-
   replacePath(newObj, `${orgPath}/`, dirObj.path);
   dirObj.children.push(newObj);
   renderHierarchy();
