@@ -790,6 +790,8 @@ function handleCommand(command) {
       current.children.push(newFile);
     }
     addCommand(command);
+  } else if (op === 'ls') {
+    addCommand(command);
   } else if (op === 'cd') {
     if (rest.length === 0) {
       current = root;
