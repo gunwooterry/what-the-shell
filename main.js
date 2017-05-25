@@ -693,11 +693,13 @@ function renderBreadcrumb(current) {
     const dividerText = document.createTextNode('/');
     if (idx === arr.length - 1) {
       const folder = document.createElement('div');
+      if (folderName === '~') folder.title = '~ : home directory';
       folder.classList.add('active', 'section');
       folder.appendChild(folderNameText);
       breadcrumb.appendChild(folder);
     } else {
       const folder = document.createElement('a');
+      if (folderName === '~') folder.title = '~ : home directory';
       folder.className = 'section';
       folder.appendChild(folderNameText);
       breadcrumb.appendChild(folder);
