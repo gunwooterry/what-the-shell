@@ -68,16 +68,16 @@ input.emphasized {
   background-color: #fcfcfc;
 }
 
-.no_right_pad{
+.no_right_pad {
   padding-right: 0px !important;
   padding-left: 16px !important;
 }
 
-.no_left_pad{
+.no_left_pad {
   padding-left: 5px !important;
 }
 
-.rename_desc{
+.rename_desc {
   font-size: 18px;
   margin-bottom: 5px;
 }
@@ -102,7 +102,7 @@ input.emphasized {
   background-color: #ffffff;
 }
 
-.command_color{
+.command_color {
   font-family: monospace;
   font-size: 17px;
   padding: 0px 0px 0px 0px !important;
@@ -110,14 +110,14 @@ input.emphasized {
   background-color: #F4F4F4;
 }
 
-.command_text{
+.command_text {
   word-wrap: break-word;
   white-space: normal;
   display: block;
   line-height: 130%;
 }
 
-#command_line{
+#command_line {
   font-family: monospace;
 }
 
@@ -153,7 +153,11 @@ input.emphasized {
   border-radius: 0.28571429rem;
 }
 
-#ctxMenu{
+#clear {
+  cursor: pointer;
+}
+
+#ctxMenu {
     background: #FFFFFF;
     display:none;
     z-index:100;
@@ -164,7 +168,7 @@ input.emphasized {
   font-weight:bold;
 }
 
-#ctxMenu2{
+#ctxMenu2 {
     background: #FFFFFF;
     display:none;
     z-index:100;
