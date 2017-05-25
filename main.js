@@ -544,7 +544,7 @@ function renderHierarchy() {
         title.classList.add('title');
         title.id = child.path;
         dropdown.classList.add('dropdown', 'icon');
-        icon.classList.add('folder', 'icon');
+        icon.classList.add('blue', 'folder', 'icon');
         icon.onclick = () => {
           goto(child);
           addCommand(`cd ${child.path}`);
