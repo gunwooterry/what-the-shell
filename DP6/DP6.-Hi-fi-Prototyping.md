@@ -55,9 +55,16 @@ jQuery
 
 **Representative screenshots**
 ![main](main.jpeg)
+Figure 1. Main view of WhatTheShell
+
 ![copy](copy.jpeg)
+Figure 2. Popup window when  `copy` is selected in right-click menu
+
 ![see_manual](see_manual.jpeg)
+Figure 3. Manual popup explaining each command
+
 ![wrong_command](wrong_command.jpeg)
+Figure 4. Feedback for a wrong command
 
 ## Individual Reflections
 
