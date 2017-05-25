@@ -54,6 +54,9 @@ let root = {
 };
 let current = root;
 let selectedObj = root;
+let history_stack = [];
+let history_index = 0;
+let command_buffer = '';
 
 $document.ready(() => {
   const $welcome = $('#welcome');
@@ -395,72 +398,43 @@ $document.ready(() => {
 
   $('#submit_copy').click(function (event) {
     let targetObj = findByAbsolutePath(target.id);
-    if (targetObj.path.indexOf(selectedObj.path) === -1) {
-      if (copyorcut === "copy") {
-        if (!$('#submit_copy').hasClass('disabled')) {
-          let dup = 0
-          let dup_name = ''
-          for (let i = 0; i < targetObj.children.length; i++) {
-            if (targetObj.children[i].name === selectedObj.name) {
-              dup = 1
-              dup_name = targetObj.children[i].name
-              break
-            }
-          }
-          if(dup == 0) {
-            handleCopy(selectedObj, targetObj);
-            if (selectedObj.type === 'folder') {
+    if (targetObj.path === selectedObj.path) {
+      alert('you cannot do recursive copy or move');
+    }
+    else {
+      if(copyorcut == "copy") {
+        if(!$('#submit_copy').hasClass('disabled')){
+          if(handleCopy(selectedObj, targetObj) == 0){
+            if(selectedObj.type === 'folder'){
               addCommand(`cp -r ${selectedObj.name} ${targetObj.path}`);
             }
             else {
               addCommand(`cp ${selectedObj.name} ${targetObj.path}`);
             }
-            if (current === targetObj) {
-              renderFinder(current);
-            }
-            renderHierarchy();
-            if (modal_on === 1) {
-              if (prev_target !== 0) prev_target.style.color = '#000000';
+            if(modal_on == 1) {
+              if(prev_target != 0) prev_target.style.color = '#000000';
               $('#submit_copy').addClass('disabled');
               $('#modal_popup').hide();
               modal_on = 0;
             }
-          } else {
-            alert(`${dup_name} already exists`);
           }
         }
-      } else if (copyorcut === "cut") {
-        if (!$('#submit_copy').hasClass('disabled')) {
-          let dup = 0
-          let dup_name = ''
-          for (let i = 0; i < targetObj.children.length; i++) {
-            if (targetObj.children[i].name === selectedObj.name) {
-              dup = 1
-              dup_name = targetObj.children[i].name
-              break
-            }
-          }
-          if(dup == 0) {
-            handleCopy(selectedObj, targetObj);
+      } else if(copyorcut == "cut") {
+        if(!$('#submit_copy').hasClass('disabled')){
+          if(handleCopy(selectedObj, targetObj) == 0){
             handleDelete(selectedObj);
-            if (current === targetObj) {
-              renderFinder(current);
-            }
-            renderHierarchy();
             addCommand(`mv ${selectedObj.name} ${targetObj.path}`);
-            if (modal_on === 1) {
-              if (prev_target !== 0) prev_target.style.color = '#000000';
+            if(modal_on == 1) {
+              if(prev_target != 0) prev_target.style.color = '#000000';
               $('#submit_copy').addClass('disabled');
               $('#modal_popup').hide();
-              modal_on = 0;
+              modal_on =0;
             }
           } else {
             alert(`${dup_name} already exists`);
           }
         }
       }
-    } else {
-      alert('you cannot do recursive copy or move');
     }
   });
 })
@@ -726,6 +700,8 @@ function renderBreadcrumb(current) {
 }
 
 function addCommand(command) {
+  const commandLine = document.getElementById('command_line');
+  commandLine.value = '';
   $('#command_line').popup('destroy');
   const history = document.getElementById('history');
   const newCommand = document.createElement('div');
@@ -761,26 +737,49 @@ function addCommand(command) {
 
   history.scrollTop = history.scrollHeight;
   historyCount += 1;
+  history_stack.push(command);
+  history_index = history_stack.length;
 }
 
 function commandInput(e) {
-  if (currentMode === 'CUI' && e.keyCode === 13) {
+  if (currentMode == 'CUI' && e.keyCode == 13) {
     const commandLine = document.getElementById('command_line');
     const command = commandLine.value;
-    if (command) {
+    if (command){
       handleCommand(command);
     }
-    commandLine.value = '';
   }
-  else if (currentMode === 'GUI' && modal_on >= 2 && e.keyCode === 13) {
-    if (modal_on === 2) $('#rename_submit').trigger('click');
-    if (modal_on === 3) $('#mkdir_submit').trigger('click');
+  else if (currentMode == 'CUI' && e.keyCode == 38) {
+    const commandLine = document.getElementById('command_line');
+    if(history_index == history_stack.length){
+      command_buffer = commandLine.value;
+    }
+    if(history_index > 0){
+      history_index -= 1;
+      commandLine.value = history_stack[history_index];
+    }
   }
-  else if (currentMode === 'GUI' && modal_on >= 2 && e.keyCode === 27) {
-    if (modal_on === 2) $('#modal_popup_rename').trigger('click');
-    if (modal_on === 3) $('#modal_popup_mkdir').trigger('click');
+  else if (currentMode == 'CUI' && e.keyCode == 40) {
+    const commandLine = document.getElementById('command_line');
+    if(history_index < history_stack.length){
+      history_index += 1;
+      if(history_index == history_stack.length){
+        commandLine.value = command_buffer;
+      }
+      else{
+        commandLine.value = history_stack[history_index];
+      }
+    }
   }
-  else if (currentMode === 'GUI' && modal_on === 1 && e.keyCode === 27) {
+  else if (currentMode == 'GUI' && modal_on >= 2 && e.keyCode == 13) {
+    if(modal_on == 2) $('#rename_submit').trigger('click');
+    if(modal_on == 3) $('#mkdir_submit').trigger('click');
+  }
+  else if (currentMode == 'GUI' && modal_on >= 2 && e.keyCode == 27) {
+    if(modal_on == 2) $('#modal_popup_rename').trigger('click');
+    if(modal_on == 3) $('#modal_popup_mkdir').trigger('click');
+  }
+  else if (currentMode == 'GUI' && modal_on == 1 && e.keyCode == 27) {
     $('#modal_popup').trigger('click');
   }
 }
@@ -1003,7 +1002,7 @@ function handleCommand(command) {
               dir_string = dst_arr.join('/') + '/';
               dst_dir_obj = findByPath(dir_string);
             }
-            else if (dst[0] === '~') {
+            else if(dst[0] == '~' || dst === '/'){
               dst_dir_obj = root;
             }
             if (dst_dir_obj === 0 || dst_dir_obj === -1) {
@@ -1018,8 +1017,7 @@ function handleCommand(command) {
                 dst_dir_obj.children.push(newChild);
                 addCommand(command);
               }
-              else if (dst_folder_child.type === 'folder') {
-                console.log('yoyo');
+              else if(dst_folder_child.type === 'folder'){
                 let last_child = hasChildNamed(dst_folder_child, src_obj.name);
                 if (last_child === 0) {
                   let newChild = deepcopy(src_obj);
@@ -1101,7 +1099,7 @@ function handleCommand(command) {
                 dir_string = dst_arr.join('/') + '/';
                 dst_dir_obj = findByPath(dir_string);
               }
-              else if (dst[0] === '~') {
+              else if(dst[0] == '~' || dst === '/'){
                 dst_dir_obj = root;
               }
               if (dst_dir_obj === 0 || dst_dir_obj === -1) {
@@ -1155,7 +1153,7 @@ function handleCommand(command) {
               dir_string = dst_arr.join('/') + '/';
               dst_dir_obj = findByPath(dir_string);
             }
-            else if (dst[0] == '~') {
+            else if(dst[0] == '~' || dst === '/'){
               dst_dir_obj = root;
             }
             if (dst_dir_obj == 0 || dst_dir_obj == -1) {
@@ -1165,6 +1163,7 @@ function handleCommand(command) {
               let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
               if (dst_folder_child == 0) {
                 let newChild = deepcopy(src_obj);
+                newChild.name = dst_filename;
                 replacePath(newChild, src_obj.path, dst_dir_obj.path + dst_filename + '/');
                 dst_dir_obj.children.push(newChild);
                 addCommand(command);
@@ -1367,13 +1366,41 @@ function showErrorMsg(msg) {
 }
 
 
-function handleCopy(obj, dirObj) {
-  const newObj = deepcopy(obj);
-  const orgPath = parentPath(newObj.path);
-  replacePath(newObj, `${orgPath}/`, dirObj.path);
-  dirObj.children.push(newObj);
+// return 0 if success -1 if failed
+function handleCopy(selectedObj, targetObj) {
+  let dst_folder_child = hasChildNamed(targetObj, selectedObj.name);
+  if(dst_folder_child !== 0){
+    if(selectedObj.type === 'folder' && dst_folder_child.type === 'file'){
+      alert(`It already has file named ${selectedObj.name}`);
+      return -1;
+    }
+    else if(selectedObj.type === 'folder' && dst_folder_child.type === 'folder' && dst_folder_child.children.length != 0){
+      alert(`It already has unempty folder named ${selectedObj.name}`);
+      return -1;
+    }
+    else if(selectedObj.type === 'file' && dst_folder_child.type === 'folder'){
+      alert(`It already has folder named ${selectedObj.name}`);
+      return -1;
+    }
+    else{
+      let new_child = deepcopy(selectedObj);
+      replacePath(new_child, getParentObject(selectedObj).path , targetObj.path);
+      if(selectedObj.type === 'file'){
+        dst_folder_child.content = new_child.content;
+      }
+      else{
+        dst_folder_child.children = new_child.children;
+      }
+    }
+  }
+  else{
+    let new_child = deepcopy(selectedObj);
+    replacePath(new_child, getParentObject(selectedObj).path , targetObj.path);
+    targetObj.children.push(new_child);
+  }
   renderHierarchy();
   renderFinder(current);
+  return 0;
 }
 
 function getAbsolutePath(path) {
@@ -1406,7 +1433,6 @@ function replacePath(target, orgPath, newPath) {
     target.children.forEach((child) => replacePath(child, orgPath, newPath))
   }
 }
-
 
 function findByPath(path) {
   if (path === '') return -10;
