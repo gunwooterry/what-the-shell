@@ -358,6 +358,13 @@ $document.ready(() => {
     }
   });
 
+  $('#manual').click(function (event) {
+    if (modal_on !== 0) {
+      $('#manual').hide();
+      modal_on = 0;
+    }
+  });
+
   $('#modal_popup').bind('keydown', function (event) {
     commandInput(event);
   })
@@ -394,6 +401,13 @@ $document.ready(() => {
       $('#submit_copy').removeClass('disabled');
     }
     return false;
+  });
+
+  $('#manual_submit').click(function (event){
+    if (modal_on !== 0) {
+      $('#manual').hide();
+      modal_on = 0;
+    }
   });
 
   $('#submit_copy').click(function (event) {
@@ -1541,14 +1555,19 @@ function closeFile() {
 }
 
 function showManual(command) {
-  const manualModal = document.getElementById('manual');
+  const manualModal = $('#manual');
   const header = document.getElementById('manual_header');
   const description = document.getElementById('manual_desc');
   const parseCmd = command.split(' ');
 
   header.innerHTML = command;
   description.innerHTML = descriptions[parseCmd[0]];
-  manualModal.style.visibility = 'visible';
+  ctxMenu.style.display = '';
+  if (modal_on === 0) {
+    manualModal.show();
+    modal_on = 3;
+  }
+  return false;
 }
 
 function hideManual() {
