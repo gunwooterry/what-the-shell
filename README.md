@@ -1,2 +1,2 @@
-# what-the-shell
+# WhatTheShell
 CS374
