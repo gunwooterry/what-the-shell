@@ -1,6 +1,7 @@
 const descriptions = manuals;
 const $document = $(document);
 var modal_on = 0;
+let manual_on = 0;
 let copyorcut = "copy";
 let root = {
   type: 'folder',
@@ -359,9 +360,9 @@ $document.ready(() => {
   });
 
   $('#manual').click(function (event) {
-    if (modal_on !== 0) {
+    if (manual_on !== 0) {
       $('#manual').hide();
-      modal_on = 0;
+      manual_on = 0;
     }
   });
 
@@ -404,9 +405,9 @@ $document.ready(() => {
   });
 
   $('#manual_submit').click(function (event){
-    if (modal_on !== 0) {
+    if (manual_on !== 0) {
       $('#manual').hide();
-      modal_on = 0;
+      manual_on = 0;
     }
   });
 
@@ -1565,9 +1566,9 @@ function showManual(command) {
   header.innerHTML = command;
   description.innerHTML = descriptions[parseCmd[0]];
   ctxMenu.style.display = '';
-  if (modal_on === 0) {
+  if (manual_on === 0) {
     manualModal.show();
-    modal_on = 3;
+    manual_on = 3;
   }
   return false;
 }
