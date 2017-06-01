@@ -80,19 +80,19 @@ All of the testers have less than a month of Linux shell experience, so they mee
 
 ### Summary of sessions
 P1
-![P1 image](p1.jpg)
+![P1 image](P1.JPG)
 She was the least experienced user in our tests. She even thought that she must type `$` before the command. We thought our descriptions were easy enough, but we found that they need to be more concrete, since some users might suffer from even filling in the blanks.
 
 P2
-![P2 image](p2.jpg)
+![P2 image](P2.JPG)
 He was the only graduate student among the testers. He has some experience in Windows command (DOS), so he is familiar to command line interface despite not knowing concrete Linux commands. He was interested in some advanced commands, so we found that beginners’ needs are not restricted to only simple commands we support.
 
 P3
-![P3 image](p3.jpg)
+![P3 image](P3.JPG)
 He used our interface most actively among participants. He tried many different things while testing, so we could get a lot of insights on safety. Also, he was the one who spoke the most. He told us all the inconveniences he had while testing bluntly, and suggested a lot of strategies for our usability issues.
 
 P4
-![P4 image](p4.jpg)
+![P4 image](P4.JPG)
 She is a freshman in KAIST, and learned Linux for about weeks in SPARCS, a student developer community. She had her own model about file system. For example, she thought that a directory is a virtual ‘cover’, so when she removes a directory without `-r` flag, its contents will remain. We found that we should enable users with wrong user models to use our interface, or make users learn the right model by our interface.
 
 ## Usability lessons
