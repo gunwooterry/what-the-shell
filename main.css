@@ -158,6 +158,11 @@ input.emphasized {
   cursor: pointer;
 }
 
+#go_parent {
+  cursor: pointer;
+  font-size: 24px;
+}
+
 #ctxMenu {
     background: #FFFFFF;
     display:none;

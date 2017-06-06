@@ -452,6 +452,13 @@ $document.ready(() => {
       }
     }
   });
+
+  $('#go_parent').click(function(event) {
+    if (current.path !== root.path) {
+      goto(getParentObject(current));
+      addCommand('cd ..');
+    }
+  })
 })
 
 const arrowBig = 4;
