@@ -485,6 +485,16 @@ function changeModeListener(clicked) {
 
   const guiWindow = document.getElementById('gui_window');
   const commandLine = document.getElementById('command_line');
+  $('#command_line').focus();
+  $('#command_line').autocomplete({
+		source : commandList,
+		select : function( event, ui ) {
+      console.log(ui);
+			// $('#command_line').val()
+			// $('#command_line').click()
+			// ui.item.value = ""
+		}
+	});
 
   const btnToCUI = clicked === 'arrow_btn' && currentMode === 'GUI';
   const btnToGUI = clicked === 'arrow_btn' && currentMode === 'CUI';
@@ -814,8 +824,16 @@ function handleDelete(fileObj) {
   renderFinder(current);
 }
 
+
+
 function handleCommand(command) {
-  // TODO : handle '>'
+  let parser = matchingList[command];
+  if (parser){
+    const commandLine = document.getElementById('command_line');
+    commandLine.value = parser;
+    handleCommand(parser);
+    return;
+  }
   const redirect = command.split(' > ');
   const args = redirect[0].split(' ');
   const op = args[0];                     // operator

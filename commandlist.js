@@ -1,0 +1,38 @@
+let commandList = [
+  'cd',
+  'rm',
+  'mv',
+  'echo',
+  'mkdir',
+  'cat',
+  'cp'
+];
+
+let matchingList = {
+  'change directory': 'cd',
+  'go to': 'cd',
+  'get in': 'cd',
+  'go to': 'cd',
+  'remove': 'rm',
+  'erase': 'rm',
+  'delete': 'rm',
+  'delete file': 'rm',
+  'get rid of': 'rm',
+  'move': 'mv',
+  'move file': 'mv',
+  'move folder': 'mv',
+  'moving': 'mv',
+  'rename': 'mv',
+  'change name': 'mv',
+  'say': 'echo',
+  'repeat': 'echo',
+  'speak': 'echo',
+  'make folder': 'mkdir',
+  'make directory': 'mkdir',
+  'create folder': 'mkdir',
+  'new folder': 'mkdir',
+  'show file': 'cat',
+  'show': 'cat',
+  'copy': 'cp',
+  'duplicate': 'cp',
+}

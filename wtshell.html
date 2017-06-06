@@ -2,13 +2,14 @@
 <html>
 <head>
   <title>What The Shell</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css?family=Lato:400,900|Roboto+Mono" rel="stylesheet">
   <link href="./main.css" rel="stylesheet" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
   <script src="./description.js"></script>
   <script src="./main.js"></script>
+  <script src="./commandlist.js"></script>
 </head>
 <body>
   <div class="ui small secondary pointing menu header_menu1" style="display:block;">
@@ -134,7 +135,7 @@
         <div class="row" style="padding: 0; margin: 0; height: 14px">
         </div>
         <div class="ui segment" style="padding: 0; margin: 0; height: 48px">
-          <input id="command_line" ondblclick="changeModeListener(this.id)"
+          <input id="command_line" autocomplete="on" ondblclick="changeModeListener(this.id)"
           onclick="changeModeListener(this.id)" type="text" name="command"
           placeholder="Type your command here" onkeydown="commandInput(event)"
           data-inverted="" data-variation="very wide large" data-html="" />
