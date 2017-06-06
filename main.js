@@ -228,8 +228,8 @@ $document.ready(() => {
   $document.on('click', '.delete', function (event) {
     event.preventDefault();
     handleDelete(selectedObj);
-    if (selectedObj.fileType === 'folder') addCommand(`rm -rf ${ selectedObj.name }`);
-    else addCommand(`rm -f ${ selectedObj.name }`);
+    if (selectedObj.type === 'folder') addCommand(`rm -r ${ selectedObj.name }`);
+    else addCommand(`rm ${ selectedObj.name }`);
   });
 
   $('#rename_input').on('input', function () {
@@ -604,7 +604,13 @@ function renderHierarchy() {
 
   const sidebar = document.getElementById('sidebar');
   while (sidebar.firstChild) sidebar.removeChild(sidebar.firstChild);
-  sidebar.appendChild(renderHierarchyRec(root));
+  const rootWrapper = {
+    type: 'folder',
+    name: '/',
+    path: '/',
+    children: [deepcopy(root)]
+  }
+  sidebar.appendChild(renderHierarchyRec(rootWrapper));
 }
 
 function renderModalHierarchy() {
