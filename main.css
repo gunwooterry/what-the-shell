@@ -1,6 +1,7 @@
 body {
   font-family: 'Lato', sans-serif;
   overflow-x: scroll;
+  min-height: 1000px;
 }
 
 input {

@@ -212,6 +212,18 @@ $document.ready(() => {
     return false;
   });
 
+  $('#command_line').autocomplete({
+		source : commandList,
+    minLength : 0,
+		select : function( event, ui ) {
+			// $('#command_line').val(ui.item.value);
+      // console.log(ui.item.value);
+      // handleCommand(ui.item.value + " ");
+		}
+	}).focus(function() {
+    $(this).autocomplete("search", $(this).val());
+  });
+
 
   $document.on('click', '.cut', function (event) {
     //event.preventDefault();
@@ -475,6 +487,7 @@ function clear() {
 }
 
 function changeModeListener(clicked) {
+  console.log('hi');
   function emphasize(target) {
     target.classList.add('emphasized');
   }
@@ -485,16 +498,7 @@ function changeModeListener(clicked) {
 
   const guiWindow = document.getElementById('gui_window');
   const commandLine = document.getElementById('command_line');
-  $('#command_line').focus();
-  $('#command_line').autocomplete({
-		source : commandList,
-		select : function( event, ui ) {
-      console.log(ui);
-			// $('#command_line').val()
-			// $('#command_line').click()
-			// ui.item.value = ""
-		}
-	});
+
 
   const btnToCUI = clicked === 'arrow_btn' && currentMode === 'GUI';
   const btnToGUI = clicked === 'arrow_btn' && currentMode === 'CUI';
