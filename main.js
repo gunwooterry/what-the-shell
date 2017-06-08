@@ -59,6 +59,12 @@ let history_stack = [];
 let history_index = 0;
 let command_buffer = '';
 
+const errorLabel = '<div class="ui large red horizontal label">Error</div>';
+const formatLabel = '<div class="ui large grey horizontal label">Format</div>';
+const exampleLabel = '<div class="ui large grey horizontal label">Examples</div>'
+const tryLabel = '<div class="ui large grey horizontal label">Try this</div>'
+const notSupportedLabel = '<div class="ui large yellow horizontal label">Not supported</div>'
+
 $document.ready(() => {
   const $welcome = $('#welcome');
   $welcome.modal({blurring: true}).modal('show', function () {
@@ -857,7 +863,22 @@ function handleCommand(command) {
 
   if (op === 'echo') {
     if (rest.length === 0) {
-      showErrorMsg(`echo usage : echo [string] > [output name] ex) echo "hello,world" > hello.txt`);
+      showErrorMsg(`
+        <table class="ui compact very basic table">
+          <tbody>
+            <tr>
+              <td>${formatLabel}</td>
+              <td>echo [string] > [output file] </td>
+            </tr>
+            <tr>
+              <td>${exampleLabel}</td>
+              <td>
+                echo <b>"Hi"</b> > <b>hi.txt</b>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      `);
       return;
     }
     else if (redirect.length === 2) {
@@ -882,34 +903,88 @@ function handleCommand(command) {
       const path = rest[0];
       const found = findByPath(path);
       console.log(found);
-      if (found <= 0) showErrorMsg('cd usage: no such directory');
+      if (found <= 0) showErrorMsg(`
+        ${errorLabel}
+        Directory <b>${path}</b> does not exist
+      `);
       else {
         current = found;
         addCommand(command);
       }
     } else {
-      showErrorMsg('cd usage : cd [folder name] ex) cd aaa');
+      showErrorMsg(`
+        <table class="ui compact very basic table">
+          <tbody>
+            <tr>
+              <td>${formatLabel}</td>
+              <td>cd [folder]</td>
+            </tr>
+            <tr>
+              <td>${exampleLabel}</td>
+              <td>
+                cd <b>aaa</b>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      `);
     }
   } else if (op === 'mkdir') {
     if (rest.length === 0) {
-      showErrorMsg(`mkdir usage : mkdir [new folder name] ex) mkdir folder1`);
+      showErrorMsg(`
+        <table class="ui compact very basic table">
+          <tbody>
+            <tr>
+              <td>${formatLabel}</td>
+              <td>mkdir [new folder name]</td>
+            </tr>
+            <tr>
+              <td>${exampleLabel}</td>
+              <td>
+                mkdir <b>ccc</b>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      `);
       return;
     } else if (rest.length === 1) {
       let new_name = rest[0];
       if (new_name !== '') {
         if (new_name === ' ') {
-          showErrorMsg(`mkdir usage : mkdir [new folder name] ex) mkdir folder1`);
+          showErrorMsg(`
+            <table class="ui compact very basic table">
+              <tbody>
+                <tr>
+                  <td>${formatLabel}</td>
+                  <td>mkdir [new folder name]</td>
+                </tr>
+                <tr>
+                  <td>${exampleLabel}</td>
+                  <td>
+                    mkdir <b>ccc</b>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          `);
           return;
         } else if (!new_name.includes(' ')) {
           if (hasChildNamed(current, new_name) === 0) {
             addCommand(`mkdir ${new_name}`);
             makeDirectory(new_name);
           } else {
-            showErrorMsg(`${new_name} already exists!`);
+            showErrorMsg(`
+              ${errorLabel}
+              Directory <b>${new_name}</b> already exists
+            `);
             return;
           }
         } else {
-          showErrorMsg('Whitespace on name is not supported yet.. sorry');
+          showErrorMsg(`
+            ${notSupportedLabel}
+            Whitespace on the folder name is not supported yet
+          `);
           return;
         }
       }
@@ -919,15 +994,50 @@ function handleCommand(command) {
     }
   } else if (op === 'rm') {
     if (rest.length === 0) {
-      showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
+      showErrorMsg(`
+        <table class="ui compact very basic table">
+          <tbody>
+            <tr>
+              <td>${formatLabel}</td>
+              <td>rm [options] [folder/file name] </td>
+            </tr>
+            <tr>
+              <td>${exampleLabel}</td>
+              <td>
+                rm <b>README.md</b> <br/>
+                rm -r <b>aaa</b>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      `);
     } else if (rest.length === 1) {
       const path = rest[0];
       if (path.includes('-')) {
-        showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
+        showErrorMsg(`
+          <table class="ui compact very basic table">
+            <tbody>
+              <tr>
+                <td>${formatLabel}</td>
+                <td>rm [options] [folder/file name] </td>
+              </tr>
+              <tr>
+                <td>${exampleLabel}</td>
+                <td>
+                  rm <b>README.md</b> <br/>
+                  rm -r <b>aaa</b>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        `);
       } else {
         let remove_obj = findByPath(path);
         if (remove_obj === 0) {
-          showErrorMsg('rm : no such file or directory ' + path);
+          showErrorMsg(`
+            ${errorLabel}
+            No file or directory named <b>${path}</b>
+          `);
         } else {
           if (remove_obj.type === 'file') {
             let parent_obj = getParentObject(remove_obj);
@@ -939,7 +1049,22 @@ function handleCommand(command) {
             }
             addCommand(command);
           } else {
-            showErrorMsg('rm : ' + path + ' is a directory. <br /> Try rm -r ' + path);
+            showErrorMsg(`
+              <table class="ui compact very basic table">
+                <tbody>
+                  <tr>
+                    <td>${errorLabel}</td>
+                    <td><b>${path}</b> is a directory</td>
+                  </tr>
+                  <tr>
+                    <td>${tryLabel}</td>
+                    <td>
+                      rm <b>-r</b> ${path}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            `);
           }
         }
       }
@@ -947,16 +1072,38 @@ function handleCommand(command) {
       const flag = rest[0];
       const path = rest[1];
       if (!flag.includes('-')) {
-        showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
+        showErrorMsg(`
+          <table class="ui compact very basic table">
+            <tbody>
+              <tr>
+                <td>${formatLabel}</td>
+                <td>rm [options] [folder/file name] </td>
+              </tr>
+              <tr>
+                <td>${exampleLabel}</td>
+                <td>
+                  rm <b>README.md</b> <br/>
+                  rm -r <b>aaa</b>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        `);
       }
       else if (flag === '-r') {
         let remove_obj = findByPath(path);
         if (remove_obj === 0) {
-          showErrorMsg('rm : no such file or directory ' + path);
+          showErrorMsg(`
+            ${errorLabel}
+            No file or directory named <b>${path}</b>
+          `);
         }
         else {
           if (remove_obj.name === '~') {
-            showErrorMsg('rm : cannot remove the root folder');
+            showErrorMsg(`
+              ${errorLabel}
+              Cannot remove the root folder
+            `);
           }
           else {
             let parent_obj = getParentObject(remove_obj);
@@ -973,7 +1120,10 @@ function handleCommand(command) {
       else if (flag === '-f') {
         let remove_obj = findByPath(path);
         if (remove_obj === 0) {
-          showErrorMsg('rm : no such file or directory ' + path);
+          showErrorMsg(`
+            ${errorLabel}
+            No file or directory named <b>${path}</b>
+          `);
         }
         else {
           if (remove_obj.type === 'file') {
@@ -987,7 +1137,22 @@ function handleCommand(command) {
             addCommand(command);
           }
           else {
-            showErrorMsg('rm : ' + path + ' is a directory. <br /> Try rm -r ' + path);
+            showErrorMsg(`
+              <table class="ui compact very basic table">
+                <tbody>
+                  <tr>
+                    <td>${errorLabel}</td>
+                    <td><b>${path}</b> is a directory</td>
+                  </tr>
+                  <tr>
+                    <td>${tryLabel}</td>
+                    <td>
+                      rm <b>-r</b> ${path}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            `);
           }
         }
       }
@@ -996,33 +1161,90 @@ function handleCommand(command) {
       }
     }
     else {
-      showErrorMsg('rm usage : rm [flag (optional)][folder/file name] <br /> ex) rm -r aaa or rm README.md');
+      showErrorMsg(`
+        <table class="ui compact very basic table">
+          <tbody>
+            <tr>
+              <td>${formatLabel}</td>
+              <td>rm [options] [folder/file name] </td>
+            </tr>
+            <tr>
+              <td>${exampleLabel}</td>
+              <td>
+                rm <b>README.md</b> <br/>
+                rm -r <b>aaa</b>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      `);
     }
   } else if (op === 'cp') {
     if (rest.length === 0 || rest.length === 1) {
-      showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] ex) cp README.md bbb');
+      showErrorMsg(`
+        <table class="ui compact very basic table">
+          <tbody>
+            <tr>
+              <td>${formatLabel}</td>
+              <td>cp [options] [files/folders] [destination] </td>
+            </tr>
+            <tr>
+              <td>${exampleLabel}</td>
+              <td>
+                cp README.md bbb <br/>
+                cp -r aaa bbb
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      `);
       return;
     }
     else if (rest.length === 2) {
       const src = rest[0];
       const dst = rest[1];
       if (src.includes('-')) {
-        showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] <br /> ex) cp README.md bbb');
+        showErrorMsg(`
+          <table class="ui compact very basic table">
+            <tbody>
+              <tr>
+                <td>${formatLabel}</td>
+                <td>cp [options] [files/folders] [destination] </td>
+              </tr>
+              <tr>
+                <td>${exampleLabel}</td>
+                <td>
+                  cp README.md bbb <br/>
+                  cp -r aaa bbb
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        `);
         return;
       }
       let src_obj = findByPath(src);
       if (src_obj === 0) {
-        showErrorMsg('No such file named ' + src);
+        showErrorMsg(`
+          ${errorLabel}
+          No file or directory named ${src}
+        `);
       }
       else {
         if (src_obj.type === 'file') {
           if (dst[dst.length - 1] === '/') {
             let dst_obj = findByPath(dst);
             if (dst_obj === 0) {
-              showErrorMsg('cp: directory ' + dst + ' does not exist');
+              showErrorMsg(`
+                ${errorLabel}
+                Directory ${dst} does not exist
+              `);
             }
             else if (dst_obj.type === 'file') {
-              showErrorMsg('cp: directory ' + dst + ' does not exist');
+              showErrorMsg(`
+                ${errorLabel}
+                Directory ${dst} does not exist
+              `);
             }
             else {
               let child = hasChildNamed(dst_obj, src_obj.name);
@@ -1038,7 +1260,10 @@ function handleCommand(command) {
                 addCommand(command);
               }
               else {
-                showErrorMsg('cp: cannot overwrite directory ' + child.name + ' with non-directory ' + src_obj.name);
+                showErrorMsg(`
+                  ${errorLabel}
+                  Cannot overwrite directory ${child.name} with non-directory ${src_obj.name}
+                `);
               }
             }
           }
@@ -1057,7 +1282,10 @@ function handleCommand(command) {
               dst_dir_obj = root;
             }
             if (dst_dir_obj === 0 || dst_dir_obj === -1) {
-              showErrorMsg('cp: directory ' + dst + ' does not exist');
+              showErrorMsg(`
+                ${errorLabel}
+                Directory ${dst} does not exist
+              `);
             }
             else if (dst_dir_obj.type === 'folder') {
               let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
@@ -1077,7 +1305,10 @@ function handleCommand(command) {
                   addCommand(command);
                 }
                 else if (last_child.type === 'folder') {
-                  showErrorMsg('cp: cannot overwrite directory ' + last_child.name + ' with non-directory ' + src_obj.name);
+                  showErrorMsg(`
+                    ${errorLabel}
+                    Cannot overwrite directory ${last_child.name} with non-directory ${src_obj.name}
+                  `);
                 }
                 else {
                   let newChild = deepcopy(src_obj);
@@ -1094,7 +1325,22 @@ function handleCommand(command) {
           }
         }
         else {
-          showErrorMsg('cp : ' + src + ' is a directory. Try cp -r ' + src + ' ' + dst);
+          showErrorMsg(`
+            <table class="ui compact very basic table">
+              <tbody>
+                <tr>
+                  <td>${errorLabel}</td>
+                  <td><b>${path}</b> is a folder</td>
+                </tr>
+                <tr>
+                  <td>${tryLabel}</td>
+                  <td>
+                    cp <b>-r</b> ${src} ${dst}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          `);
         }
       }
     }
@@ -1103,23 +1349,48 @@ function handleCommand(command) {
       const src = rest[1];
       const dst = rest[2];
       if (!flag.includes('-')) {
-        showErrorMsg('cp usage : cp [flag (optional)] [source] [destination] <br /> ex) cp README.md bbb');
+        showErrorMsg(`
+          <table class="ui compact very basic table">
+            <tbody>
+              <tr>
+                <td>${formatLabel}</td>
+                <td>cp [options] [files/folders] [destination] </td>
+              </tr>
+              <tr>
+                <td>${exampleLabel}</td>
+                <td>
+                  cp README.md bbb <br/>
+                  cp -r aaa bbb
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        `);
         return;
       }
       else if (flag === '-r') {
         let src_obj = findByPath(src);
         if (src_obj === 0) {
-          showErrorMsg('No such file named ' + src);
+          showErrorMsg(`
+            ${errorLabel}
+            No file named <b>${src}</b>
+          `);
         }
         else {
           if (src_obj.type === 'file') {
             if (dst[dst.length - 1] === '/') {
               let dst_obj = findByPath(dst);
               if (dst_obj === 0) {
-                showErrorMsg('cp: directory ' + dst + ' does not exist');
+                showErrorMsg(`
+                  ${errorLabel}
+                  Directory <b>${dst}</b> does not exist
+                `);
               }
               else if (dst_obj.type === 'file') {
-                showErrorMsg('cp: directory ' + dst + ' does not exist');
+                showErrorMsg(`
+                  ${errorLabel}
+                  Directory <b>${dst}</b> does not exist
+                `);
               }
               else {
                 let child = hasChildNamed(dst_obj, src_obj.name);
@@ -1135,7 +1406,10 @@ function handleCommand(command) {
                   addCommand(command);
                 }
                 else {
-                  showErrorMsg('cp: cannot overwrite directory ' + child.name + ' with non-directory ' + src_obj.name);
+                  showErrorMsg(`
+                    ${errorLabel}
+                    Cannot overwrite directory <b>${child.name}</b> with non-directory <b>${src_obj.name}</b>
+                  `);
                 }
               }
             }
@@ -1154,7 +1428,10 @@ function handleCommand(command) {
                 dst_dir_obj = root;
               }
               if (dst_dir_obj === 0 || dst_dir_obj === -1) {
-                showErrorMsg('cp: directory ' + dst + ' does not exist');
+                showErrorMsg(`
+                  ${errorLabel}
+                  Directory <b>${dst}</b> does not exist
+                `);
               }
               else if (dst_dir_obj.type === 'folder') {
                 let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
@@ -1174,7 +1451,10 @@ function handleCommand(command) {
                     addCommand(command);
                   }
                   else if (last_child.type === 'folder') {
-                    showErrorMsg('cp: cannot overwrite directory ' + last_child.name + ' with non-directory ' + src_obj.name);
+                    showErrorMsg(`
+                      ${errorLabel}
+                      Cannot overwrite directory <b>${last_child.name}</b> with non-directory <b>${src_obj.name}</b>
+                    `);
                   }
                   else {
                     let newChild = deepcopy(src_obj);
@@ -1208,7 +1488,10 @@ function handleCommand(command) {
               dst_dir_obj = root;
             }
             if (dst_dir_obj == 0 || dst_dir_obj == -1) {
-              showErrorMsg('cp: directory ' + dst + ' does not exist');
+              showErrorMsg(`
+                ${errorLabel}
+                Directory <b>${dst}</b> does not exist
+              `);
             }
             else if (dst_dir_obj.type === 'folder') {
               let dst_folder_child = hasChildNamed(dst_dir_obj, dst_filename);
@@ -1234,12 +1517,18 @@ function handleCommand(command) {
                   addCommand(command);
                 }
                 else {
-                  showErrorMsg('cp: cannot overwrite non-directory ' + last_child.name + ' with directory ' + src_obj.name);
+                  showErrorMsg(`
+                    ${errorLabel}
+                    Cannot overwrite directory <b>${last_child.name}</b> with non-directory <b>${src_obj.name}</b>
+                  `);
 
                 }
               }
               else {
-                showErrorMsg('cp: cannot overwrite non-directory ' + dst_folder_child.name + ' with directory ' + src_obj.name);
+                showErrorMsg(`
+                  ${errorLabel}
+                  Cannot overwrite directory <b>${dst_folder_child.name}</b> with non-directory <b>${src_obj.name}</b>
+                `);
               }
             }
           }
@@ -1252,7 +1541,23 @@ function handleCommand(command) {
     }
   } else if (op === 'mv') {
     if (rest.length == 0 || rest.length == 1) {
-      showErrorMsg('mv usage : mv [source] [destination] <br /> ex) mv file1 folder1');
+      showErrorMsg(`
+        <table class="ui compact very basic table">
+          <tbody>
+            <tr>
+              <td>${formatLabel}</td>
+              <td>mv [source] [destination] </td>
+            </tr>
+            <tr>
+              <td>${exampleLabel}</td>
+              <td>
+                mv hi.txt aaa <br/>
+                mv <b>-r</b> aaa bbb
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      `);
       return;
     }
     let srcPath, dstPath;
@@ -1269,7 +1574,10 @@ function handleCommand(command) {
     if (dstObj != 0) {
       if (dstObj.type == 'file') {
         if (srcObj.type == 'folder') {
-          showErrorMsg(`${dstObj.name} already exists and is not a directory`);
+          showErrorMsg(`
+            ${errorLabel}
+            <b>${dstObj.name}</b> already exists and is not a directory
+          `);
           return;
         } else {
           const newObj = deepcopy(srcObj);
@@ -1336,8 +1644,14 @@ function handleCommand(command) {
             dstObj.children.splice(dup_index, 1);
             dstObj.children.push(newObj);
           } else {
-            if (dstObj.children[dup_index].type == 'folder') showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not a file!`);
-            else if (dstObj.children[dup_index].type == 'file') showErrorMsg(`${dstObj.children[dup_index].name} already exists in the destination and is not a folder!`);
+            if (dstObj.children[dup_index].type == 'folder') showErrorMsg(`
+                ${errorLabel}
+                <b>${dstObj.children[dup_index].name}</b> already exists in the destination folder and is not a file.
+              `);
+            else if (dstObj.children[dup_index].type == 'file') showErrorMsg(`
+                ${errorLabel}
+                <b>${dstObj.children[dup_index].name}</b> already exists in the destination folder and is not a folder.
+              `);
             return;
           }
         } else {
@@ -1359,7 +1673,10 @@ function handleCommand(command) {
       let newName;
       if (dstPathFrags[dstPathFrags.length - 1] === '') {
         if (srcObj.type !== 'folder'){
-          showErrorMsg(`not a directory: ${ srcObj.name }`);
+          showErrorMsg(`
+              ${errorLabel}
+              <b>${srcObj.name}</b> is not a directory.
+            `);
           return;
         }
         newName = dstPathFrags[dstPathFrags.length - 2];
@@ -1374,7 +1691,10 @@ function handleCommand(command) {
       else dstPrevObj = findByAbsolutePath(dstPathFrags.join('/'));
 
       if (dstPrevObj == 0 || dstPrevObj.type != 'folder') { /* dstPrevObj does not exist or it is not a folder */
-        showErrorMsg(`no such directory: ${ rest[1] }`)
+        showErrorMsg(`
+            ${errorLabel}
+            Directory <b>${rest[1]}</b> does not exist.
+          `)
         return;
       } else { /* dstPrevObj is a folder */
         /* rename */

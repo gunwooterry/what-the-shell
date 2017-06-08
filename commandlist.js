@@ -12,7 +12,6 @@ let matchingList = {
   'change directory': 'cd',
   'go to': 'cd',
   'get in': 'cd',
-  'go to': 'cd',
   'remove': 'rm',
   'erase': 'rm',
   'delete': 'rm',
