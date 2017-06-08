@@ -586,19 +586,46 @@ function renderHierarchy() {
         title.id = child.path;
         dropdown.classList.add('dropdown', 'icon');
         icon.classList.add('blue', 'folder', 'icon');
-        icon.onclick = () => {
-          goto(child);
-          addCommand(`cd ${child.path}`);
-        };
-        nameText.onclick = () => {
-          goto(child);
-          addCommand(`cd ${child.path}`);
-        };
 
         title.appendChild(dropdown);
         item.appendChild(icon);
         item.appendChild(nameText);
+        item.onclick = () => {
+          goto(child);
+          addCommand(`cd ${child.path}`);
+        };
+
         title.appendChild(item);
+        title.ondragenter = function(event) {
+          event.preventDefault();
+          return true;
+        }
+
+        title.ondragover = function(event) {
+          event.preventDefault();
+          return true;
+        }
+
+        title.ondrop = function(event) {
+          let dragObjId = event.dataTransfer.getData('id');
+          let dragObj = findByRelativePath(dragObjId);
+          if (this.id !== dragObj.path
+            && this.id !== getParentObject(dragObj).path
+            && this.id.indexOf(dragObj.path) === -1) {
+            let targetObj = findByAbsolutePath(this.id);
+            handleCopy(dragObj, targetObj);
+            handleDelete(dragObj);
+
+            addCommand(`mv ${ dragObj.name } ${ targetObj.path }`);
+          } else if (this.id === getParentObject(dragObj).path) {
+            alert('cannot move to current directory');
+          } else if (this.id.indexOf(dragObj.path) !== -1) {
+            alert('cannot do recursive move');
+          }
+
+          event.stopPropagation();
+        }
+
         currentDir.appendChild(title);
 
         const content = document.createElement('div');
@@ -703,6 +730,39 @@ function renderFinder(current) {
         openFile(child);
         addCommand(`cat ${name}`);
       }
+    }
+
+    unit.draggable = true;
+    unit.ondragstart = function(event) {
+      event.dataTransfer.effectAllowed = 'copy';
+      event.dataTransfer.setData('id', event.target.getAttribute('id'));
+      return true;
+    }
+
+    unit.ondragenter = function(event) {
+      event.preventDefault();
+      return true;
+    }
+
+    unit.ondragover = function(event) {
+      event.preventDefault();
+      return true;
+    }
+
+    unit.ondrop = function(event) {
+      let dragObjId = event.dataTransfer.getData('id');
+      let dragObj = findByRelativePath(dragObjId);
+      if (this.id !== dragObjId) {
+        let targetObj = findByRelativePath(this.id);
+        if (targetObj.type === 'folder') {
+          handleCopy(dragObj, targetObj);
+          handleDelete(dragObj);
+
+          addCommand(`mv ${ dragObj.name } ${ targetObj.name }`);
+        }
+      }
+
+      event.stopPropagation();
     }
 
     unit.appendChild(icon);
@@ -1769,6 +1829,7 @@ function handleCopy(selectedObj, targetObj) {
     replacePath(new_child, getParentObject(selectedObj).path , targetObj.path);
     targetObj.children.push(new_child);
   }
+
   renderHierarchy();
   renderFinder(current);
   return 0;
