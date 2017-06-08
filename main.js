@@ -466,10 +466,9 @@ $document.ready(() => {
   });
 
   $('#go_parent').click(function(event) {
-    if (current.path !== root.path) {
+    if (current.path !== root.path)
       goto(getParentObject(current));
-      addCommand('cd ..');
-    }
+    addCommand('cd ..');
   })
 })
 
