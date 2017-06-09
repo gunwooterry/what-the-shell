@@ -709,7 +709,13 @@ function renderModalHierarchy() {
 
   const hierarchy = document.getElementById('hierarchy');
   while (hierarchy.firstChild) hierarchy.removeChild(hierarchy.firstChild);
-  hierarchy.appendChild(renderModalHierarchyRec(root));
+  const rootWrapper = {
+    type: 'folder',
+    name: '/',
+    path: '/',
+    children: [deepcopy(root)]
+  }
+  hierarchy.appendChild(renderModalHierarchyRec(rootWrapper));
 }
 
 function renderFinder(current) {
