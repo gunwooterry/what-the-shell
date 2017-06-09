@@ -126,7 +126,7 @@ input.emphasized {
 
 .help.icon {
   opacity: 0.6;
-  cursor: crosshair;
+  cursor: pointer;
 }
 
 .help.icon:hover {
