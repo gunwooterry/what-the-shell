@@ -219,13 +219,15 @@ $document.ready(() => {
   });
 
   $('#command_line').autocomplete({
-		source : commandList,
+    source: function (request, response) {
+        var matches = $.map(commandList, function (acItem) {
+            if (acItem.toUpperCase().indexOf(request.term.toUpperCase()) === 0) {
+                return acItem;
+            }
+        });
+        response(matches);
+    },
     minLength : 0,
-		select : function( event, ui ) {
-			// $('#command_line').val(ui.item.value);
-      // console.log(ui.item.value);
-      // handleCommand(ui.item.value + " ");
-		}
 	}).focus(function() {
     $(this).autocomplete("search", $(this).val());
   });
@@ -1410,7 +1412,7 @@ function handleCommand(command) {
               <tbody>
                 <tr>
                   <td>${errorLabel}</td>
-                  <td><b>${path}</b> is a folder</td>
+                  <td><b>${src}</b> is a folder</td>
                 </tr>
                 <tr>
                   <td>${tryLabel}</td>
