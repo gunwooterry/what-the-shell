@@ -126,10 +126,11 @@ input.emphasized {
 
 .help.icon {
   opacity: 0.6;
+  cursor: pointer;
 }
 
 .help.icon:hover {
-  transform: scale(1.5, 1.5) !important; /** default is 1, scale it to 1.5 */
+  transform: scale(1.7, 1.7) !important; /** default is 1, scale it to 1.5 */
   opacity: 1;
 }
 
