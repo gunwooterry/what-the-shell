@@ -4,7 +4,6 @@ let commandList = [
   'mv',
   'echo',
   'mkdir',
-  'cat',
   'cp'
 ];
 
