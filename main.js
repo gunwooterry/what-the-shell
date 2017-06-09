@@ -361,6 +361,19 @@ $document.ready(() => {
     return false;
   });
 
+  $document.on('mouseenter', '.command_element', function (event) {
+    jQuery(this).find("i").css('opacity', '1', 'important');
+    jQuery(this).find("i").addClass('blue');
+    jQuery(this).find("i").css('transform', 'scale(1.3, 1.3)');
+  });
+
+
+  $document.on('mouseleave', '.command_element', function (event) {
+    jQuery(this).find("i").css('opacity', '0.1', 'important');
+    jQuery(this).find("i").removeClass('blue');
+    jQuery(this).find("i").css('transform', 'scale(1, 1)');
+  });
+
 
 // $document.on('click', '.title', function(event) {
 //   //event.preventDefault();
@@ -684,7 +697,7 @@ function renderModalHierarchy() {
         content.appendChild(renderModalHierarchyRec(child));
         currentDir.appendChild(content);
 
-        dropdown.onclick = function () {
+        title.onclick = function () {
           title.classList.toggle('active');
           content.classList.toggle('active');
         }
@@ -828,7 +841,7 @@ function addCommand(command) {
   manualColumn.appendChild(manualButton);
 
   newCommand.id = `command_${historyCount}`;
-  newCommand.classList.add('ui', 'three', 'column', 'grid');
+  newCommand.classList.add('ui', 'three', 'column', 'grid', 'command_element');
   if (historyCount % 2 == 0) newCommand.classList.add('command');
   else newCommand.classList.add('command_color');
 
@@ -840,6 +853,7 @@ function addCommand(command) {
   manualButton.classList.add('one', 'wide', 'column', 'help', 'icon');
   manualButton.style.cssFloat = 'right';
   manualButton.style.margin = 0;
+  manualButton.style.opacity = 0.1;
   manualButton.onclick = function () {
     showManual(command)
   };
