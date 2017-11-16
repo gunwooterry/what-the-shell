@@ -6,8 +6,8 @@ const logoStyle = {
   fontSize: 18,
 };
 
-export default () => (
-  <Segment attached>
+const Header = () => (
+  <Segment attached="top">
     <Container style={logoStyle}>
       <span style={{ fontFamily: 'monospace' }}>>_</span>
       <span>What</span>
@@ -16,3 +16,5 @@ export default () => (
     </Container>
   </Segment>
 );
+
+export default Header;
