@@ -4,6 +4,8 @@ import './App.css';
 
 import Header from '../components/Header';
 import GUIWindow from '../components/GUIWindow';
+import CommandList from '../components/CommandList';
+import Shell from '../components/Shell';
 
 const noPadding = {
   padding: 0,
@@ -13,7 +15,7 @@ export default class App extends Component {
   constructor() {
     super();
     this.state = {
-      isGuiEmphasized: true,
+      isGuiSelected: true,
     };
   }
 
@@ -24,10 +26,16 @@ export default class App extends Component {
         <Container style={{ marginTop: 54, marginBottom: 54, height: 600 }}>
           <Grid style={{ width: 1200 }}>
             <Grid.Column width={8} style={noPadding}>
-              <GUIWindow emphasized={this.state.isGuiEmphasized} />
+              <GUIWindow emphasized={this.state.isGuiSelected} />
             </Grid.Column>
             <Grid.Column width={1} style={noPadding}></Grid.Column>
-            <Grid.Column width={7} style={noPadding}></Grid.Column>
+            <Grid.Column width={7} style={noPadding}>
+              <div style={{ height: 28, textAlign: 'right' }}>
+                <a>Clear History</a>
+              </div>
+              <CommandList />
+              <Shell emphasized={!this.state.isGuiSelected} />
+            </Grid.Column>
           </Grid>
         </Container>
       </div>
