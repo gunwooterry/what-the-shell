@@ -24,6 +24,20 @@ class App extends React.Component<AppProps, AppStates> {
     this.state = {
       isGuiSelected: true,
     };
+    this.modeToGui = this.modeToGui.bind(this);
+    this.modeToCli = this.modeToCli.bind(this);
+  }
+
+  toggleMode(e: Event) {
+    this.setState({ isGuiSelected: !this.state.isGuiSelected });
+  }
+
+  modeToGui(e: Event) {
+    this.setState({ isGuiSelected: true });
+  }
+
+  modeToCli(e: Event) {
+    this.setState({ isGuiSelected: false });
   }
 
   render() {
@@ -33,7 +47,10 @@ class App extends React.Component<AppProps, AppStates> {
         <Container style={{ marginTop: 54, marginBottom: 54, height: 600 }}>
           <Grid style={{ width: 1200 }}>
             <Grid.Column width={8} style={noPadding}>
-              <GUIWindow emphasized={this.state.isGuiSelected}/>
+              <GUIWindow
+                emphasized={this.state.isGuiSelected}
+                modeHandler={this.modeToGui}
+              />
             </Grid.Column>
             <Grid.Column width={1} style={noPadding}>
             </Grid.Column>
@@ -42,7 +59,10 @@ class App extends React.Component<AppProps, AppStates> {
                 <a>Clear History</a>
               </div>
               <CommandList/>
-              <Shell emphasized={!this.state.isGuiSelected}/>
+              <Shell
+                emphasized={!this.state.isGuiSelected}
+                modeHandler={this.modeToCli}
+              />
             </Grid.Column>
           </Grid>
         </Container>
