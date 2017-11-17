@@ -3,7 +3,7 @@ import { Grid, Segment } from 'semantic-ui-react';
 
 interface GUIWindowProps {
   emphasized: boolean;
-  modeHandler: (e: Event) => void;
+  modeHandler: () => void;
 }
 
 const windowStyle = {

@@ -3,7 +3,7 @@ import { Segment } from 'semantic-ui-react';
 
 interface ShellProps {
   emphasized: boolean;
-  modeHandler: (e: Event) => void;
+  modeHandler: () => void;
 }
 
 const shellStyle = {

@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import GUIWindow from '../components/GUIWindow';
 import CommandList from '../components/CommandList';
 import Shell from '../components/Shell';
+import Arrows from '../components/Arrows';
 
 interface AppProps {
 }
@@ -19,24 +20,25 @@ const noPadding = {
 };
 
 class App extends React.Component<AppProps, AppStates> {
-  constructor(props: {}) {
+  constructor(props: AppProps) {
     super(props);
     this.state = {
       isGuiSelected: true,
     };
+    this.toggleMode = this.toggleMode.bind(this);
     this.modeToGui = this.modeToGui.bind(this);
     this.modeToCli = this.modeToCli.bind(this);
   }
 
-  toggleMode(e: Event) {
+  toggleMode() {
     this.setState({ isGuiSelected: !this.state.isGuiSelected });
   }
 
-  modeToGui(e: Event) {
+  modeToGui() {
     this.setState({ isGuiSelected: true });
   }
 
-  modeToCli(e: Event) {
+  modeToCli() {
     this.setState({ isGuiSelected: false });
   }
 
@@ -52,7 +54,11 @@ class App extends React.Component<AppProps, AppStates> {
                 modeHandler={this.modeToGui}
               />
             </Grid.Column>
-            <Grid.Column width={1} style={noPadding}>
+            <Grid.Column width={1} verticalAlign="middle" style={noPadding}>
+              <Arrows
+                isGuiSelected={this.state.isGuiSelected}
+                modeHandler={this.toggleMode}
+              />
             </Grid.Column>
             <Grid.Column width={7} style={noPadding}>
               <div style={{ height: 28, textAlign: 'right' }}>
