@@ -1,6 +1,9 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import { Segment } from 'semantic-ui-react';
-import PropTypes from 'prop-types';
+
+interface ShellProps {
+  emphasized: boolean;
+}
 
 const shellStyle = {
   border: 0,
@@ -21,7 +24,7 @@ const emphasizedStyle = {
   outline: 'none',
 };
 
-class Shell extends Component {
+class Shell extends React.Component<ShellProps> {
   render() {
     return (
       <Segment style={{ padding: 0, margin: 0, height: 48 }}>
@@ -33,10 +36,5 @@ class Shell extends Component {
     );
   }
 }
-
-Shell.propTypes = {
-  emphasized: PropTypes.bool.isRequired,
-};
-
 
 export default Shell;

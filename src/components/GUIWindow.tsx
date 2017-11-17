@@ -1,6 +1,9 @@
-import React, { Component } from 'react';
-import { Segment, Grid } from 'semantic-ui-react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
+import { Grid, Segment } from 'semantic-ui-react';
+
+interface GUIWindowProps {
+  emphasized: boolean;
+}
 
 const windowStyle = {
   marginTop: 0,
@@ -18,7 +21,7 @@ const noPadding = {
   padding: 0,
 };
 
-class GUIWindow extends Component {
+class GUIWindow extends React.Component<GUIWindowProps> {
   render() {
     return (
       <Segment
@@ -26,20 +29,16 @@ class GUIWindow extends Component {
       >
         <Grid celled="internally">
           <Grid.Column width={4} style={noPadding}>
-            <Segment basic />
+            <Segment basic={true}/>
           </Grid.Column>
           <Grid.Column width={12} style={noPadding}>
-            <Segment basic style={{ margin: 0, height: 36 }} />
-            <Segment basic style={{ margin: 0, height: 560 }} />
+            <Segment basic={true} style={{ margin: 0, height: 36 }}/>
+            <Segment basic={true} style={{ margin: 0, height: 560 }}/>
           </Grid.Column>
         </Grid>
       </Segment>
     );
   }
 }
-
-GUIWindow.propTypes = {
-  emphasized: PropTypes.bool.isRequired,
-};
 
 export default GUIWindow;

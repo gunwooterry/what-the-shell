@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import { Segment } from 'semantic-ui-react';
 
 const historyStyle = {
@@ -10,7 +10,7 @@ const historyStyle = {
   overflowY: 'auto',
 };
 
-class CommandList extends Component {
+class CommandList extends React.Component {
   render() {
     return (
       <Segment style={historyStyle}>
