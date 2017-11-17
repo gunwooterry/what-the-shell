@@ -22,7 +22,7 @@ class GUIWindow extends Component {
   render() {
     return (
       <Segment
-        style={this.props.emphasized ? Object.assign(windowStyle, emphasizedStyle) : windowStyle}
+        style={Object.assign(windowStyle, this.props.emphasized && emphasizedStyle)}
       >
         <Grid celled="internally">
           <Grid.Column width={4} style={noPadding}>

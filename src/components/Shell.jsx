@@ -27,7 +27,7 @@ class Shell extends Component {
       <Segment style={{ padding: 0, margin: 0, height: 48 }}>
         <input
           type="text"
-          style={this.props.emphasized ? Object.assign(shellStyle, emphasizedStyle) : shellStyle}
+          style={Object.assign(shellStyle, this.props.emphasized && emphasizedStyle)}
         />
       </Segment>
     );
