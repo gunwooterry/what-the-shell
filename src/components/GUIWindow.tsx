@@ -1,9 +1,14 @@
 import * as React from 'react';
 import { Grid, Segment } from 'semantic-ui-react';
+import { Folder } from '../containers/Entity';
+
+import Breadcrumb from './Breadcrumb';
 
 interface GUIWindowProps {
   emphasized: boolean;
+  currentDirectory: Folder;
   modeHandler: () => void;
+  directoryHandler: (target: Folder) => void;
 }
 
 const windowStyle = {
@@ -34,7 +39,10 @@ class GUIWindow extends React.Component<GUIWindowProps> {
             <Segment basic={true}/>
           </Grid.Column>
           <Grid.Column width={12} style={noPadding}>
-            <Segment basic={true} style={{ margin: 0, height: 36 }}/>
+            <Breadcrumb
+              currentDirectory={this.props.currentDirectory}
+              directoryHandler={this.props.directoryHandler}
+            />
             <Segment basic={true} style={{ margin: 0, height: 560 }}/>
           </Grid.Column>
         </Grid>

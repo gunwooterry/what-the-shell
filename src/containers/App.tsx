@@ -59,7 +59,9 @@ class App extends React.Component<AppProps, AppStates> {
             <Grid.Column width={8} style={noPadding}>
               <GUIWindow
                 emphasized={this.state.isGuiSelected}
+                currentDirectory={this.state.currentDirectory}
                 modeHandler={this.modeToGui}
+                directoryHandler={this.changeDirectory}
               />
             </Grid.Column>
             <Grid.Column width={1} verticalAlign="middle" style={noPadding}>
