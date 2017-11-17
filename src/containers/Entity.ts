@@ -14,6 +14,7 @@ abstract class Entity {
       path = `${current.name}/${path}`;
       current = current.parent;
     }
+    return path;
   }
 }
 

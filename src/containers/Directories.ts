@@ -20,4 +20,6 @@ const img2 = new File('img2');
 downloadsFolder.addChild(imagesFolder);
 imagesFolder.addChildren([img1, img2]);
 
+root.addChildren([documentsFolder, downloadsFolder]);
+
 export { root };
