@@ -3,6 +3,7 @@ import { Grid, Segment } from 'semantic-ui-react';
 
 interface GUIWindowProps {
   emphasized: boolean;
+  modeHandler: () => void;
 }
 
 const windowStyle = {
@@ -25,7 +26,8 @@ class GUIWindow extends React.Component<GUIWindowProps> {
   render() {
     return (
       <Segment
-        style={Object.assign(windowStyle, this.props.emphasized && emphasizedStyle)}
+        onClick={this.props.modeHandler}
+        style={Object.assign({}, windowStyle, this.props.emphasized && emphasizedStyle)}
       >
         <Grid celled="internally">
           <Grid.Column width={4} style={noPadding}>

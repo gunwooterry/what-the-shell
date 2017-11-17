@@ -3,6 +3,7 @@ import { Segment } from 'semantic-ui-react';
 
 interface ShellProps {
   emphasized: boolean;
+  modeHandler: () => void;
 }
 
 const shellStyle = {
@@ -27,10 +28,14 @@ const emphasizedStyle = {
 class Shell extends React.Component<ShellProps> {
   render() {
     return (
-      <Segment style={{ padding: 0, margin: 0, height: 48 }}>
+      <Segment
+        onClick={this.props.modeHandler}
+        style={{ padding: 0, margin: 0, height: 48 }}
+      >
         <input
           type="text"
-          style={Object.assign(shellStyle, this.props.emphasized && emphasizedStyle)}
+          placeholder={'Type your command here'}
+          style={Object.assign({}, shellStyle, this.props.emphasized && emphasizedStyle)}
         />
       </Segment>
     );
