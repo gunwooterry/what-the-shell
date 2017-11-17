@@ -7,12 +7,15 @@ import GUIWindow from '../components/GUIWindow';
 import CommandList from '../components/CommandList';
 import Shell from '../components/Shell';
 import Arrows from '../components/Arrows';
+import { Folder } from './Entity';
+import { root } from './Directories';
 
 interface AppProps {
 }
 
 interface AppStates {
   isGuiSelected: boolean;
+  currentDirectory: Folder;
 }
 
 const noPadding = {
@@ -24,6 +27,7 @@ class App extends React.Component<AppProps, AppStates> {
     super(props);
     this.state = {
       isGuiSelected: true,
+      currentDirectory: root,
     };
     this.toggleMode = this.toggleMode.bind(this);
     this.modeToGui = this.modeToGui.bind(this);
@@ -40,6 +44,10 @@ class App extends React.Component<AppProps, AppStates> {
 
   modeToCli() {
     this.setState({ isGuiSelected: false });
+  }
+
+  changeDirectory(target: Folder) {
+    this.setState({ currentDirectory: target });
   }
 
   render() {
