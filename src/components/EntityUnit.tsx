@@ -7,34 +7,43 @@ interface EntityUnitProps {
   directoryHandler: (target: Folder) => void;
 }
 
+interface EntityUnitStates {
+  selected: boolean;
+}
+
 const iconStyle = {
   margin: 'auto',
   display: 'block',
 };
 
-class EntityUnit extends React.Component<EntityUnitProps> {
+class EntityUnit extends React.Component<EntityUnitProps, EntityUnitStates> {
   constructor(props: EntityUnitProps) {
     super(props);
-    this.moveTo = this.moveTo.bind(this);
+    this.state = {
+      selected: false,
+    };
+    this.select = this.select.bind(this);
   }
 
-  moveTo() {
-    const entity = this.props.entity;
-    if (entity.type === EntityType.folder) {
-      this.props.directoryHandler(entity as Folder);
-    }
+  select() {
+    this.setState({
+      selected: true,
+    });
   }
 
   render() {
-    const icon =
-      this.props.entity.type === EntityType.folder ?
-        <Icon name={'folder'} color={'blue'} size={'huge'} style={iconStyle}/> :
-        <Icon name={'file'} size={'huge'} style={iconStyle}/>;
+    const entity = this.props.entity;
+    const folderIcon = <Icon name={'folder'} color={'blue'} size={'huge'} style={iconStyle}/>;
+    const fileIcon = <Icon name={'file'} size={'huge'} style={iconStyle}/>;
 
     return (
-      <div onDoubleClick={this.moveTo}>
-        {icon}
-        <span style={{ display: 'block' }}>{this.props.entity.name}</span>
+      <div
+        onClick={this.select}
+        onDoubleClick={() => entity.type === EntityType.folder && this.props.directoryHandler(entity as Folder)}
+        style={{ backgroundColor: this.state.selected ? '#AAAAAA' : '#FFFFFF' }}
+      >
+        {entity.type === EntityType.folder ? folderIcon : fileIcon}
+        <span style={{ display: 'block' }}>{entity.name}</span>
       </div>
     );
   }
