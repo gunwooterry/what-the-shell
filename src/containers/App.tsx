@@ -32,6 +32,7 @@ class App extends React.Component<AppProps, AppStates> {
     this.toggleMode = this.toggleMode.bind(this);
     this.modeToGui = this.modeToGui.bind(this);
     this.modeToCli = this.modeToCli.bind(this);
+    this.changeDirectory = this.changeDirectory.bind(this);
   }
 
   toggleMode() {

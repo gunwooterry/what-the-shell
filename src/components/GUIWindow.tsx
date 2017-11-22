@@ -3,6 +3,7 @@ import { Grid, Segment } from 'semantic-ui-react';
 import { Folder } from '../containers/Entity';
 
 import Breadcrumb from './Breadcrumb';
+import Finder from './Finder';
 
 interface GUIWindowProps {
   emphasized: boolean;
@@ -43,7 +44,10 @@ class GUIWindow extends React.Component<GUIWindowProps> {
               currentDirectory={this.props.currentDirectory}
               directoryHandler={this.props.directoryHandler}
             />
-            <Segment basic={true} style={{ margin: 0, height: 560 }}/>
+            <Finder
+              currentDirectory={this.props.currentDirectory}
+              directoryHandler={this.props.directoryHandler}
+            />
           </Grid.Column>
         </Grid>
       </Segment>

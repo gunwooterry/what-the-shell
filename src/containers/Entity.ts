@@ -1,9 +1,9 @@
-enum EntityType {
+export enum EntityType {
   folder,
   file,
 }
 
-abstract class Entity {
+export abstract class Entity {
   public parent?: Folder;
   constructor(public type: EntityType, public name: string) {}
 
