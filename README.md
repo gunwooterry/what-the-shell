@@ -1,21 +1,20 @@
 # WhatTheShell
 
+**Tool for Linux beginners to learn shell commands**
 
-- wtshell.html:
-  - Basic layout and popups are defined
-- main.css:
-  - CSS stylesheet for the entire project
-- description.js:
-  - Includes template strings that contains descriptions for each command. 
-- server.js:
-  - Javascript file just for deployment. No backend logic used. Used node.js, Express.
-- main.js:
-  - Javascript file containing all the logic and dynamic features of the interface
-    - Contains the basic hierachy of folder and files in JSON
-    - Contains function for rendering the directory hierarchy
-    - Handles hovering, clicking, right-clicking and double-clicking or keyboard input events
-    - Parses user commands in CUI input and reflect the change in GUI and history
-    - Handles GUI action and reflect the change in GUI and history
-    - Codes for inserting history
-    - Codes for warning messages
-    
+WhatTheShell is a translator between GUI actions and shell commands.
+Actions like click and double-click, copying and removing files are translated to corresponding commands, and vice versa.
+It currently supports basic Bash commands (e.g. `mv`, `cp`, `rm`).
+
+## Branches
+- `vanilla` - Original work, written in pure (but messy) JavaScript
+- `react` - Being re-written in React and TypeScript
+
+## Contributors
+- Gunwoo Kim - [gunwooterry](https://github.com/gunwooterry)
+- Jooyoung Lee - [leenoix](https://github.com/leenoix)
+- Suhwan Jee - [zeniuus](https://github.com/zeniuus)
+- Youngkyu Hong - [realykhong](https://github.com/realykhong)
+
+## Acknowledgement
+WhatTheShell is a course project of KAIST CS374 (Intro to HCI), instructed by [Juho Kim](https://juhokim.com).
